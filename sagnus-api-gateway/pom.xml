@@ -1,0 +1,81 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.slifesys.sagnus</groupId>
+        <artifactId>sagnus</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>sagnus-api-gateway</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Web / REST -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Segurança (quando plugarmos o módulo security) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Dependências para enxergar os BCs -->
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-cadastro</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-faturamento-nfe</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-financeiro-ctpagar</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-financeiro-ctreceber</artifactId>
+        </dependency>		
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-estoque</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-compra</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-contabil</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-fiscal</artifactId>
+        </dependency>		
+        <!-- Testes -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- empacotar como aplicação Boot -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
