@@ -1,0 +1,8 @@
+# CODEOWNERS - define responsáveis por partes do repositório
+
+*       @seu-usuario-github
+
+/sagnus/sagnus-bc-cadastro/         @seu-usuario-github
+/sagnus/sagnus-bc-faturamento-nfe/  @seu-usuario-github
+/sagnus/sagnus-platform-security/   @seu-usuario-github
+/sagnus/sagnus-shared-api-error/    @seu-usuario-github
