@@ -211,7 +211,7 @@ E siga o padrão de branches:
 
 ## 📜 Licença
 
-(*Definir: MIT, Apache 2.0 ou licença proprietária.*)
+LICENSE (Apache 2.0)
 
 ---
 
