@@ -1,19 +1,11 @@
 spring:
   application:
-    name: sagnus-bc-corp
-
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/sagnus
-#    username: postgres
-#    password: postgres
-#    driver-class-name: org.postgresql.Driver
-
+    name: sagnus-bc-auth
   datasource:
     url: ${SAGNUS_DB_URL:jdbc:postgresql://localhost:5432/sagnus}
     username: ${SAGNUS_DB_USER:postgres}
     password: ${SAGNUS_DB_PASS:}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: validate
@@ -22,11 +14,17 @@ spring:
         globally_quoted_identifiers: true
         default_schema: sagnus
     open-in-view: false
-
   flyway:
     enabled: true
     schemas: sagnus
     baseline-on-migrate: true
 
+sagnus:
+  security:
+    jwt:
+      secret: ${SAGNUS_JWT_SECRET:troque-por-um-secret-com-32+chars}
+      accessTokenMinutes: ${SAGNUS_JWT_ACCESS_MINUTES:30}
+      issuer: ${SAGNUS_JWT_ISSUER:sagnus}
+
 server:
-  port: 8080
+  port: 8082

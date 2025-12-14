@@ -1,0 +1,40 @@
+CREATE SCHEMA IF NOT EXISTS sagnus;
+CREATE SEQUENCE IF NOT EXISTS sagnus.seq_auth_usuario START WITH 1 INCREMENT BY 1 CACHE 1;
+CREATE SEQUENCE IF NOT EXISTS sagnus.seq_auth_perfil START WITH 1 INCREMENT BY 1 CACHE 1;
+
+CREATE TABLE IF NOT EXISTS sagnus.auth_usuario (
+  "ID" numeric(11,0) DEFAULT nextval('sagnus.seq_auth_usuario'::regclass) NOT NULL,
+  "LOGIN" varchar(80) NOT NULL,
+  "SENHA_HASH" varchar(200) NOT NULL,
+  "STATUS" varchar(20) DEFAULT 'ATIVO' NOT NULL,
+  "TOKEN_VERSION" numeric(11,0) DEFAULT 0 NOT NULL,
+  "PESSOA_ID" numeric(11,0),
+  "DT_CRIACAO" timestamptz DEFAULT now() NOT NULL,
+  "USU_CRIACAO" varchar(30),
+  "DT_ALTERACAO" timestamptz,
+  "USU_ALTERACAO" varchar(30),
+  CONSTRAINT "PK_AUTH_USUARIO" PRIMARY KEY ("ID"),
+  CONSTRAINT "UK_AUTH_USUARIO_LOGIN" UNIQUE ("LOGIN")
+);
+
+CREATE TABLE IF NOT EXISTS sagnus.auth_perfil (
+  "ID" numeric(11,0) DEFAULT nextval('sagnus.seq_auth_perfil'::regclass) NOT NULL,
+  "NOME" varchar(80) NOT NULL,
+  CONSTRAINT "PK_AUTH_PERFIL" PRIMARY KEY ("ID"),
+  CONSTRAINT "UK_AUTH_PERFIL_NOME" UNIQUE ("NOME")
+);
+
+CREATE TABLE IF NOT EXISTS sagnus.auth_usuario_perfil (
+  "USUARIO_ID" numeric(11,0) NOT NULL,
+  "PERFIL_ID" numeric(11,0) NOT NULL,
+  CONSTRAINT "PK_AUTH_USUARIO_PERFIL" PRIMARY KEY ("USUARIO_ID","PERFIL_ID"),
+  CONSTRAINT "FK_AUTH_USUARIO_PERFIL_USUARIO" FOREIGN KEY ("USUARIO_ID") REFERENCES sagnus.auth_usuario("ID"),
+  CONSTRAINT "FK_AUTH_USUARIO_PERFIL_PERFIL" FOREIGN KEY ("PERFIL_ID") REFERENCES sagnus.auth_perfil("ID")
+);
+
+-- Seeds mínimos
+INSERT INTO sagnus.auth_perfil("NOME")
+SELECT 'AUTH_ADMIN' WHERE NOT EXISTS (SELECT 1 FROM sagnus.auth_perfil WHERE "NOME"='AUTH_ADMIN');
+
+INSERT INTO sagnus.auth_perfil("NOME")
+SELECT 'ADMIN' WHERE NOT EXISTS (SELECT 1 FROM sagnus.auth_perfil WHERE "NOME"='ADMIN');

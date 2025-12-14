@@ -7,7 +7,7 @@
 
     <parent>
         <groupId>com.slifesys.sagnus</groupId>
-        <artifactId>sagnus</artifactId>
+        <artifactId>sagnus-erp</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
