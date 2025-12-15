@@ -1,23 +1,11 @@
-# sagnus-bc-corp
+# sagnus-bc-corp (Domain A)
 
-BC CORP (Corporate Core) — Shared Kernel leve do SAGNUS ERP.
+Este módulo contém o núcleo do Bounded Context CORP iniciado pela Aggregate Root **Pessoa** (DDD puro).
 
-## Primeiro recorte: Pessoa
+## Estrutura
+- `domain` → modelo e invariantes (sem Spring/JPA)
+- `application` → casos de uso (orquestração)
+- `infrastructure` → (B e C virão depois)
 
-- corp_pessoa
-- corp_pessoa_endereco
-- corp_pessoa_telefone
-- corp_pessoa_contato
-
-## Rodar local
-
-1) Ajuste `application.yml` para o seu Postgres (db/senha).
-2) Rode:
-
-```bash
-mvn -pl sagnus-bc-corp spring-boot:run
-```
-
-Endpoints:
-- GET `/corp/pessoas/{id}`
-- POST `/corp/pessoas`
+## Status
+- Etapa A concluída: VO `Documento` com validação real CPF/CNPJ + demais VOs/AR base.
