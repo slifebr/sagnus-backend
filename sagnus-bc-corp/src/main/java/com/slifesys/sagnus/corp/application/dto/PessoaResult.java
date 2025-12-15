@@ -12,5 +12,6 @@ public class PessoaResult {
     String documento;
     String nome;
     String email;
+    String site;
     boolean ativa;
 }

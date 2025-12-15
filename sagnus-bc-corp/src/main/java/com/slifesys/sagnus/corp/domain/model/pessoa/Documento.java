@@ -37,10 +37,8 @@ public class Documento {
         return raw.replaceAll("\\D", "");
     }
 
-    // ===== CPF =====
     public static boolean isValidCpf(String cpfDigits) {
         if (cpfDigits == null) return false;
-
         String cpf = cpfDigits.replaceAll("\\D", "");
         if (cpf.length() != 11) return false;
         if (allEqual(cpf)) return false;
@@ -54,7 +52,7 @@ public class Documento {
 
     private static int calcCpfDigit(String cpf, int length) {
         int sum = 0;
-        int weight = length + 1; // 10 ou 11
+        int weight = length + 1;
         for (int i = 0; i < length; i++) {
             int num = cpf.charAt(i) - '0';
             sum += num * (weight - i);
@@ -63,10 +61,8 @@ public class Documento {
         return (mod < 2) ? 0 : 11 - mod;
     }
 
-    // ===== CNPJ =====
     public static boolean isValidCnpj(String cnpjDigits) {
         if (cnpjDigits == null) return false;
-
         String cnpj = cnpjDigits.replaceAll("\\D", "");
         if (cnpj.length() != 14) return false;
         if (allEqual(cnpj)) return false;

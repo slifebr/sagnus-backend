@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface PessoaRepository {
     Optional<Pessoa> findById(PessoaId id);
-
     Optional<Pessoa> findByDocumento(String documentoDigits, TipoPessoa tipo);
-
     Pessoa save(Pessoa pessoa);
 }
