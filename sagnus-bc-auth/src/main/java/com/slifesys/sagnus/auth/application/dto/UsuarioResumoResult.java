@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.auth.api.auth.dto;
+package com.slifesys.sagnus.auth.application.dto;
 
 import lombok.Builder;
 import lombok.Value;
@@ -7,13 +7,10 @@ import java.util.Set;
 
 @Value
 @Builder
-public class LoginResponse {
-    String accessToken;
-    String refreshToken;
-    String tokenType;
-    Long expiresInSeconds;
-
+public class UsuarioResumoResult {
+    Long usuarioId;
     String username;
+    boolean ativo;
     Set<String> roles;
 
     Long pessoaId;

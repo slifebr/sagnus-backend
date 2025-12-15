@@ -32,7 +32,9 @@
         <module>sagnus-shared-api-error</module>
         <module>sagnus-platform-security</module>
         <module>sagnus-platform-web</module>
-        <module>sagnus-bc-auth</module>
+        <module>sagnus-bc-corp-api</module>
+         <module>sagnus-bc-auth</module>
+
         <module>sagnus-bc-corp</module>
 <!--        <module>sagnus-bc-faturamento-nfe</module>-->
 

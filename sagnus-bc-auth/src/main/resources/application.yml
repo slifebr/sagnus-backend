@@ -4,27 +4,17 @@ spring:
   datasource:
     url: ${SAGNUS_DB_URL:jdbc:postgresql://localhost:5432/sagnus}
     username: ${SAGNUS_DB_USER:postgres}
-    password: ${SAGNUS_DB_PASS:}
-    driver-class-name: org.postgresql.Driver
+    password: ${SAGNUS_DB_PASS:postgres}
   jpa:
     hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
-        default_schema: sagnus
+      ddl-auto: none
     open-in-view: false
-  flyway:
-    enabled: true
-    schemas: sagnus
-    baseline-on-migrate: true
-
-sagnus:
-  security:
-    jwt:
-      secret: ${SAGNUS_JWT_SECRET:troque-por-um-secret-com-32+chars}
-      accessTokenMinutes: ${SAGNUS_JWT_ACCESS_MINUTES:30}
-      issuer: ${SAGNUS_JWT_ISSUER:sagnus}
 
 server:
-  port: 8082
+  port: ${SAGNUS_AUTH_PORT:8083}
+
+jwt:
+  secret: ${SAGNUS_JWT_SECRET:TROQUE-ISSO-POR-UM-SEGREDO-GRANDE-32+CHARS-PELO-MENOS}
+  accessMinutes: ${SAGNUS_JWT_ACCESS_MINUTES:30}
+  refreshDays: ${SAGNUS_JWT_REFRESH_DAYS:7}
+  issuer: ${SAGNUS_JWT_ISSUER:sagnus}
