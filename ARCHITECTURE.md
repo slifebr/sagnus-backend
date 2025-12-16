@@ -267,4 +267,3 @@ Conventional Commits:
 - **Ports & Adapters:** interfaces (ports) + implementações (adapters) para isolar infra.
 
 ---
-
