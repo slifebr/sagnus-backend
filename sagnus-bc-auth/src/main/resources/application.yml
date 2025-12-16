@@ -1,20 +1,59 @@
 spring:
   application:
+    # Cada BC deve sobrescrever via:
+    # - spring.application.name no seu próprio module (ou profile), OU
+    # - argumento: --spring.application.name=sagnus-bc-<nome>
     name: sagnus-bc-auth
+
+  profiles:
+    # por padrão, não força profile aqui; ative via:
+    spring.profiles.active=local #|prod|test
+    active: ${SPRING_PROFILES_ACTIVE:local}
+
   datasource:
+    # Banco padrão compartilhado (pode ser um por BC no futuro)
     url: ${SAGNUS_DB_URL:jdbc:postgresql://localhost:5432/sagnus}
     username: ${SAGNUS_DB_USER:postgres}
     password: ${SAGNUS_DB_PASS:postgres}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: none
-    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
 
 server:
-  port: ${SAGNUS_AUTH_PORT:8083}
+  # Porta padrão por BC:
+  # - SAGNUS_SERVER_PORT (genérico para qualquer BC)
+  # - ou variáveis específicas (ex.: SAGNUS_AUTH_PORT) com fallback
+  port: ${SAGNUS_SERVER_PORT:${SAGNUS_AUTH_PORT:8080}}
 
-jwt:
-  secret: ${SAGNUS_JWT_SECRET:TROQUE-ISSO-POR-UM-SEGREDO-GRANDE-32+CHARS-PELO-MENOS}
-  accessMinutes: ${SAGNUS_JWT_ACCESS_MINUTES:30}
-  refreshDays: ${SAGNUS_JWT_REFRESH_DAYS:7}
-  issuer: ${SAGNUS_JWT_ISSUER:sagnus}
+# ======================================================
+# Segurança (plataforma) — valores comuns a todos os BCs
+# ======================================================
+sagnus:
+  security:
+    jwt:
+      secret: ${SAGNUS_JWT_SECRET:change-me-32+chars}
+      expiration-minutes: ${SAGNUS_JWT_EXP_MIN:15}
+      refresh-expiration-minutes: ${SAGNUS_JWT_REFRESH_EXP_MIN:60}
+
+# ======================================================
+# Observabilidade / logs (genérico)
+# ======================================================
+logging:
+  level:
+    root: ${SAGNUS_LOG_LEVEL:INFO}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${SAGNUS_MGMT_EXPOSE:health,info}
+  endpoint:
+    health:
+      show-details: ${SAGNUS_HEALTH_DETAILS:never}

@@ -1,19 +1,59 @@
 spring:
   application:
-    name: sagnus-bc-corp
+    # Cada BC deve sobrescrever via:
+    # - spring.application.name no seu próprio module (ou profile), OU
+    # - argumento: --spring.application.name=sagnus-bc-<nome>
+    name: sagnus-bc
+
+  profiles:
+    # por padrão, não força profile aqui; ative via:
+    # --spring.profiles.active=local|prod|test
+    active: ${SPRING_PROFILES_ACTIVE:}
+
   datasource:
+    # Banco padrão compartilhado (pode ser um por BC no futuro)
     url: ${SAGNUS_DB_URL:jdbc:postgresql://localhost:5432/sagnus}
     username: ${SAGNUS_DB_USER:postgres}
     password: ${SAGNUS_DB_PASS:postgres}
+    driver-class-name: org.postgresql.Driver
+
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: none
     properties:
       hibernate:
         format_sql: true
-        jdbc:
-          time_zone: UTC
-    open-in-view: false
+        show_sql: false
 
 server:
-  port: ${SAGNUS_CORP_PORT:8082}
+  # Porta padrão por BC:
+  # - SAGNUS_SERVER_PORT (genérico para qualquer BC)
+  # - ou variáveis específicas (ex.: SAGNUS_AUTH_PORT) com fallback
+  port: ${SAGNUS_SERVER_PORT:${SAGNUS_AUTH_PORT:8080}}
+
+# ======================================================
+# Segurança (plataforma) — valores comuns a todos os BCs
+# ======================================================
+sagnus:
+  security:
+    jwt:
+      secret: ${SAGNUS_JWT_SECRET:change-me-32+chars}
+      expiration-minutes: ${SAGNUS_JWT_EXP_MIN:15}
+      refresh-expiration-minutes: ${SAGNUS_JWT_REFRESH_EXP_MIN:60}
+
+# ======================================================
+# Observabilidade / logs (genérico)
+# ======================================================
+logging:
+  level:
+    root: ${SAGNUS_LOG_LEVEL:INFO}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ${SAGNUS_MGMT_EXPOSE:health,info}
+  endpoint:
+    health:
+      show-details: ${SAGNUS_HEALTH_DETAILS:never}
