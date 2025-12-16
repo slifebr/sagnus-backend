@@ -36,7 +36,8 @@
          <module>sagnus-bc-auth</module>
 
         <module>sagnus-bc-corp</module>
-<!--        <module>sagnus-bc-faturamento-nfe</module>-->
+        <module>sagnus-bc-nfe</module>
+        <!--        <module>sagnus-bc-faturamento-nfe</module>-->
 
 <!--        <module>sagnus-bc-financeiro-ctpagar</module>-->
 <!--        <module>sagnus-bc-financeiro-ctreceber</module>-->
