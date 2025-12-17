@@ -25,6 +25,9 @@ public final class Dinheiro {
     public BigDecimal getValue() {
         return value;
     }
+    public BigDecimal getValor() {
+        return value;
+    }    // alias para value
 
     public Dinheiro add(Dinheiro other) {
         return Dinheiro.of(this.value.add(other.value));

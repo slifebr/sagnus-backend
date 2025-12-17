@@ -1,7 +1,9 @@
 package com.slifesys.sagnus.nfe.domain.model.nfe;
 
-import java.util.UUID;
+import lombok.Value;
 
+import java.util.UUID;
+@Value
 public final class NfeId {
 
     private final String value;
@@ -10,11 +12,15 @@ public final class NfeId {
         this.value = value;
     }
 
-    public static NfeId novo() {
-        return new NfeId(UUID.randomUUID().toString());
-    }
+//    public static NfeId novo() {
+//        return new NfeId(UUID.randomUUID().toString());
+//    }
 
-    public String getValue() {
-        return value;
+//    public String getValue() {        return value;    }
+
+
+    // Método estático para criar o NfeId
+    public static NfeId of(String value) {
+        return new NfeId(value);
     }
 }

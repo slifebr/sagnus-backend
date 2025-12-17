@@ -21,6 +21,9 @@ public final class Quantidade {
     public BigDecimal getValue() {
         return value;
     }
+    public BigDecimal getValor() {
+        return value;
+    }  // alias para value
 
     @Override
     public boolean equals(Object o) {

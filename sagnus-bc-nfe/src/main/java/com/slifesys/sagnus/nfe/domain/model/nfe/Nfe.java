@@ -1,77 +1,83 @@
 package com.slifesys.sagnus.nfe.domain.model.nfe;
 
-import com.slifesys.sagnus.nfe.domain.exception.NfeDomainException;
-import com.slifesys.sagnus.nfe.domain.model.fiscal.Dinheiro;
+import lombok.Getter;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
+@Getter
 public class Nfe {
 
-    private final NfeId id;
+    private NfeId id;
     private final Emitente emitente;
     private final Destinatario destinatario;
-    private final Instant criadaEm;
-
     private NfeStatus status;
+    private Instant createdAt;
+    private Instant updatedAt;
 
+    private final List<NfeItem> itens = new ArrayList<>();
+
+    // construtor principal usado no domínio
     public Nfe(Emitente emitente, Destinatario destinatario) {
-        if (emitente == null || destinatario == null) {
-            throw new NfeDomainException("Emitente e destinatário são obrigatórios");
-        }
-
-        this.id = NfeId.novo();
         this.emitente = emitente;
         this.destinatario = destinatario;
-        this.criadaEm = Instant.now();
         this.status = NfeStatus.RASCUNHO;
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    /** usado pelo mapper para “reidratar” a NFe vinda do banco */
+    public void rehydrate(NfeId id,
+                          NfeStatus status,
+                          Instant createdAt,
+                          Instant updatedAt) {
+        this.id = id;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public void adicionarItem(NfeItem item) {
+        this.itens.add(item);
+        this.updatedAt = Instant.now();
+    }
+
+    /** opcional: para não expor lista mutável */
+    public List<NfeItem> getItens() {
+        return Collections.unmodifiableList(itens);
     }
 
     public void validar() {
-        if (status != NfeStatus.RASCUNHO) {
-            throw new NfeDomainException("NFe não pode ser validada neste estado");
-        }
-        status = NfeStatus.VALIDADA;
+        // Regras mínimas de consistência (MVP)
+        if (emitente == null) throw new IllegalStateException("Emitente é obrigatório.");
+        if (destinatario == null) throw new IllegalStateException("Destinatário é obrigatório.");
+        if (itens == null || itens.isEmpty()) throw new IllegalStateException("A NFe deve possuir itens.");
+
+        // Você pode acrescentar validações por item aqui (NCM/CFOP etc.)
+        // Ex.: validar produto, quantidade > 0, valor unitário >= 0, etc.
+
+        this.status = NfeStatus.VALIDADA;
+        this.updatedAt = Instant.now();
     }
 
     public void emitir() {
-        if (status != NfeStatus.VALIDADA) {
-            throw new NfeDomainException("NFe deve estar VALIDADA para emitir");
-        }
-        status = NfeStatus.EMITIDA;
-    }
-    private final java.util.List<NfeItem> itens = new java.util.ArrayList<>();
-
-    public void adicionarItem(NfeItem item) {
-        if (status != NfeStatus.RASCUNHO) {
-            throw new NfeDomainException("Só pode alterar itens no status RASCUNHO");
-        }
-        if (item == null) throw new IllegalArgumentException("Item é obrigatório");
-        itens.add(item);
-    }
-
-    public java.util.List<NfeItem> getItens() {
-        return java.util.Collections.unmodifiableList(itens);
-    }
-
-    public NfeTotais calcularTotais() {
-        var vProd = Dinheiro.zero();
-        var vDesc = Dinheiro.zero();
-        var vFrete = Dinheiro.zero();
-        var vSeg   = Dinheiro.zero();
-        var vOutro = Dinheiro.zero();
-
-        for (var it : itens) {
-            vProd = vProd.add(it.getValorBruto());
-            vDesc = vDesc.add(it.getDesconto());
-            vFrete = vFrete.add(it.getFrete());
-            vSeg = vSeg.add(it.getSeguro());
-            vOutro = vOutro.add(it.getOutras());
+        // Regra de transição de estado (DDD)
+        if (this.status != NfeStatus.VALIDADA && this.status != NfeStatus.RASCUNHO) {
+            throw new IllegalStateException("NFe não pode ser emitida no status: " + this.status);
         }
 
-        var vNF = vProd.sub(vDesc).add(vFrete).add(vSeg).add(vOutro);
-        return new NfeTotais(vProd, vDesc, vFrete, vSeg, vOutro, vNF);
+        // Se permitir emitir direto do rascunho, chama validar
+        if (this.status == NfeStatus.RASCUNHO) {
+            validar();
+        }
+
+        this.status = NfeStatus.EMITIDA;
+        this.updatedAt = Instant.now();
+
+        // (Opcional) registrar evento de domínio aqui:
+        // domainEvents.add(new NfeEmitidaEvent(...));
     }
 
-    public NfeId getId() { return id; }
-    public NfeStatus getStatus() { return status; }
 }
