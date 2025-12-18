@@ -23,6 +23,8 @@ class NfeXmlGeneratorNfe40AdapterIbsCbsTest {
         var dest = new Destinatario(2L, "Destinatario Teste", DocumentoFiscal.of("12345678000195"));
 
         var nfe = new Nfe(emit, dest);
+
+
         nfe.rehydrate(NfeId.of("NFeTESTE00000000000000000000000000000000000000"), NfeStatus.RASCUNHO, nfe.getCreatedAt(), nfe.getUpdatedAt());
 
         var produto = new ProdutoFiscal(10L, "Produto X", "12345678", "5102", "UN");

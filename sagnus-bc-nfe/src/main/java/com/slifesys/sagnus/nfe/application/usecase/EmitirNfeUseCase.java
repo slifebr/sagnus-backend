@@ -24,6 +24,7 @@ import com.slifesys.sagnus.nfe.domain.model.nfe.Destinatario;
 import com.slifesys.sagnus.nfe.domain.model.nfe.Emitente;
 import com.slifesys.sagnus.nfe.domain.model.nfe.Nfe;
 import com.slifesys.sagnus.nfe.domain.model.nfe.NfeItem;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -49,6 +50,7 @@ public class EmitirNfeUseCase {
         this.eventPublisher = eventPublisher != null ? eventPublisher : event -> {};
     }
 
+    @Transactional
     public EmitirNfeResult execute(EmitirNfeCommand cmd) {
         validarEntrada(cmd);
 
@@ -174,42 +176,42 @@ public class EmitirNfeUseCase {
         );
     }
 
-    
-private Optional<Ibs> parseIbs(EmitirNfeItemCommand it, String itemLabel) {
-    boolean any = it.getIbsBase() != null || it.getIbsAliquota() != null || it.getIbsValor() != null;
-    if (!any) return Optional.empty();
 
-    RtcIbsCbsNormalizer.TaxTriplet t = rtcNormalizer.normalizeTriplet(itemLabel + " IBS", it.getIbsBase(), it.getIbsAliquota(), it.getIbsValor());
-    RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+    private Optional<Ibs> parseIbs(EmitirNfeItemCommand it, String itemLabel) {
+        boolean any = it.getIbsBase() != null || it.getIbsAliquota() != null || it.getIbsValor() != null;
+        if (!any) return Optional.empty();
 
-    return Optional.of(new Ibs(
-            t.base(),
-            t.aliquota(),
-            t.valor(),
-            regime,
-            Optional.empty(),
-            Optional.empty()
-    ));
-}
+        RtcIbsCbsNormalizer.TaxTriplet t = rtcNormalizer.normalizeTriplet(itemLabel + " IBS", it.getIbsBase(), it.getIbsAliquota(), it.getIbsValor());
+        RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+
+        return Optional.of(new Ibs(
+                t.base(),
+                t.aliquota(),
+                t.valor(),
+                regime,
+                Optional.empty(),
+                Optional.empty()
+        ));
+    }
 
 
-private Optional<Cbs> parseCbs(EmitirNfeItemCommand it, String itemLabel) {
-    boolean any = it.getCbsBase() != null || it.getCbsAliquota() != null || it.getCbsValor() != null;
-    if (!any) return Optional.empty();
+    private Optional<Cbs> parseCbs(EmitirNfeItemCommand it, String itemLabel) {
+        boolean any = it.getCbsBase() != null || it.getCbsAliquota() != null || it.getCbsValor() != null;
+        if (!any) return Optional.empty();
 
-    RtcIbsCbsNormalizer.TaxTriplet t = rtcNormalizer.normalizeTriplet(itemLabel + " CBS", it.getCbsBase(), it.getCbsAliquota(), it.getCbsValor());
-    RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+        RtcIbsCbsNormalizer.TaxTriplet t = rtcNormalizer.normalizeTriplet(itemLabel + " CBS", it.getCbsBase(), it.getCbsAliquota(), it.getCbsValor());
+        RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
 
-    return Optional.of(new Cbs(
-            t.base(),
-            t.aliquota(),
-            t.valor(),
-            regime,
-            Optional.empty()
-    ));
-}
+        return Optional.of(new Cbs(
+                t.base(),
+                t.aliquota(),
+                t.valor(),
+                regime,
+                Optional.empty()
+        ));
+    }
 
-private RegimeIbsCbs parseRegime(String regimeStr) {
+    private RegimeIbsCbs parseRegime(String regimeStr) {
         if (regimeStr == null || regimeStr.isBlank()) {
             return RegimeIbsCbs.REGULAR;
         }

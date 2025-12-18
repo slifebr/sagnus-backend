@@ -1,9 +1,10 @@
 package com.slifesys.sagnus.nfe.infrastructure.xml;
 
-
 import com.slifesys.sagnus.nfe.domain.model.imposto.TributosItem;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+
+
 /**
  * Adapter RTC (Reforma Tributária do Consumo).
  *
@@ -15,13 +16,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class NfeXmlGeneratorRtc2025Adapter extends NfeXmlGeneratorNfe40Adapter {
 
-
-
     @Override
     protected String buildRtcExtraGroups(TributosItem trib) {
         // RTC: emite o grupo próprio (det/imposto/IBSCBS)
-        return buildIbsCbsGroup(trib); // <<< emite <IBSCBS>...
+        return buildIbsCbsGroup(trib);
     }
+
     @Override
     protected String buildInfAdProdRtc(TributosItem trib) {
         // RTC: evitamos duplicar IBS/CBS no infAdProd.

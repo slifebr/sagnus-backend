@@ -13,14 +13,15 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NfeXmlGeneratorRtc2025AdapterIbsCbsTest {
 
     @Test
     void deveEmitirGrupoIBSCBSNoRtc() {
-        var emit = new Emitente(1l,"Emitente LTDA", DocumentoFiscal.of("12345678000199"));
-        var dest = new Destinatario(2l,"Cliente SA", DocumentoFiscal.of("99887766000155"));
+        var emit = new Emitente(1l, "Emitente LTDA", DocumentoFiscal.of("12345678000199"));
+        var dest = new Destinatario(2l, "Cliente SA", DocumentoFiscal.of("99887766000155"));
 
         var produto = new ProdutoFiscal(10L, "Produto X", "12345678", "5102", "UN");
 
@@ -41,15 +42,14 @@ class NfeXmlGeneratorRtc2025AdapterIbsCbsTest {
                 Optional.of(new CClassTrib("000000"))
         );
 
-        var item = new NfeItem(1, produto, Quantidade.of(new BigDecimal("1")),
-                Dinheiro.of(new BigDecimal("100.00")),
-                Dinheiro.zero(), Dinheiro.zero(), Dinheiro.zero(), Dinheiro.zero(),
-                trib);
-
-        //var nfe = new Nfe(NfeId.of("TEMP123"), emit, dest, java.util.List.of(item));
+        var item = new NfeItem(1,
+                                produto,
+                                Quantidade.of(new BigDecimal("1")),
+                                Dinheiro.of(new BigDecimal("100.00")),
+                                Dinheiro.zero(), Dinheiro.zero(), Dinheiro.zero(), Dinheiro.zero(),
+                                trib);
 
         var nfe = new Nfe(emit, dest);
-        //adiciona os itens
         nfe.adicionarItem(item);
 
         var adapter = new NfeXmlGeneratorRtc2025Adapter();

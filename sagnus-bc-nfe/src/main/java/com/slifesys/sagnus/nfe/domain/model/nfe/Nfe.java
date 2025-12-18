@@ -26,8 +26,6 @@ public class Nfe {
         this.status = NfeStatus.RASCUNHO;
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
-
-
     }
 
     /** usado pelo mapper para “reidratar” a NFe vinda do banco */
