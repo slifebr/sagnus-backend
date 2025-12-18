@@ -18,18 +18,9 @@ Pipeline:
 sagnus:
   nfe:
     xml:
-      # NFE40 (default) | RTC2025
-      layout: NFE40
       store: filesystem
       dir: ./var/nfe/xml
 ```
-
-### Feature-flag de layout
-- `layout: NFE40` (default) -> habilita `NfeXmlGeneratorNfe40Adapter`
-- `layout: RTC2025` -> habilita `NfeXmlGeneratorRtc2025Adapter`
-
-Obs.: os adapters são controlados por `@ConditionalOnProperty`, então somente um bean de `NfeXmlGeneratorPort`
-fica ativo por vez, evitando ambiguidade de injeção.
 
 ## Integração necessária
 Você precisa de pelo menos 1 implementação de `NfeFinderPort`.
@@ -37,3 +28,15 @@ Você precisa de pelo menos 1 implementação de `NfeFinderPort`.
 - JPA: repo.findById + mapper Entity->Domain
 
 Se quiser, eu já te entrego o `NfeFinderPort` pronto (InMemory + JPA) alinhado ao seu código atual.
+
+## Reforma Tributária (RTC) — IBS/CBS (stub)
+
+O domínio já possui `Ibs` / `Cbs` em `TributosItem` (Fiscal v2). Neste MVP, o `NfeXmlGeneratorNfe40Adapter` **não gera ainda o Grupo UB oficial (det/imposto/IBSCBS)**.
+
+O que já foi plugado:
+- Se existir IBS/CBS no item, o adapter preenche `<det><prod><infAdProd>` com uma string curta (`RTC:IBS[...] ; CBS[...]`) limitada a 500 chars.
+- O `<det><imposto><vTotTrib>` passa a somar também IBS + CBS (além dos tributos legados quando presentes no domínio).
+
+Próximo passo (quando for aderir ao schema RTC / NT 2025.002):
+- Modelar `CST-IBS/CBS` e `cClassTrib` no domínio.
+- Gerar efetivamente `<det><imposto><IBSCBS>...` com IBSUF/IBSMun/CBS e totalizadores W03.

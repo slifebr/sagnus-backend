@@ -3,6 +3,8 @@ package com.slifesys.sagnus.nfe.infrastructure.xml;
 import com.slifesys.sagnus.nfe.application.port.NfeXmlGeneratorPort;
 import com.slifesys.sagnus.nfe.domain.model.nfe.Nfe;
 import com.slifesys.sagnus.nfe.domain.model.nfe.NfeItem;
+import com.slifesys.sagnus.nfe.domain.model.imposto.TributosItem;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -11,6 +13,7 @@ import java.util.Objects;
 /**
  * Gerador XML mínimo NF-e 4.00 (sem assinatura, sem validação XSD nesta fase).
  */
+@ConditionalOnProperty(prefix = "sagnus.nfe.xml", name = "layout", havingValue = "NFE40", matchIfMissing = true)
 @Component
 public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
 
@@ -56,7 +59,16 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
 
             sb.append("</prod>");
 
-            // aqui entra <imposto> depois que você ligar o pacote fiscal v2
+            // ======= Impostos =======
+            TributosItem trib = it.getTributos();
+            sb.append("<imposto>");
+            sb.append("<vTotTrib>").append(fmt(calcVTotTrib(trib))).append("</vTotTrib>");
+            String ibsCbsGroup = buildIbsCbsGroup(trib);
+            if (!ibsCbsGroup.isBlank()) {
+                sb.append(ibsCbsGroup);
+            }
+            sb.append("</imposto>");
+
             sb.append("</det>");
         }
 
@@ -145,41 +157,6 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
             sb.append("</det>");
         }
 
-/*
-        for (NfeItem it : nfe.getItens()) {
-            sb.append("<det nItem=\"").append(it.getNItem()).append("\">");
-            sb.append("<prod>");
-            sb.append("<cProd>").append(it.getProduto().getProdutoId()).append("</cProd>");
-            sb.append("<xProd>").append(escape(it.getProduto().getDescricao())).append("</xProd>");
-            sb.append("<NCM>").append(escape(it.getProduto().getNcm())).append("</NCM>");
-            sb.append("<CFOP>").append(escape(it.getProduto().getCfop())).append("</CFOP>");
-            sb.append("<uCom>").append(escape(it.getProduto().getUCom())).append("</uCom>");
-            sb.append("<qCom>").append(fmt(it.getQuantidade().getValor())).append("</qCom>");
-            sb.append("<vUnCom>").append(fmt(it.getValorUnitario().getValor())).append("</vUnCom>");
-
-            BigDecimal vProd = it.getQuantidade().getValor().multiply(it.getValorUnitario().getValor());
-            sb.append("<vProd>").append(fmt(vProd)).append("</vProd>");
-
-            BigDecimal desc = it.getDesconto() != null ? it.getDesconto().getValor() : BigDecimal.ZERO;
-            BigDecimal frete = it.getFrete() != null ? it.getFrete().getValor() : BigDecimal.ZERO;
-            BigDecimal seg = it.getSeguro() != null ? it.getSeguro().getValor() : BigDecimal.ZERO;
-            BigDecimal outro = it.getOutras() != null ? it.getOutras().getValor() : BigDecimal.ZERO;
-
-            sb.append("<vDesc>").append(fmt(desc)).append("</vDesc>");
-            if (frete.compareTo(BigDecimal.ZERO) > 0) sb.append("<vFrete>").append(fmt(frete)).append("</vFrete>");
-            if (seg.compareTo(BigDecimal.ZERO) > 0) sb.append("<vSeg>").append(fmt(seg)).append("</vSeg>");
-            if (outro.compareTo(BigDecimal.ZERO) > 0) sb.append("<vOutro>").append(fmt(outro)).append("</vOutro>");
-            sb.append("</prod>");
-            sb.append("<imposto><vTotTrib>0.00</vTotTrib></imposto>");
-            sb.append("</det>");
-
-            vProdTotal = vProdTotal.add(vProd);
-            vDescTotal = vDescTotal.add(desc);
-            vFreteTotal = vFreteTotal.add(frete);
-            vSegTotal = vSegTotal.add(seg);
-            vOutroTotal = vOutroTotal.add(outro);
-        }
-*/
         sb.append("<total><ICMSTot>");
         sb.append("<vProd>").append(fmt(vProdTotal)).append("</vProd>");
         sb.append("<vDesc>").append(fmt(vDescTotal)).append("</vDesc>");
@@ -206,10 +183,79 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
         if (v == null) return "0.00";
         return v.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
     }
+
+
+    private static String fmtAliq(BigDecimal v) {
+        if (v == null) return "0.0000";
+        return v.setScale(4, BigDecimal.ROUND_HALF_UP).toPlainString();
+    }
+
+    private static BigDecimal calcVTotTrib(TributosItem trib) {
+        if (trib == null) return BigDecimal.ZERO;
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        if (trib.getIbs() != null && trib.getIbs().isPresent()) {
+            total = total.add(trib.getIbs().get().valor());
+        }
+        if (trib.getCbs() != null && trib.getCbs().isPresent()) {
+            total = total.add(trib.getCbs().get().valor());
+        }
+
+        // (MVP) aqui pode somar ICMS/PIS/COFINS/IPI quando o adapter fiscal legado for ligado
+        return total;
+    }
+
+    /**
+     * Grupo RTC IBS/CBS dentro de <imposto>.
+     *
+     * Mapeamento inicial (enxuto):
+     * - CST: usa o valor do domínio, ou default "000"
+     * - cClassTrib: usa o valor do domínio, ou default CST+"000" (ex.: "000000")
+     *
+     * OBS: este grupo é da adequação RTC; em ambientes que não validem XSD RTC,
+     * você pode habilitar via feature flag.
+     */
+    private static String buildIbsCbsGroup(TributosItem trib) {
+        if (trib == null) return "";
+
+        boolean hasIbs = trib.getIbs() != null && trib.getIbs().isPresent();
+        boolean hasCbs = trib.getCbs() != null && trib.getCbs().isPresent();
+        if (!hasIbs && !hasCbs) return "";
+
+        String cst = trib.getCstIbsCbs().map(v -> v.getValor()).orElse("000");
+        String cClassTrib = trib.getCClassTrib().map(v -> v.getValor()).orElse(cst + "000");
+
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("<IBSCBS>");
+        sb.append("<CST>").append(cst).append("</CST>");
+        sb.append("<cClassTrib>").append(cClassTrib).append("</cClassTrib>");
+
+        if (hasIbs) {
+            var ibs = trib.getIbs().get();
+            sb.append("<vBC>").append(fmt(ibs.base())).append("</vBC>");
+            sb.append("<pIBS>").append(fmtAliq(ibs.aliquota())).append("</pIBS>");
+            sb.append("<vIBS>").append(fmt(ibs.valor())).append("</vIBS>");
+        }
+
+        if (hasCbs) {
+            var cbs = trib.getCbs().get();
+            if (!hasIbs) {
+                sb.append("<vBC>").append(fmt(cbs.base())).append("</vBC>");
+            }
+            sb.append("<pCBS>").append(fmtAliq(cbs.aliquota())).append("</pCBS>");
+            sb.append("<vCBS>").append(fmt(cbs.valor())).append("</vCBS>");
+        }
+
+        sb.append("</IBSCBS>");
+        return sb.toString();
+    }
+
     private static String fmtLongToStr(Long v) {
         if (v == null) return "0";
         return v.toString();
     }
+    
     private static String escape(String v) {
         if (v == null) return "";
         return v.replace("&", "&amp;")

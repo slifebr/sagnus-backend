@@ -1,4 +1,5 @@
 **/application*.yml
+**/_patch_*/**
 
 # Maven
 target/
