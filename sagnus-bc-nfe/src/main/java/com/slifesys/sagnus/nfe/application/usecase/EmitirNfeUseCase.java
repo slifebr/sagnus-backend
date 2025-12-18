@@ -4,9 +4,12 @@ import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
 import com.slifesys.sagnus.nfe.application.command.EmitirNfeCommand;
 import com.slifesys.sagnus.nfe.application.command.EmitirNfeItemCommand;
 import com.slifesys.sagnus.nfe.application.port.CorpPessoaGatewayPort;
+import com.slifesys.sagnus.nfe.application.port.DomainEventPublisher;
 import com.slifesys.sagnus.nfe.application.port.NfeRepository;
 import com.slifesys.sagnus.nfe.application.result.EmitirNfeResult;
 import com.slifesys.sagnus.nfe.application.service.RtcIbsCbsNormalizer;
+import com.slifesys.sagnus.nfe.application.context.CorrelationIdHolder;
+import com.slifesys.sagnus.nfe.domain.event.NfeEmitidaEvent;
 import com.slifesys.sagnus.nfe.domain.exception.NfeDomainException;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.Dinheiro;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.ProdutoFiscal;
@@ -24,6 +27,7 @@ import com.slifesys.sagnus.nfe.domain.model.nfe.NfeItem;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -33,11 +37,16 @@ public class EmitirNfeUseCase {
     private final NfeRepository nfeRepository;
     private final CorpPessoaGatewayPort corpPessoaGateway;
     private final RtcIbsCbsNormalizer rtcNormalizer;
+    private final DomainEventPublisher eventPublisher;
 
-    public EmitirNfeUseCase(NfeRepository nfeRepository, CorpPessoaGatewayPort corpPessoaGateway, RtcIbsCbsNormalizer rtcNormalizer) {
+    public EmitirNfeUseCase(NfeRepository nfeRepository,
+                            CorpPessoaGatewayPort corpPessoaGateway,
+                            RtcIbsCbsNormalizer rtcNormalizer,
+                            DomainEventPublisher eventPublisher) {
         this.nfeRepository = nfeRepository;
         this.corpPessoaGateway = corpPessoaGateway;
         this.rtcNormalizer = rtcNormalizer;
+        this.eventPublisher = eventPublisher != null ? eventPublisher : event -> {};
     }
 
     public EmitirNfeResult execute(EmitirNfeCommand cmd) {
@@ -76,6 +85,16 @@ public class EmitirNfeUseCase {
 
         // 4) persiste
         Nfe saved = nfeRepository.save(nfe);
+
+        // 5) publica evento (gera XML, auditoria, etc.)
+        String cid = CorrelationIdHolder.get();
+        eventPublisher.publish(NfeEmitidaEvent.builder()
+                .correlationId(cid)
+                .nfeId(saved.getId().getValue())
+                .emitentePessoaId(saved.getEmitente().getPessoaId())
+                .destinatarioPessoaId(saved.getDestinatario().getPessoaId())
+                .status(saved.getStatus().name())
+                .build());
 
         return EmitirNfeResult.builder()
                 .nfeId(saved.getId().getValue())
@@ -133,8 +152,10 @@ public class EmitirNfeUseCase {
      * ICMS/PIS/COFINS/IPI seguem placeholders por enquanto.
      */
     private TributosItem montarTributos(EmitirNfeItemCommand it) {
-        Optional<Ibs> ibs = parseIbs(it);
-        Optional<Cbs> cbs = parseCbs(it);
+        String itemLabel = "Item " + it.getNItem() + " (produtoId=" + it.getProdutoId() + ")";
+
+        Optional<Ibs> ibs = parseIbs(it, itemLabel);
+        Optional<Cbs> cbs = parseCbs(it, itemLabel);
 
         Optional<CstIbsCbs> cst = (it.getCstIbsCbs() == null || it.getCstIbsCbs().isBlank())
                 ? Optional.empty()
@@ -153,46 +174,42 @@ public class EmitirNfeUseCase {
         );
     }
 
-    private Optional<Ibs> parseIbs(EmitirNfeItemCommand it) {
-        boolean any = it.getIbsBase() != null || it.getIbsAliquota() != null || it.getIbsValor() != null;
-        if (!any) return Optional.empty();
+    
+private Optional<Ibs> parseIbs(EmitirNfeItemCommand it, String itemLabel) {
+    boolean any = it.getIbsBase() != null || it.getIbsAliquota() != null || it.getIbsValor() != null;
+    if (!any) return Optional.empty();
 
-        if (it.getIbsBase() == null || it.getIbsAliquota() == null || it.getIbsValor() == null) {
-            throw new NfeDomainException("RTC IBS: informe base, aliquota e valor (todos)");
-        }
+    RtcIbsCbsNormalizer.TaxTriplet t = rtcNormalizer.normalizeTriplet(itemLabel + " IBS", it.getIbsBase(), it.getIbsAliquota(), it.getIbsValor());
+    RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
 
-        RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+    return Optional.of(new Ibs(
+            t.base(),
+            t.aliquota(),
+            t.valor(),
+            regime,
+            Optional.empty(),
+            Optional.empty()
+    ));
+}
 
-        return Optional.of(new Ibs(
-                it.getIbsBase(),
-                it.getIbsAliquota(),
-                it.getIbsValor(),
-                regime,
-                Optional.empty(),
-                Optional.empty()
-        ));
-    }
 
-    private Optional<Cbs> parseCbs(EmitirNfeItemCommand it) {
-        boolean any = it.getCbsBase() != null || it.getCbsAliquota() != null || it.getCbsValor() != null;
-        if (!any) return Optional.empty();
+private Optional<Cbs> parseCbs(EmitirNfeItemCommand it, String itemLabel) {
+    boolean any = it.getCbsBase() != null || it.getCbsAliquota() != null || it.getCbsValor() != null;
+    if (!any) return Optional.empty();
 
-        if (it.getCbsBase() == null || it.getCbsAliquota() == null || it.getCbsValor() == null) {
-            throw new NfeDomainException("RTC CBS: informe base, aliquota e valor (todos)");
-        }
+    RtcIbsCbsNormalizer.TaxTriplet t = rtcNormalizer.normalizeTriplet(itemLabel + " CBS", it.getCbsBase(), it.getCbsAliquota(), it.getCbsValor());
+    RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
 
-        RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+    return Optional.of(new Cbs(
+            t.base(),
+            t.aliquota(),
+            t.valor(),
+            regime,
+            Optional.empty()
+    ));
+}
 
-        return Optional.of(new Cbs(
-                it.getCbsBase(),
-                it.getCbsAliquota(),
-                it.getCbsValor(),
-                regime,
-                Optional.empty()
-        ));
-    }
-
-    private RegimeIbsCbs parseRegime(String regimeStr) {
+private RegimeIbsCbs parseRegime(String regimeStr) {
         if (regimeStr == null || regimeStr.isBlank()) {
             return RegimeIbsCbs.REGULAR;
         }

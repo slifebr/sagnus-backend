@@ -15,7 +15,9 @@ import lombok.ToString;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class NfeEmitidaEvent extends AbstractDomainEvent {
+public class NfeEmitidaEvent extends AbstractDomainEvent implements CorrelatedDomainEvent {
+
+    private final String correlationId;
 
     private final String nfeId;
     private final Long emitentePessoaId;
@@ -23,14 +25,21 @@ public class NfeEmitidaEvent extends AbstractDomainEvent {
     private final String status;
 
     @Builder
-    public NfeEmitidaEvent(String nfeId,
+    public NfeEmitidaEvent(String correlationId,
+                           String nfeId,
                            Long emitentePessoaId,
                            Long destinatarioPessoaId,
                            String status) {
         super();
+        this.correlationId = correlationId;
         this.nfeId = nfeId;
         this.emitentePessoaId = emitentePessoaId;
         this.destinatarioPessoaId = destinatarioPessoaId;
         this.status = status;
+    }
+
+    @Override
+    public String getCorrelationId() {
+        return correlationId;
     }
 }

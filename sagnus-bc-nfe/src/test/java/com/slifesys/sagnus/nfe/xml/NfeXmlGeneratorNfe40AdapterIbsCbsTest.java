@@ -73,12 +73,10 @@ class NfeXmlGeneratorNfe40AdapterIbsCbsTest {
         String xml = adapter.generateXml(nfe);
 
         assertTrue(xml.contains("<imposto>"), "deve conter <imposto>");
-        assertTrue(xml.contains("<IBSCBS>"), "deve conter o grupo IBSCBS");
-        assertTrue(xml.contains("<CST>000</CST>"), "deve conter CST");
-        assertTrue(xml.contains("<cClassTrib>000000</cClassTrib>"), "deve conter cClassTrib");
-        assertTrue(xml.contains("<vIBS>0.10</vIBS>"), "deve conter vIBS");
-        assertTrue(xml.contains("<vCBS>0.90</vCBS>"), "deve conter vCBS");
-
+        assertTrue(xml.contains("<infAdProd>"), "deve conter infAdProd para transportar IBS/CBS no layout NFE40");
+        assertTrue(xml.contains("RTC:IBS[bc=100.00;p=0.1000;v=0.10]"), "deve conter IBS em infAdProd");
+        assertTrue(xml.contains("CBS[bc=100.00;p=0.9000;v=0.90]"), "deve conter CBS em infAdProd");
+        assertFalse(xml.contains("<IBSCBS>"), "layout NFE40 não deve emitir tags RTC (IBSCBS)");
         // vTotTrib = IBS + CBS = 1.00
         assertTrue(xml.contains("<vTotTrib>1.00</vTotTrib>"), "deve somar IBS + CBS no vTotTrib");
     }

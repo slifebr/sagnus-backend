@@ -27,12 +27,15 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         sb.append("<nfeProc xmlns=\"http://www.portalfiscal.inf.br/nfe\" versao=\"4.00\">");
         sb.append("<NFe>");
-        sb.append("<infNFe Id=\"").append(escape(nfe.getId().getValue())).append("\" versao=\"4.00\">");
+        //sb.append("<infNFe Id=\"").append(escape(nfe.getId().getValue())).append("\" versao=\"4.00\">");
+        String infNfeId = buildInfNfeId(nfe);
+        sb.append("<infNFe Id=\"").append(escape(infNfeId)).append("\" versao=\"4.00\">");
 
         // ======= Itens =======
         int idx = 1;
         for (NfeItem it : nfe.getItens()) {
             sb.append("<det nItem=\"").append(idx++).append("\">");
+            TributosItem trib = it.getTributos();
             sb.append("<prod>");
 
             sb.append("<cProd>").append(escape(fmtLongToStr(it.getProduto().getProdutoId()))).append("</cProd>");
@@ -47,25 +50,27 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
             var vProd = it.getQuantidade().getValor().multiply(it.getValorUnitario().getValor());
             sb.append("<vProd>").append(fmt(vProd)).append("</vProd>");
 
-            var desc = it.getDesconto().getValor();
-            var frete = it.getFrete().getValor();
-            var seg = it.getSeguro().getValor();
-            var outro = it.getOutras().getValor();
+            var desc = it.getDesconto() != null ? it.getDesconto().getValor() : BigDecimal.ZERO;
+            var frete = it.getFrete() != null ? it.getFrete().getValor() : BigDecimal.ZERO;
+            var seg = it.getSeguro() != null ? it.getSeguro().getValor() : BigDecimal.ZERO;
+            var outro = it.getOutras() != null ? it.getOutras().getValor() : BigDecimal.ZERO;
 
             if (desc.compareTo(BigDecimal.ZERO) > 0) sb.append("<vDesc>").append(fmt(desc)).append("</vDesc>");
             if (frete.compareTo(BigDecimal.ZERO) > 0) sb.append("<vFrete>").append(fmt(frete)).append("</vFrete>");
             if (seg.compareTo(BigDecimal.ZERO) > 0) sb.append("<vSeg>").append(fmt(seg)).append("</vSeg>");
             if (outro.compareTo(BigDecimal.ZERO) > 0) sb.append("<vOutro>").append(fmt(outro)).append("</vOutro>");
 
+            String infAdProd = buildInfAdProdRtc(trib);
+            if (!infAdProd.isBlank()) sb.append("<infAdProd>").append(escape(infAdProd)).append("</infAdProd>");
+
             sb.append("</prod>");
 
             // ======= Impostos =======
-            TributosItem trib = it.getTributos();
             sb.append("<imposto>");
             sb.append("<vTotTrib>").append(fmt(calcVTotTrib(trib))).append("</vTotTrib>");
-            String ibsCbsGroup = buildIbsCbsGroup(trib);
-            if (!ibsCbsGroup.isBlank()) {
-                sb.append(ibsCbsGroup);
+            String rtcExtra = buildRtcExtraGroups(trib);
+            if (!rtcExtra.isBlank()) {
+                sb.append(rtcExtra);
             }
             sb.append("</imposto>");
 
@@ -156,7 +161,8 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
 
             sb.append("</det>");
         }
-        
+
+
         sb.append("<total><ICMSTot>");
         sb.append("<vProd>").append(fmt(vProdTotal)).append("</vProd>");
         sb.append("<vDesc>").append(fmt(vDescTotal)).append("</vDesc>");
@@ -171,7 +177,28 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
         sb.append("</NFe>");
         return sb.toString();
     }
+    //--------------------------------------------------------------------------------
+    private static String buildInfNfeId(Nfe nfe) {
+        // Se vier do domínio/persistência, usa; senão gera um temporário
+        String id = null;
+        if (nfe != null && nfe.getId() != null && nfe.getId().getValue() != null) {
+            id = nfe.getId().getValue().trim();
+            if (id.isBlank()) id = null;
+        }
 
+        if (id == null) {
+            // temporário estável o suficiente para testes/rascunho
+            id = "TEMP";
+        }
+
+        // O atributo Id em infNFe normalmente vem com prefixo "NFe"
+        if (!id.startsWith("NFe")) {
+            id = "NFe" + id;
+        }
+        return id;
+    }
+
+    //--------------------------------------------------------------------------------
     private static String safe(String v) { return v == null ? "" : v; }
 
     private static String onlyDigits(String v) {
@@ -216,7 +243,7 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
      * OBS: este grupo é da adequação RTC; em ambientes que não validem XSD RTC,
      * você pode habilitar via feature flag.
      */
-    private static String buildIbsCbsGroup(TributosItem trib) {
+    protected static String buildIbsCbsGroup(TributosItem trib) {
         if (trib == null) return "";
 
         boolean hasIbs = trib.getIbs() != null && trib.getIbs().isPresent();
@@ -249,6 +276,45 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
 
         sb.append("</IBSCBS>");
         return sb.toString();
+    }
+
+
+    /**
+     * Hook: em layout NFE40 não emitimos tags RTC (para manter XSD NF-e 4.00 "puro").
+     * Subclasses (RTC2025) podem sobrescrever para emitir grupos adicionais.
+     */
+    protected String buildRtcExtraGroups(TributosItem trib) {
+        return "";
+    }
+
+    /**
+     * Em layout NFE40, transportamos IBS/CBS em infAdProd (schema-safe, 500 chars) para não quebrar validação.
+     * Em RTC2025, normalmente não é necessário (pois os grupos próprios são emitidos).
+     */
+    protected String buildInfAdProdRtc(TributosItem trib) {
+        if (trib == null) return "";
+        boolean hasIbs = trib.getIbs() != null && trib.getIbs().isPresent();
+        boolean hasCbs = trib.getCbs() != null && trib.getCbs().isPresent();
+        if (!hasIbs && !hasCbs) return "";
+
+        StringBuilder sb = new StringBuilder(160);
+        sb.append("RTC:");
+        if (hasIbs) {
+            var ibs = trib.getIbs().get();
+            sb.append("IBS[bc=").append(fmt(ibs.base()))
+              .append(";p=").append(fmtAliq(ibs.aliquota()))
+              .append(";v=").append(fmt(ibs.valor())).append("]");
+        }
+        if (hasCbs) {
+            if (hasIbs) sb.append(";");
+            var cbs = trib.getCbs().get();
+            sb.append("CBS[bc=").append(fmt(cbs.base()))
+              .append(";p=").append(fmtAliq(cbs.aliquota()))
+              .append(";v=").append(fmt(cbs.valor())).append("]");
+        }
+
+        String s = sb.toString();
+        return s.length() <= 500 ? s : s.substring(0, 500);
     }
 
     private static String fmtLongToStr(Long v) {

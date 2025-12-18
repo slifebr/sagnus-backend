@@ -47,8 +47,7 @@ O endpoint `/nfe/emitir` passou a aceitar (por item) os campos:
 - `regimeIbsCbs` (ex.: `REGULAR`, `ISENCAO`, `DIFERIMENTO`)
 
 Regras MVP implementadas:
-- Se informar qualquer campo de IBS, deve informar os 3 (`base`, `aliquota`, `valor`).
-- Se informar qualquer campo de CBS, deve informar os 3.
+- IBS/CBS: pode informar **2 de 3** campos (`base`, `aliquota`, `valor`). O sistema calcula o terceiro automaticamente.
 - Se IBS ou CBS estiver presente:
   - Em `LENIENT` (default): se `cstIbsCbs` ou `cClassTrib` não vierem, aplica default.
   - Em `STRICT`: se faltar `cstIbsCbs` ou `cClassTrib`, a emissão falha.
@@ -62,3 +61,13 @@ sagnus:
       defaultCst: "000"
       defaultCClassTrib: "000000"
 ```
+
+
+### RTC: reconciliação base/alíquota/valor (LENIENT)
+
+Quando os 3 campos (`base`, `aliquota`, `valor`) são informados e não fecham dentro de `valorTolerance`, o modo **LENIENT** reconcilia conforme `sagnus.nfe.rtc.reconcileStrategy`:
+
+- `BASE_ALIQUOTA`: ajusta **valor**
+- `BASE_VALOR`: ajusta **aliquota**
+- `ALIQ_VALOR`: ajusta **base**
+- `AUTO_MIN_ADJUST` (default): escolhe automaticamente o menor ajuste relativo
