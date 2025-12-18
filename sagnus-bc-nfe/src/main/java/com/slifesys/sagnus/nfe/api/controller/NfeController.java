@@ -61,6 +61,15 @@ public class NfeController {
                 .frete(it.getFrete())
                 .seguro(it.getSeguro())
                 .outras(it.getOutras())
+                .cstIbsCbs(it.getCstIbsCbs())
+                .cClassTrib(it.getCClassTrib())
+                .ibsBase(it.getIbsBase())
+                .ibsAliquota(it.getIbsAliquota())
+                .ibsValor(it.getIbsValor())
+                .cbsBase(it.getCbsBase())
+                .cbsAliquota(it.getCbsAliquota())
+                .cbsValor(it.getCbsValor())
+                .regimeIbsCbs(it.getRegimeIbsCbs())
                 .build();
     }
 }

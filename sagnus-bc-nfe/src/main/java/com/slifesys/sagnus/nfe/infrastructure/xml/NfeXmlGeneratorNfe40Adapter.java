@@ -47,10 +47,10 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
             var vProd = it.getQuantidade().getValor().multiply(it.getValorUnitario().getValor());
             sb.append("<vProd>").append(fmt(vProd)).append("</vProd>");
 
-            var desc = it.getDesconto() != null ? it.getDesconto().getValor() : BigDecimal.ZERO;
-            var frete = it.getFrete() != null ? it.getFrete().getValor() : BigDecimal.ZERO;
-            var seg = it.getSeguro() != null ? it.getSeguro().getValor() : BigDecimal.ZERO;
-            var outro = it.getOutras() != null ? it.getOutras().getValor() : BigDecimal.ZERO;
+            var desc = it.getDesconto().getValor();
+            var frete = it.getFrete().getValor();
+            var seg = it.getSeguro().getValor();
+            var outro = it.getOutras().getValor();
 
             if (desc.compareTo(BigDecimal.ZERO) > 0) sb.append("<vDesc>").append(fmt(desc)).append("</vDesc>");
             if (frete.compareTo(BigDecimal.ZERO) > 0) sb.append("<vFrete>").append(fmt(frete)).append("</vFrete>");
@@ -156,7 +156,7 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
 
             sb.append("</det>");
         }
-
+        
         sb.append("<total><ICMSTot>");
         sb.append("<vProd>").append(fmt(vProdTotal)).append("</vProd>");
         sb.append("<vDesc>").append(fmt(vDescTotal)).append("</vDesc>");

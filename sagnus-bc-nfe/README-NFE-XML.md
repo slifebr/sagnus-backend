@@ -37,3 +37,28 @@ Você precisa de pelo menos 1 implementação de `NfeFinderPort`.
 - JPA: repo.findById + mapper Entity->Domain
 
 Se quiser, eu já te entrego o `NfeFinderPort` pronto (InMemory + JPA) alinhado ao seu código atual.
+
+## RTC IBS/CBS — Entrada + Validação (MVP)
+O endpoint `/nfe/emitir` passou a aceitar (por item) os campos:
+- `cstIbsCbs` (3 dígitos)
+- `cClassTrib` (6 dígitos)
+- `ibsBase`, `ibsAliquota`, `ibsValor`
+- `cbsBase`, `cbsAliquota`, `cbsValor`
+- `regimeIbsCbs` (ex.: `REGULAR`, `ISENCAO`, `DIFERIMENTO`)
+
+Regras MVP implementadas:
+- Se informar qualquer campo de IBS, deve informar os 3 (`base`, `aliquota`, `valor`).
+- Se informar qualquer campo de CBS, deve informar os 3.
+- Se IBS ou CBS estiver presente:
+  - Em `LENIENT` (default): se `cstIbsCbs` ou `cClassTrib` não vierem, aplica default.
+  - Em `STRICT`: se faltar `cstIbsCbs` ou `cClassTrib`, a emissão falha.
+
+Configuração:
+```yaml
+sagnus:
+  nfe:
+    rtc:
+      validation: LENIENT # ou STRICT
+      defaultCst: "000"
+      defaultCClassTrib: "000000"
+```

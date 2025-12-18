@@ -6,28 +6,38 @@ import com.slifesys.sagnus.nfe.application.command.EmitirNfeItemCommand;
 import com.slifesys.sagnus.nfe.application.port.CorpPessoaGatewayPort;
 import com.slifesys.sagnus.nfe.application.port.NfeRepository;
 import com.slifesys.sagnus.nfe.application.result.EmitirNfeResult;
+import com.slifesys.sagnus.nfe.application.service.RtcIbsCbsNormalizer;
 import com.slifesys.sagnus.nfe.domain.exception.NfeDomainException;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.Dinheiro;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.ProdutoFiscal;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.Quantidade;
 import com.slifesys.sagnus.nfe.domain.model.imposto.TributosItem;
+import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.CClassTrib;
+import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.Cbs;
+import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.CstIbsCbs;
+import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.Ibs;
+import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.RegimeIbsCbs;
 import com.slifesys.sagnus.nfe.domain.model.nfe.Destinatario;
 import com.slifesys.sagnus.nfe.domain.model.nfe.Emitente;
 import com.slifesys.sagnus.nfe.domain.model.nfe.Nfe;
 import com.slifesys.sagnus.nfe.domain.model.nfe.NfeItem;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class EmitirNfeUseCase {
 
     private final NfeRepository nfeRepository;
     private final CorpPessoaGatewayPort corpPessoaGateway;
+    private final RtcIbsCbsNormalizer rtcNormalizer;
 
-    public EmitirNfeUseCase(NfeRepository nfeRepository, CorpPessoaGatewayPort corpPessoaGateway) {
+    public EmitirNfeUseCase(NfeRepository nfeRepository, CorpPessoaGatewayPort corpPessoaGateway, RtcIbsCbsNormalizer rtcNormalizer) {
         this.nfeRepository = nfeRepository;
         this.corpPessoaGateway = corpPessoaGateway;
+        this.rtcNormalizer = rtcNormalizer;
     }
 
     public EmitirNfeResult execute(EmitirNfeCommand cmd) {
@@ -64,7 +74,7 @@ public class EmitirNfeUseCase {
         nfe.validar();
         nfe.emitir();
 
-        // 4) persiste (infra implementa depois)
+        // 4) persiste
         Nfe saved = nfeRepository.save(nfe);
 
         return EmitirNfeResult.builder()
@@ -101,8 +111,9 @@ public class EmitirNfeUseCase {
         Dinheiro seg = it.getSeguro() != null ? Dinheiro.of(it.getSeguro()) : Dinheiro.zero();
         Dinheiro out = it.getOutras() != null ? Dinheiro.of(it.getOutras()) : Dinheiro.zero();
 
-        // Tributos ainda “placeholder” (domínio suporta; cálculo vem depois)
-        TributosItem tributos = new TributosItem(null, null, null, null);
+        // Tributos (legado + RTC IBS/CBS)
+        TributosItem tributos = montarTributos(it);
+        tributos = rtcNormalizer.normalize(tributos);
 
         return new NfeItem(
                 it.getNItem(),
@@ -115,5 +126,86 @@ public class EmitirNfeUseCase {
                 out,
                 tributos
         );
+    }
+
+    /**
+     * MVP de tributos: só persiste/gera IBS/CBS + CST/cClassTrib.
+     * ICMS/PIS/COFINS/IPI seguem placeholders por enquanto.
+     */
+    private TributosItem montarTributos(EmitirNfeItemCommand it) {
+        Optional<Ibs> ibs = parseIbs(it);
+        Optional<Cbs> cbs = parseCbs(it);
+
+        Optional<CstIbsCbs> cst = (it.getCstIbsCbs() == null || it.getCstIbsCbs().isBlank())
+                ? Optional.empty()
+                : Optional.of(new CstIbsCbs(it.getCstIbsCbs()));
+
+        Optional<CClassTrib> cClassTrib = (it.getCClassTrib() == null || it.getCClassTrib().isBlank())
+                ? Optional.empty()
+                : Optional.of(new CClassTrib(it.getCClassTrib()));
+
+        return new TributosItem(
+                null, null, null, null,
+                ibs,
+                cbs,
+                cst,
+                cClassTrib
+        );
+    }
+
+    private Optional<Ibs> parseIbs(EmitirNfeItemCommand it) {
+        boolean any = it.getIbsBase() != null || it.getIbsAliquota() != null || it.getIbsValor() != null;
+        if (!any) return Optional.empty();
+
+        if (it.getIbsBase() == null || it.getIbsAliquota() == null || it.getIbsValor() == null) {
+            throw new NfeDomainException("RTC IBS: informe base, aliquota e valor (todos)");
+        }
+
+        RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+
+        return Optional.of(new Ibs(
+                it.getIbsBase(),
+                it.getIbsAliquota(),
+                it.getIbsValor(),
+                regime,
+                Optional.empty(),
+                Optional.empty()
+        ));
+    }
+
+    private Optional<Cbs> parseCbs(EmitirNfeItemCommand it) {
+        boolean any = it.getCbsBase() != null || it.getCbsAliquota() != null || it.getCbsValor() != null;
+        if (!any) return Optional.empty();
+
+        if (it.getCbsBase() == null || it.getCbsAliquota() == null || it.getCbsValor() == null) {
+            throw new NfeDomainException("RTC CBS: informe base, aliquota e valor (todos)");
+        }
+
+        RegimeIbsCbs regime = parseRegime(it.getRegimeIbsCbs());
+
+        return Optional.of(new Cbs(
+                it.getCbsBase(),
+                it.getCbsAliquota(),
+                it.getCbsValor(),
+                regime,
+                Optional.empty()
+        ));
+    }
+
+    private RegimeIbsCbs parseRegime(String regimeStr) {
+        if (regimeStr == null || regimeStr.isBlank()) {
+            return RegimeIbsCbs.REGULAR;
+        }
+        try {
+            return RegimeIbsCbs.valueOf(regimeStr.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new NfeDomainException("regimeIbsCbs inválido: " + regimeStr);
+        }
+    }
+
+    // util (para futuras validações numéricas mais rígidas)
+    @SuppressWarnings("unused")
+    private static BigDecimal nvl(BigDecimal v) {
+        return v != null ? v : BigDecimal.ZERO;
     }
 }

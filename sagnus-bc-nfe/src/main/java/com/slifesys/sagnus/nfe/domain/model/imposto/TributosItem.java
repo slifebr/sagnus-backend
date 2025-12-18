@@ -50,6 +50,7 @@ public class TributosItem {
             Optional<CstIbsCbs> cstIbsCbs,
             Optional<CClassTrib> cClassTrib
     ) {
+        // MVP: estes tributos podem vir nulos enquanto o cálculo legado não estiver plugado
         if (icms == null || pis == null || cofins == null || ipi == null) {
             throw new IllegalArgumentException("TributosItem: ICMS/PIS/COFINS/IPI são obrigatórios");
         }

@@ -7,6 +7,7 @@ import com.slifesys.sagnus.nfe.domain.model.imposto.TributosItem;
 import com.slifesys.sagnus.nfe.domain.model.nfe.*;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.entity.NfeEntity;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.entity.NfeItemEntity;
+import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.json.TributosItemJsonMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -31,11 +32,11 @@ public final class NfeJpaMapper {
                 .updatedAt(now)
                 .build();
 
-        // itens
         e.clearItems();
         for (NfeItem it : nfe.getItens()) {
             e.addItem(toItemEntity(it));
         }
+
         return e;
     }
 
@@ -53,9 +54,9 @@ public final class NfeJpaMapper {
                 .frete(it.getFrete().getValor())
                 .seguro(it.getSeguro().getValor())
                 .outras(it.getOutras().getValor())
+                .tributacaoJson(TributosItemJsonMapper.toJson(it.getTributos()))
                 .build();
     }
-
 
     public static Nfe toDomain(NfeEntity e) {
         Emitente emitente = new Emitente(
@@ -71,8 +72,6 @@ public final class NfeJpaMapper {
         );
 
         Nfe nfe = new Nfe(emitente, dest);
-
-        // reatribui id/status/datas (assumindo setters ou construtor adequado)
         nfe.rehydrate(
                 NfeId.of(e.getId()),
                 NfeStatus.valueOf(e.getStatus()),
@@ -89,6 +88,8 @@ public final class NfeJpaMapper {
                     it.getUCom()
             );
 
+            TributosItem tributos = TributosItemJsonMapper.fromJson(it.getTributacaoJson());
+
             NfeItem domainItem = new NfeItem(
                     it.getNItem(),
                     produto,
@@ -98,7 +99,7 @@ public final class NfeJpaMapper {
                     Dinheiro.of(nvl(it.getFrete())),
                     Dinheiro.of(nvl(it.getSeguro())),
                     Dinheiro.of(nvl(it.getOutras())),
-                    new TributosItem(null, null, null, null)
+                    tributos
             );
             nfe.adicionarItem(domainItem);
         }

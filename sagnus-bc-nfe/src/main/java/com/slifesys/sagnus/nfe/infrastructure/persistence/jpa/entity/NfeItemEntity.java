@@ -58,4 +58,8 @@ public class NfeItemEntity {
 
     @Column(name = "outras", nullable = false, precision = 18, scale = 6)
     private BigDecimal outras;
+
+    @Column(name = "tributacao_json", columnDefinition = "text")
+    private String tributacaoJson;
+
 }

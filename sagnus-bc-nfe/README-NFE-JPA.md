@@ -9,8 +9,13 @@ Este pacote adiciona persistência JPA **sem poluir o domínio**.
 - `NfeJpaRepository` (Spring Data)
 - `NfeJpaRepositoryAdapter` implementando `NfeRepository`
 - `NfeJpaConfig` (EntityScan + EnableJpaRepositories)
-- Flyway migration:
-  - `db/migration/V1__nfe_persistencia_minima.sql`
+
+## RTC IBS/CBS — Persistência via JSON (v1)
+Para suportar evolução do RTC sem ficar “refém” de schema em cada iteração, o item passa a ter:
+- coluna `tributacao_json` (`TEXT` no PostgreSQL) contendo um JSON com IBS/CBS + CST + `cClassTrib`.
+
+Script SQL sugerido (PostgreSQL):
+- `docs/db/001_add_nfe_item_tributacao_json.sql`
 
 ## Como ativar
 Por padrão, o projeto pode estar rodando com `InMemoryNfeRepositoryAdapter`.
@@ -25,9 +30,8 @@ sagnus:
 E garanta dependências no POM do bc-nfe:
 - spring-boot-starter-data-jpa
 - postgresql
-- flyway-core (opcional, se você quiser migração automática)
+- (opcional) flyway-core / liquibase-core — se você quiser migração automática
 
 ## Observações importantes
-1) O mapper assume que o domínio tem um método `rehydrate(...)` para reconstituir agregado.
-   Se ainda não existir, eu ajusto para o seu modelo real (me diga como está a classe Nfe).
-2) O schema/tabelas aqui são “mínimos para rodar”. Depois alinhamos nomes/constraints ao padrão do Sagnus.
+1) O mapper assume que o domínio tem um método `rehydrate(...)` para reconstituir o agregado.
+2) O JSON de tributos está versionado (`schema: RTC-IBSCBS-V1`) para facilitar compatibilidade futura.

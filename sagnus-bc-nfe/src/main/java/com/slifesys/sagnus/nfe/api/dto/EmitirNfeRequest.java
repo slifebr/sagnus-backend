@@ -72,5 +72,35 @@ public class EmitirNfeRequest {
 
         @DecimalMin(value = "0.00", inclusive = true, message = "outras não pode ser negativo")
         private BigDecimal outras;
+
+        // ===== RTC (IBS/CBS) - MVP =====
+        // Obs: validações cruzadas (ex.: base/aliquota/valor juntos) são feitas no UseCase.
+
+        @Pattern(regexp = "^$|\\d{3}", message = "cstIbsCbs inválido (3 dígitos)")
+        private String cstIbsCbs;
+
+        @Pattern(regexp = "^$|\\d{6}", message = "cClassTrib inválido (6 dígitos)")
+        private String cClassTrib;
+
+        @DecimalMin(value = "0.00", inclusive = true, message = "ibsBase não pode ser negativa")
+        private BigDecimal ibsBase;
+
+        @DecimalMin(value = "0.0000", inclusive = true, message = "ibsAliquota não pode ser negativa")
+        private BigDecimal ibsAliquota;
+
+        @DecimalMin(value = "0.00", inclusive = true, message = "ibsValor não pode ser negativo")
+        private BigDecimal ibsValor;
+
+        @DecimalMin(value = "0.00", inclusive = true, message = "cbsBase não pode ser negativa")
+        private BigDecimal cbsBase;
+
+        @DecimalMin(value = "0.0000", inclusive = true, message = "cbsAliquota não pode ser negativa")
+        private BigDecimal cbsAliquota;
+
+        @DecimalMin(value = "0.00", inclusive = true, message = "cbsValor não pode ser negativo")
+        private BigDecimal cbsValor;
+
+        // Ex.: REGULAR, ISENCAO, DIFERIMENTO...
+        private String regimeIbsCbs;
     }
 }
