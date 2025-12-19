@@ -61,4 +61,30 @@ public class Sindicato {
         this.atualizadoEm = atualizadoEm;
         this.usuAlteracao = usuAlteracao;
     }
+
+    public Sindicato(String nome, Long codigoBanco, Long codigoAgencia, String contaBanco, String codigoCedente,
+            String logradouro, String numero, String bairro, Long municipioIbge, String uf, String fone1, String fone2,
+            String email, String tipoSindicato, LocalDate dataBase, BigDecimal pisoSalarial, String cnpj,
+            String classificacaoContabilConta, String usuCriacao) {
+        this.nome = nome;
+        this.codigoBanco = codigoBanco;
+        this.codigoAgencia = codigoAgencia;
+        this.contaBanco = contaBanco;
+        this.codigoCedente = codigoCedente;
+        this.logradouro = logradouro;
+        this.numero = numero;
+        this.bairro = bairro;
+        this.municipioIbge = municipioIbge;
+        this.uf = uf;
+        this.fone1 = fone1;
+        this.fone2 = fone2;
+        this.email = email;
+        this.tipoSindicato = tipoSindicato;
+        this.dataBase = dataBase;
+        this.pisoSalarial = pisoSalarial;
+        this.cnpj = cnpj;
+        this.classificacaoContabilConta = classificacaoContabilConta;
+        this.criadoEm = Instant.now();
+        this.usuCriacao = usuCriacao;
+    }
 }

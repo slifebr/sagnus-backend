@@ -128,6 +128,8 @@ public final class CorpPersistenceMapper {
         return TabelaPrecoEntity.builder()
                 .id(d.getId())
                 .nome(d.getNome())
+                .dataInicio(d.getDataInicio())
+                .dataFim(d.getDataFim())
                 .coeficiente(d.getCoeficiente())
                 .criadoEm(d.getCriadoEm())
                 .usuCriacao(d.getUsuCriacao())
@@ -140,8 +142,8 @@ public final class CorpPersistenceMapper {
         return new TabelaPreco(
                 e.getId(),
                 e.getNome(),
-                null, // dataInicio not in JPA
-                null, // dataFim not in JPA
+                e.getDataInicio(),
+                e.getDataFim(),
                 e.getCoeficiente(),
                 e.getCriadoEm(),
                 e.getUsuCriacao(),
@@ -284,7 +286,8 @@ public final class CorpPersistenceMapper {
         return TransportadoraEntity.builder()
                 .id(d.getId())
                 .idPessoa(d.getIdPessoa())
-                // placaVeiculo and rntc not in JPA
+                .placaVeiculo(d.getPlacaVeiculo())
+                .rntc(d.getRntc())
                 .criadoEm(d.getCriadoEm())
                 .usuCriacao(d.getUsuCriacao())
                 .atualizadoEm(d.getAtualizadoEm())
@@ -296,8 +299,8 @@ public final class CorpPersistenceMapper {
         return new Transportadora(
                 e.getId(),
                 e.getIdPessoa(),
-                null, // placaVeiculo not in JPA
-                null, // rntc not in JPA
+                e.getPlacaVeiculo(),
+                e.getRntc(),
                 e.getCriadoEm(),
                 e.getUsuCriacao(),
                 e.getAtualizadoEm(),
@@ -310,7 +313,8 @@ public final class CorpPersistenceMapper {
                 .id(d.getId())
                 .sigla(d.getSigla())
                 .nome(d.getNome())
-                // icms not in JPA
+                .icmsInterno(d.getIcmsInterno())
+                .icmsInterestadual(d.getIcmsInterestadual())
                 .criadoEm(d.getCriadoEm())
                 .usuCriacao(d.getUsuCriacao())
                 .atualizadoEm(d.getAtualizadoEm())
@@ -323,8 +327,8 @@ public final class CorpPersistenceMapper {
                 e.getId(),
                 e.getSigla(),
                 e.getNome(),
-                null, // icms not in JPA
-                null, // icms not in JPA
+                e.getIcmsInterno(),
+                e.getIcmsInterestadual(),
                 e.getCriadoEm(),
                 e.getUsuCriacao(),
                 e.getAtualizadoEm(),

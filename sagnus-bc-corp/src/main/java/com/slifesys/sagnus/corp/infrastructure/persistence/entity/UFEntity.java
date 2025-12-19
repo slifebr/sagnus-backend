@@ -28,9 +28,11 @@ public class UFEntity {
     @Column(name = "codigo_ibge")
     private Long codigoIbge;
 
-    // Note: Domain Entity had icmsInterno, icmsInterestadual. SQL table 'corp_uf'
-    // (line 3116) only has sigla, nome, codigo_ibge.
-    // I will follow SQL table definition for JPA Entity.
+    @Column(name = "icms_interno")
+    private BigDecimal icmsInterno;
+
+    @Column(name = "icms_interestadual")
+    private BigDecimal icmsInterestadual;
 
     @Column(name = "dt_criacao", nullable = false, updatable = false)
     private Instant criadoEm;

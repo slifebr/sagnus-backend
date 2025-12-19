@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.Instant;
 
 @Entity
@@ -24,6 +25,12 @@ public class TabelaPrecoEntity {
 
     @Column(name = "principal")
     private String principal; // char(1)
+
+    @Column(name = "dt_inicio")
+    private LocalDate dataInicio;
+
+    @Column(name = "dt_fim")
+    private LocalDate dataFim;
 
     @Column(name = "coeficiente")
     private BigDecimal coeficiente;
