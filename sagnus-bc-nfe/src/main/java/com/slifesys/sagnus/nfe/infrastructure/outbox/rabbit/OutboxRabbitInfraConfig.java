@@ -8,6 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
+
 /**
  * Infra Rabbit (exchange/queue/binding) para DEV/local.
  *
@@ -30,7 +32,30 @@ public class OutboxRabbitInfraConfig {
 
     @Bean
     public Queue nfeOutboxQueue(NfeOutboxRabbitProperties props) {
-        return QueueBuilder.durable(props.getQueue()).build();
+        // Fila principal: quando o worker rejeitar (nack/reject), vai para a fila de retry.
+        return QueueBuilder.durable(props.getQueue())
+                .withArguments(Map.of(
+                        "x-dead-letter-exchange", props.getExchange(),
+                        "x-dead-letter-routing-key", props.getRetryRoutingKey()
+                ))
+                .build();
+    }
+
+    @Bean
+    public Queue nfeOutboxRetryQueue(NfeOutboxRabbitProperties props) {
+        // Fila de retry: segura a mensagem por TTL e depois devolve para a fila principal.
+        return QueueBuilder.durable(props.getRetryQueue())
+                .withArguments(Map.of(
+                        "x-message-ttl", props.getRetryTtlMs(),
+                        "x-dead-letter-exchange", props.getExchange(),
+                        "x-dead-letter-routing-key", props.getRoutingKey()
+                ))
+                .build();
+    }
+
+    @Bean
+    public Queue nfeOutboxDlq(NfeOutboxRabbitProperties props) {
+        return QueueBuilder.durable(props.getDlq()).build();
     }
 
     @Bean
@@ -45,5 +70,27 @@ public class OutboxRabbitInfraConfig {
             return BindingBuilder.bind(nfeOutboxQueue).to((TopicExchange) nfeOutboxExchange).with(props.getRoutingKey());
         }
         return BindingBuilder.bind(nfeOutboxQueue).to((DirectExchange) nfeOutboxExchange).with(props.getRoutingKey());
+    }
+
+    @Bean
+    public Binding nfeOutboxRetryBinding(Queue nfeOutboxRetryQueue, Exchange nfeOutboxExchange, NfeOutboxRabbitProperties props) {
+        if (nfeOutboxExchange instanceof FanoutExchange) {
+            return BindingBuilder.bind(nfeOutboxRetryQueue).to((FanoutExchange) nfeOutboxExchange);
+        }
+        if (nfeOutboxExchange instanceof TopicExchange) {
+            return BindingBuilder.bind(nfeOutboxRetryQueue).to((TopicExchange) nfeOutboxExchange).with(props.getRetryRoutingKey());
+        }
+        return BindingBuilder.bind(nfeOutboxRetryQueue).to((DirectExchange) nfeOutboxExchange).with(props.getRetryRoutingKey());
+    }
+
+    @Bean
+    public Binding nfeOutboxDlqBinding(Queue nfeOutboxDlq, Exchange nfeOutboxExchange, NfeOutboxRabbitProperties props) {
+        if (nfeOutboxExchange instanceof FanoutExchange) {
+            return BindingBuilder.bind(nfeOutboxDlq).to((FanoutExchange) nfeOutboxExchange);
+        }
+        if (nfeOutboxExchange instanceof TopicExchange) {
+            return BindingBuilder.bind(nfeOutboxDlq).to((TopicExchange) nfeOutboxExchange).with(props.getDlqRoutingKey());
+        }
+        return BindingBuilder.bind(nfeOutboxDlq).to((DirectExchange) nfeOutboxExchange).with(props.getDlqRoutingKey());
     }
 }

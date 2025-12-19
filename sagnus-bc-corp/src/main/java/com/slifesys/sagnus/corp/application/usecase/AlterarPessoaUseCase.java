@@ -4,7 +4,7 @@ import com.slifesys.sagnus.corp.application.dto.AlterarPessoaCommand;
 import com.slifesys.sagnus.corp.application.dto.PessoaResult;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
 import com.slifesys.sagnus.corp.domain.model.pessoa.PessoaId;
-import com.slifesys.sagnus.corp.domain.port.PessoaRepository;
+import com.slifesys.sagnus.corp.application.port.PessoaRepository;
 import com.slifesys.sagnus.shared.error.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

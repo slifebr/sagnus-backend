@@ -5,7 +5,7 @@ import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
 import com.slifesys.sagnus.corp.domain.model.pessoa.PessoaId;
 import com.slifesys.sagnus.corp.domain.model.pessoa.TipoPessoa;
-import com.slifesys.sagnus.corp.domain.port.PessoaRepository;
+import com.slifesys.sagnus.corp.application.port.PessoaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,8 @@ public class CorpPessoaQueryAdapter implements CorpPessoaQueryPort {
     @Override
     @Transactional(readOnly = true)
     public Optional<PessoaResumoDTO> obterResumoPorId(Long pessoaId) {
-        if (pessoaId == null) return Optional.empty();
+        if (pessoaId == null)
+            return Optional.empty();
         return repo.findById(PessoaId.of(pessoaId))
                 .map(this::toResumo);
     }
@@ -35,7 +36,8 @@ public class CorpPessoaQueryAdapter implements CorpPessoaQueryPort {
     public Optional<PessoaResumoDTO> obterResumoPorDocumento(String tipo, String documento) {
         TipoPessoa t = parseTipo(tipo);
         String doc = documento == null ? null : documento.replaceAll("\\D", "");
-        if (t == null || doc == null || doc.isBlank()) return Optional.empty();
+        if (t == null || doc == null || doc.isBlank())
+            return Optional.empty();
         return repo.findByDocumento(doc, t).map(this::toResumo);
     }
 
@@ -49,10 +51,13 @@ public class CorpPessoaQueryAdapter implements CorpPessoaQueryPort {
     }
 
     private TipoPessoa parseTipo(String raw) {
-        if (raw == null || raw.isBlank()) return null;
+        if (raw == null || raw.isBlank())
+            return null;
         String v = raw.trim().toUpperCase();
-        if (v.equals("F") || v.equals("FISICA")) return TipoPessoa.FISICA;
-        if (v.equals("J") || v.equals("JURIDICA")) return TipoPessoa.JURIDICA;
+        if (v.equals("F") || v.equals("FISICA"))
+            return TipoPessoa.FISICA;
+        if (v.equals("J") || v.equals("JURIDICA"))
+            return TipoPessoa.JURIDICA;
         return null;
     }
 }

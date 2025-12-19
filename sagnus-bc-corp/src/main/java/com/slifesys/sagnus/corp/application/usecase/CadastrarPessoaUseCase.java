@@ -3,7 +3,7 @@ package com.slifesys.sagnus.corp.application.usecase;
 import com.slifesys.sagnus.corp.application.dto.CadastrarPessoaCommand;
 import com.slifesys.sagnus.corp.application.dto.PessoaResult;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
-import com.slifesys.sagnus.corp.domain.port.PessoaRepository;
+import com.slifesys.sagnus.corp.application.port.PessoaRepository;
 import com.slifesys.sagnus.shared.error.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,14 +17,18 @@ public class CadastrarPessoaUseCase {
 
     @Transactional
     public PessoaResult execute(CadastrarPessoaCommand cmd) {
-        if (cmd == null) throw new BusinessException("CORP-099", "Command obrigatório.");
+        if (cmd == null)
+            throw new BusinessException("CORP-099", "Command obrigatório.");
 
         String docDigits = cmd.getDocumento() == null ? null : cmd.getDocumento().replaceAll("\\D", "");
 
         repo.findByDocumento(docDigits, cmd.getTipo())
-                .ifPresent(p -> { throw new BusinessException("CORP-100", "Já existe pessoa cadastrada com este documento."); });
+                .ifPresent(p -> {
+                    throw new BusinessException("CORP-100", "Já existe pessoa cadastrada com este documento.");
+                });
 
-        Pessoa pessoa = Pessoa.criarNova(cmd.getTipo(), cmd.getDocumento(), cmd.getNome(), cmd.getEmail(), cmd.getSite());
+        Pessoa pessoa = Pessoa.criarNova(cmd.getTipo(), cmd.getDocumento(), cmd.getNome(), cmd.getEmail(),
+                cmd.getSite());
         Pessoa saved = repo.save(pessoa);
 
         return PessoaResult.builder()
