@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "corp_pessoa_endereco")
+@Table(name = "corp_pessoa_endereco", schema = "sagnus")
 @Getter
 @Setter
 public class PessoaEnderecoJpaEntity {

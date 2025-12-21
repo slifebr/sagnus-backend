@@ -7,6 +7,7 @@ import com.slifesys.sagnus.corp.application.usecase.ObterPessoaUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
@@ -27,6 +28,7 @@ public class PessoaController {
 
     @PostMapping
     public ResponseEntity<PessoaResponse> create(@RequestBody PessoaCreateRequest req) {
+        req.setUsuario(CorpSecurityUtils.getCurrentUser());
         PessoaResult saved = cadastrarPessoa.execute(req.toCommand());
         return ResponseEntity.created(URI.create("/corp/pessoas/" + saved.getId()))
                 .body(PessoaResponse.from(saved));

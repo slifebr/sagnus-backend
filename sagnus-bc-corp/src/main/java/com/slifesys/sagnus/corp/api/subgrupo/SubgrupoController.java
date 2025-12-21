@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 @RestController
 @RequestMapping("/api/v1/subgrupos")
@@ -27,8 +28,7 @@ public class SubgrupoController {
                 request.getIdGrupo(),
                 request.getNome(),
                 request.getDescricao(),
-                "SYSTEM" // TODO: obter do contexto de segurança
-        ));
+                CorpSecurityUtils.getCurrentUser()));
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(result));
     }
 
@@ -40,8 +40,7 @@ public class SubgrupoController {
                 request.getIdGrupo(),
                 request.getNome(),
                 request.getDescricao(),
-                "SYSTEM" // TODO: obter do contexto de segurança
-        ));
+                CorpSecurityUtils.getCurrentUser()));
         return ResponseEntity.ok(toResponse(result));
     }
 

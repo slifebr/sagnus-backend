@@ -11,6 +11,7 @@ public class PessoaCreateRequest {
     private String documento;
     private String site;
     private String email;
+    private String usuario;
 
     public CadastrarPessoaCommand toCommand() {
         return CadastrarPessoaCommand.builder()
@@ -19,14 +20,18 @@ public class PessoaCreateRequest {
                 .documento(documento)
                 .site(site)
                 .email(email)
+                .usuCriacao(usuario != null ? usuario : "SYSTEM")
                 .build();
     }
 
     private TipoPessoa parseTipo(String t) {
-        if (t == null || t.isBlank()) return null;
+        if (t == null || t.isBlank())
+            return null;
         String v = t.trim().toUpperCase();
-        if (v.equals("F")) return TipoPessoa.FISICA;
-        if (v.equals("J")) return TipoPessoa.JURIDICA;
+        if (v.equals("F"))
+            return TipoPessoa.FISICA;
+        if (v.equals("J"))
+            return TipoPessoa.JURIDICA;
         return TipoPessoa.valueOf(v);
     }
 }

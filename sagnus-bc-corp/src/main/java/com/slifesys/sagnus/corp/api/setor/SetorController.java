@@ -7,6 +7,7 @@ import com.slifesys.sagnus.corp.application.usecase.ObterSetorUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
@@ -27,6 +28,7 @@ public class SetorController {
 
     @PostMapping
     public ResponseEntity<SetorResponse> create(@RequestBody SetorCreateRequest req) {
+        req.setUsuario(CorpSecurityUtils.getCurrentUser());
         SetorResult saved = cadastrarSetor.execute(req.toCommand());
         return ResponseEntity.created(URI.create("/corp/setores/" + saved.getId()))
                 .body(SetorResponse.from(saved));

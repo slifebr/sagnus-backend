@@ -12,4 +12,5 @@ public class CadastrarPessoaCommand {
     String nome;
     String email;
     String site;
+    String usuCriacao;
 }

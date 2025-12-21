@@ -7,6 +7,7 @@ import com.slifesys.sagnus.corp.application.usecase.ObterMarcaUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
@@ -27,6 +28,7 @@ public class MarcaController {
 
     @PostMapping
     public ResponseEntity<MarcaResponse> create(@RequestBody MarcaCreateRequest req) {
+        req.setUsuario(CorpSecurityUtils.getCurrentUser());
         MarcaResult saved = cadastrarMarca.execute(req.toCommand());
         return ResponseEntity.created(URI.create("/corp/marcas/" + saved.getId()))
                 .body(MarcaResponse.from(saved));

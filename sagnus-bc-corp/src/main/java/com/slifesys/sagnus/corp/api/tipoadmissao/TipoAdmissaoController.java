@@ -7,6 +7,7 @@ import com.slifesys.sagnus.corp.application.usecase.ObterTipoAdmissaoUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
@@ -27,6 +28,7 @@ public class TipoAdmissaoController {
 
     @PostMapping
     public ResponseEntity<TipoAdmissaoResponse> create(@RequestBody TipoAdmissaoCreateRequest req) {
+        req.setUsuario(CorpSecurityUtils.getCurrentUser());
         TipoAdmissaoResult saved = cadastrarTipoAdmissao.execute(req.toCommand());
         return ResponseEntity.created(URI.create("/corp/tipos-admissao/" + saved.getId()))
                 .body(TipoAdmissaoResponse.from(saved));
