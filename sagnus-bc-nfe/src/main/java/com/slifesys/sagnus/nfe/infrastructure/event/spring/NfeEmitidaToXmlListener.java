@@ -5,13 +5,13 @@ import com.slifesys.sagnus.nfe.application.port.NfeXmlGeneratorPort;
 import com.slifesys.sagnus.nfe.application.port.NfeXmlStorePort;
 import com.slifesys.sagnus.nfe.domain.event.NfeEmitidaEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.event.EventListener;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(prefix = "sagnus.nfe.worker", name = "enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnExpression("'${sagnus.nfe.worker.enabled:false}'!='true'")
 public class NfeEmitidaToXmlListener {
 
     private final NfeFinderPort finder;

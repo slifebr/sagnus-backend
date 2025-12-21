@@ -22,6 +22,20 @@ import static org.mockito.Mockito.*;
 
 public class OutboxRabbitWorkerListenerTest {
 
+    /*
+     * No teste quandoExcedeTentativas_deveEnviarParaDlqEAck:
+     * 
+     * troquei props.setExchange("ex") por props.setDlxExchange("ex")
+     * 
+     * mantive o assert convertAndSend("ex", "rk.dlq", ...) (agora fica coerente)
+     * 
+     * No teste quandoFalhaMasAindaNaoExcedeu_deveNackParaRetry:
+     * 
+     * o verify “never convertAndSend” foi ajustado para não amarrar em
+     * props.getExchange() (porque o código não usa mais o exchange principal pra
+     * DLQ)
+     */
+
     @Test
     void quandoJaProcessado_deveAckEParar() throws Exception {
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
@@ -88,7 +102,7 @@ public class OutboxRabbitWorkerListenerTest {
         NfeOutboxRabbitProperties props = new NfeOutboxRabbitProperties();
         props.setQueue("q");
         props.setMaxDeliveries(3);
-        props.setExchange("ex");
+        props.setDlxExchange("ex");
         props.setDlqRoutingKey("rk.dlq");
 
         OutboxRabbitWorkerListener l = new OutboxRabbitWorkerListener(mapper, rabbit, props, inbox, List.of(handler));

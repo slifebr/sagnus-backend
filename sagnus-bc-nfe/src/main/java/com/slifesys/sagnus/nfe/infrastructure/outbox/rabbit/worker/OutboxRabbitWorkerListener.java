@@ -61,7 +61,7 @@ public class OutboxRabbitWorkerListener {
         } catch (Exception ex) {
             // payload inválido: manda para DLQ para análise e ACK.
             log.warn("[WORKER] envelope inválido. enviando para DLQ. error={}", ex.getMessage());
-            rabbit.convertAndSend(props.getExchange(), props.getDlqRoutingKey(), body);
+            rabbit.convertAndSend(props.getDlxExchange(), props.getDlqRoutingKey(), body);
             channel.basicAck(tag, false);
             return;
         }
@@ -102,7 +102,7 @@ public class OutboxRabbitWorkerListener {
             if (attempt >= props.getMaxDeliveries()) {
                 log.error("[WORKER] excedeu tentativas. enviando para DLQ. eventType={}, eventId={}, attempt={}, max={}, error={}",
                         envelope.eventType(), envelope.eventId(), attempt, props.getMaxDeliveries(), ex.getMessage());
-                rabbit.convertAndSend(props.getExchange(), props.getDlqRoutingKey(), body);
+                rabbit.convertAndSend(props.getDlxExchange(), props.getDlqRoutingKey(), body);
                 // marca como processado para não reprocessar caso DLQ seja reencaminhada sem querer
                 inbox.markProcessed(envelope.eventId(), envelope.eventType(), correlationId);
                 channel.basicAck(tag, false);

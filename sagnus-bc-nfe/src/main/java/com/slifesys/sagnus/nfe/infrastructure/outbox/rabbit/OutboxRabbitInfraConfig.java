@@ -8,12 +8,17 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
-
 /**
  * Infra Rabbit (exchange/queue/binding) para DEV/local.
  *
- * Em PROD, você pode desligar auto-declare e provisionar via infraestrutura.
+ * Topologia (quando dlqEnabled=true):
+ *
+ *  Outbox publish -> exchange (props.exchange/routingKey) -> MAIN QUEUE
+ *
+ *  Worker NACK (requeue=false) -> DLX (props.dlxExchange) -> RETRY QUEUE (TTL)
+ *  RETRY QUEUE (TTL expirou) -> dead-letter -> exchange original -> MAIN QUEUE
+ *
+ *  Worker decide DLQ (envelope inválido ou maxDeliveries) -> publish -> DLX -> DLQ
  */
 @Slf4j
 @Configuration
@@ -30,32 +35,68 @@ public class OutboxRabbitInfraConfig {
         };
     }
 
+    /**
+     * Exchange DLX (dead-letter). Usado para RETRY e DLQ.
+     */
+    @Bean
+    @ConditionalOnExpression("'${sagnus.nfe.outbox.rabbit.dlqEnabled:true}'=='true'")
+    public DirectExchange nfeOutboxDlxExchange(NfeOutboxRabbitProperties props) {
+        return new DirectExchange(props.getDlxExchange(), true, false);
+    }
+
+    /**
+     * Fila principal (work queue).
+     */
     @Bean
     public Queue nfeOutboxQueue(NfeOutboxRabbitProperties props) {
-        // Fila principal: quando o worker rejeitar (nack/reject), vai para a fila de retry.
-        return QueueBuilder.durable(props.getQueue())
-                .withArguments(Map.of(
-                        "x-dead-letter-exchange", props.getExchange(),
-                        "x-dead-letter-routing-key", props.getRetryRoutingKey()
-                ))
-                .build();
+        QueueBuilder builder = QueueBuilder.durable(props.getQueue());
+
+        // Para retry via dead-letter: mainQueue -> DLX -> retryQueue
+        if (props.isDlqEnabled()) {
+            builder.withArgument("x-dead-letter-exchange", props.getDlxExchange());
+            builder.withArgument("x-dead-letter-routing-key", props.getRetryQueue());
+        }
+
+        return builder.build();
     }
 
+    /**
+     * Retry queue (TTL). Após o TTL, volta para o exchange principal.
+     */
     @Bean
+    @ConditionalOnExpression("'${sagnus.nfe.outbox.rabbit.dlqEnabled:true}'=='true'")
     public Queue nfeOutboxRetryQueue(NfeOutboxRabbitProperties props) {
-        // Fila de retry: segura a mensagem por TTL e depois devolve para a fila principal.
         return QueueBuilder.durable(props.getRetryQueue())
-                .withArguments(Map.of(
-                        "x-message-ttl", props.getRetryTtlMs(),
-                        "x-dead-letter-exchange", props.getExchange(),
-                        "x-dead-letter-routing-key", props.getRoutingKey()
-                ))
+                .withArgument("x-message-ttl", props.getRetryTtlMs())
+                .withArgument("x-dead-letter-exchange", props.getExchange())
+                .withArgument("x-dead-letter-routing-key", props.getRoutingKey())
                 .build();
     }
 
     @Bean
-    public Queue nfeOutboxDlq(NfeOutboxRabbitProperties props) {
+    @ConditionalOnExpression("'${sagnus.nfe.outbox.rabbit.dlqEnabled:true}'=='true'")
+    public Binding nfeOutboxRetryBinding(Queue nfeOutboxRetryQueue, DirectExchange nfeOutboxDlxExchange, NfeOutboxRabbitProperties props) {
+        log.info("[OUTBOX->RABBIT] autoDeclare RETRY dlxExchange={}, retryQueue={}, retryRoutingKey={}, retryTtlMs={}ms",
+                props.getDlxExchange(), props.getRetryQueue(), props.getRetryQueue(), props.getRetryTtlMs());
+        // RoutingKey = retryQueue name (prático e sem novos properties)
+        return BindingBuilder.bind(nfeOutboxRetryQueue).to(nfeOutboxDlxExchange).with(props.getRetryQueue());
+    }
+
+    /**
+     * Dead-letter queue (parking).
+     */
+    @Bean
+    @ConditionalOnExpression("'${sagnus.nfe.outbox.rabbit.dlqEnabled:true}'=='true'")
+    public Queue nfeOutboxDlqQueue(NfeOutboxRabbitProperties props) {
         return QueueBuilder.durable(props.getDlq()).build();
+    }
+
+    @Bean
+    @ConditionalOnExpression("'${sagnus.nfe.outbox.rabbit.dlqEnabled:true}'=='true'")
+    public Binding nfeOutboxDlqBinding(Queue nfeOutboxDlqQueue, DirectExchange nfeOutboxDlxExchange, NfeOutboxRabbitProperties props) {
+        log.info("[OUTBOX->RABBIT] autoDeclare DLQ dlxExchange={}, dlqQueue={}, dlqRoutingKey={}",
+                props.getDlxExchange(), props.getDlq(), props.getDlqRoutingKey());
+        return BindingBuilder.bind(nfeOutboxDlqQueue).to(nfeOutboxDlxExchange).with(props.getDlqRoutingKey());
     }
 
     @Bean
@@ -63,34 +104,12 @@ public class OutboxRabbitInfraConfig {
         log.info("[OUTBOX->RABBIT] autoDeclare exchange={}, type={}, queue={}, routingKey={}",
                 props.getExchange(), props.getExchangeType(), props.getQueue(), props.getRoutingKey());
 
-        if (nfeOutboxExchange instanceof FanoutExchange) {
-            return BindingBuilder.bind(nfeOutboxQueue).to((FanoutExchange) nfeOutboxExchange);
+        if (nfeOutboxExchange instanceof FanoutExchange fe) {
+            return BindingBuilder.bind(nfeOutboxQueue).to(fe);
         }
-        if (nfeOutboxExchange instanceof TopicExchange) {
-            return BindingBuilder.bind(nfeOutboxQueue).to((TopicExchange) nfeOutboxExchange).with(props.getRoutingKey());
+        if (nfeOutboxExchange instanceof TopicExchange te) {
+            return BindingBuilder.bind(nfeOutboxQueue).to(te).with(props.getRoutingKey());
         }
         return BindingBuilder.bind(nfeOutboxQueue).to((DirectExchange) nfeOutboxExchange).with(props.getRoutingKey());
-    }
-
-    @Bean
-    public Binding nfeOutboxRetryBinding(Queue nfeOutboxRetryQueue, Exchange nfeOutboxExchange, NfeOutboxRabbitProperties props) {
-        if (nfeOutboxExchange instanceof FanoutExchange) {
-            return BindingBuilder.bind(nfeOutboxRetryQueue).to((FanoutExchange) nfeOutboxExchange);
-        }
-        if (nfeOutboxExchange instanceof TopicExchange) {
-            return BindingBuilder.bind(nfeOutboxRetryQueue).to((TopicExchange) nfeOutboxExchange).with(props.getRetryRoutingKey());
-        }
-        return BindingBuilder.bind(nfeOutboxRetryQueue).to((DirectExchange) nfeOutboxExchange).with(props.getRetryRoutingKey());
-    }
-
-    @Bean
-    public Binding nfeOutboxDlqBinding(Queue nfeOutboxDlq, Exchange nfeOutboxExchange, NfeOutboxRabbitProperties props) {
-        if (nfeOutboxExchange instanceof FanoutExchange) {
-            return BindingBuilder.bind(nfeOutboxDlq).to((FanoutExchange) nfeOutboxExchange);
-        }
-        if (nfeOutboxExchange instanceof TopicExchange) {
-            return BindingBuilder.bind(nfeOutboxDlq).to((TopicExchange) nfeOutboxExchange).with(props.getDlqRoutingKey());
-        }
-        return BindingBuilder.bind(nfeOutboxDlq).to((DirectExchange) nfeOutboxExchange).with(props.getDlqRoutingKey());
     }
 }

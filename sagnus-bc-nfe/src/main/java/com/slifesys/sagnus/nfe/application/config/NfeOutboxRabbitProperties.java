@@ -27,26 +27,49 @@ public class NfeOutboxRabbitProperties {
     /** Nome da fila (quando autoDeclare=true). */
     private String queue = "sagnus.nfe.events.q";
 
-    /** Fila de retry (TTL) (quando autoDeclare=true). */
-    private String retryQueue = "sagnus.nfe.events.retry.q";
-
-    /** Fila dead-letter (DLQ) (quando autoDeclare=true). */
-    private String dlq = "sagnus.nfe.events.dlq";
-
     /** Routing key usada no publish (direct/topic). */
     private String routingKey = "nfe.event";
 
-    /** Routing key para mensagens em retry (dead-letter do consumidor). */
-    private String retryRoutingKey = "nfe.event.retry";
+    /** Habilita DLQ em DEV/local (via autoDeclare). */
+    private boolean dlqEnabled = true;
 
-    /** Routing key para DLQ (quando exceder tentativas). */
+    /** Exchange DLX para dead-letter (quando dlqEnabled=true). */
+    private String dlxExchange = "sagnus.nfe.events.dlx";
+
+    /** Fila DLQ (quando dlqEnabled=true). */
+    private String dlq = "sagnus.nfe.events.dlq";
+
+    /** Routing key usada para enviar para DLQ (quando dlqEnabled=true). */
     private String dlqRoutingKey = "nfe.event.dlq";
 
-    /** TTL (ms) da fila de retry antes de voltar para a fila principal. */
-    private int retryTtlMs = 10_000;
+    /**  */
+    private String retryQueue = "sagnus.nfe.events.retry.q";
+    private int maxDeliveries = 3;
+    private int retryTtlMs = 60000;
 
-    /** Máximo de tentativas no worker antes de enviar para DLQ. */
-    private int maxDeliveries = 10;
+    public String getRetryQueue() {
+        return retryQueue;
+    }
+
+    public void setRetryQueue(String retryQueue) {
+        this.retryQueue = retryQueue;
+    }
+
+    public int getMaxDeliveries() {
+        return maxDeliveries;
+    }
+
+    public void setMaxDeliveries(int maxDeliveries) {
+        this.maxDeliveries = maxDeliveries;
+    }
+
+    public int getRetryTtlMs() {
+        return retryTtlMs;
+    }
+
+    public void setRetryTtlMs(int retryTtlMs) {
+        this.retryTtlMs = retryTtlMs;
+    }
 
     public boolean isAutoDeclare() {
         return autoDeclare;
@@ -80,12 +103,28 @@ public class NfeOutboxRabbitProperties {
         this.queue = queue;
     }
 
-    public String getRetryQueue() {
-        return retryQueue;
+    public String getRoutingKey() {
+        return routingKey;
     }
 
-    public void setRetryQueue(String retryQueue) {
-        this.retryQueue = retryQueue;
+    public void setRoutingKey(String routingKey) {
+        this.routingKey = routingKey;
+    }
+
+    public boolean isDlqEnabled() {
+        return dlqEnabled;
+    }
+
+    public void setDlqEnabled(boolean dlqEnabled) {
+        this.dlqEnabled = dlqEnabled;
+    }
+
+    public String getDlxExchange() {
+        return dlxExchange;
+    }
+
+    public void setDlxExchange(String dlxExchange) {
+        this.dlxExchange = dlxExchange;
     }
 
     public String getDlq() {
@@ -96,43 +135,11 @@ public class NfeOutboxRabbitProperties {
         this.dlq = dlq;
     }
 
-    public String getRoutingKey() {
-        return routingKey;
-    }
-
-    public void setRoutingKey(String routingKey) {
-        this.routingKey = routingKey;
-    }
-
-    public String getRetryRoutingKey() {
-        return retryRoutingKey;
-    }
-
-    public void setRetryRoutingKey(String retryRoutingKey) {
-        this.retryRoutingKey = retryRoutingKey;
-    }
-
     public String getDlqRoutingKey() {
         return dlqRoutingKey;
     }
 
     public void setDlqRoutingKey(String dlqRoutingKey) {
         this.dlqRoutingKey = dlqRoutingKey;
-    }
-
-    public int getRetryTtlMs() {
-        return retryTtlMs;
-    }
-
-    public void setRetryTtlMs(int retryTtlMs) {
-        this.retryTtlMs = retryTtlMs;
-    }
-
-    public int getMaxDeliveries() {
-        return maxDeliveries;
-    }
-
-    public void setMaxDeliveries(int maxDeliveries) {
-        this.maxDeliveries = maxDeliveries;
     }
 }

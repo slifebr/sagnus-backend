@@ -5,7 +5,10 @@ import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
 import com.slifesys.sagnus.corp.domain.model.pessoa.PessoaId;
 import com.slifesys.sagnus.corp.domain.model.pessoa.TipoPessoa;
+import com.slifesys.sagnus.corp.infrastructure.persistence.jpa.repo.PessoaSpringDataRepository;
 import com.slifesys.sagnus.corp.application.port.PessoaRepository;
+//import com.slifesys.sagnus.corp.infrastructure.persistence.jpa.repository.PessoaJpaRepository; // nao existe package
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,14 @@ public class CorpPessoaQueryAdapter implements CorpPessoaQueryPort {
                 .map(this::toResumo);
     }
 
+    /**
+     * Assinatura alinhada com o contrato (BC CORP API).
+     *
+     * Regras práticas:
+     * - documento com 11 dígitos -> CPF (FISICA)
+     * - documento com 14 dígitos -> CNPJ (JURIDICA)
+     * - caso não dê para inferir, tenta FISICA e depois JURIDICA
+     */
     @Override
     @Transactional(readOnly = true)
     public Optional<PessoaResumoDTO> obterResumoPorDocumento(String tipo, String documento) {
@@ -50,6 +61,24 @@ public class CorpPessoaQueryAdapter implements CorpPessoaQueryPort {
                 .build();
     }
 
+    /*
+     * //- verificar se relamente teria que ja mapear para um entity jpa
+     * private PessoaResumoDTO toResumoJpa(PessoaEntity p) {
+     * return PessoaResumoDTO.builder()
+     * .pessoaId(p.getId())
+     * .tipo(p.getTipo().name())
+     * .documento(p.getDocumento())
+     * .nomeRazao(p.getNomeRazao())
+     * .ie(p.getIe())
+     * .uf(p.getUf())
+     * .municipioCodIbge(p.getMunicipioCodIbge())
+     * .endereco(p.getEndereco())
+     * .numero(p.getNumero())
+     * .bairro(p.getBairro())
+     * .cep(p.getCep())
+     * .build();
+     * }
+     */
     private TipoPessoa parseTipo(String raw) {
         if (raw == null || raw.isBlank())
             return null;
