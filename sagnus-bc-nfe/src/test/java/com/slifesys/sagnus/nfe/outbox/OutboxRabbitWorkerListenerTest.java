@@ -22,20 +22,6 @@ import static org.mockito.Mockito.*;
 
 public class OutboxRabbitWorkerListenerTest {
 
-    /*
-     * No teste quandoExcedeTentativas_deveEnviarParaDlqEAck:
-     * 
-     * troquei props.setExchange("ex") por props.setDlxExchange("ex")
-     * 
-     * mantive o assert convertAndSend("ex", "rk.dlq", ...) (agora fica coerente)
-     * 
-     * No teste quandoFalhaMasAindaNaoExcedeu_deveNackParaRetry:
-     * 
-     * o verify “never convertAndSend” foi ajustado para não amarrar em
-     * props.getExchange() (porque o código não usa mais o exchange principal pra
-     * DLQ)
-     */
-
     @Test
     void quandoJaProcessado_deveAckEParar() throws Exception {
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
@@ -90,7 +76,9 @@ public class OutboxRabbitWorkerListenerTest {
         l.onMessage(msg, ch);
 
         verify(ch).basicNack(8L, false, false);
-        verify(rabbit, never()).convertAndSend(eq(props.getExchange()), eq(props.getDlqRoutingKey()), anyString());
+        // Em falha "ainda dentro" do limite de tentativas, o worker deve apenas NACK (requeue=false)
+        // e deixar o DLX+TTL (retryQueue) fazer o redelivery. Não deve publicar em DLQ.
+        verify(rabbit, never()).convertAndSend(anyString(), eq(props.getDlqRoutingKey()), anyString());
     }
 
     @Test

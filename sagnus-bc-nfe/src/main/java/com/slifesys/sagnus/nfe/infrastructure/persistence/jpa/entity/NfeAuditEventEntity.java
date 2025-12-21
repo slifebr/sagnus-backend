@@ -38,12 +38,4 @@ public class NfeAuditEventEntity {
 
     @Column(name = "payload_json", columnDefinition = "text")
     private String payloadJson;
-
-    public void setCorrelationId(String correlationId) {
-        this.correlationId = correlationId;
-    }
-
-    public void setPayloadJson(String payloadJson) {
-        this.payloadJson = payloadJson;
-    }
 }
