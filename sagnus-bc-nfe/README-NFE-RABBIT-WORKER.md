@@ -58,4 +58,4 @@ Quando `sagnus.nfe.outbox.rabbit.autoDeclare=true`, o módulo declara:
 O worker marca `eventId` em `nfe_inbox_processed`. Se o mesmo evento chegar novamente (redelivery),
 ele faz ACK e ignora (evita duplicidade).
 
-Migration: `V5__create_nfe_inbox_processed.sql`.
+Migration: `V3__create_nfe_inbox_processed.sql`.

@@ -1,9 +1,11 @@
-package com.slifesys.sagnus.platform.web.error;
+package com.slifesys.sagnus.platform.error;
 
-import com.slifesys.sagnus.platform.web.filter.CorrelationIdFilter;
+import com.slifesys.sagnus.platform.filter.CorrelationIdFilter;
 import com.slifesys.sagnus.shared.error.BusinessException;
 import com.slifesys.sagnus.shared.error.ErrorResponse;
 import com.slifesys.sagnus.shared.error.ErrorType;
+import com.slifesys.sagnus.shared.observability.CorrelationId;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@org.springframework.stereotype.Component("platformGlobalExceptionHandler")
 public class GlobalExceptionHandler {
 
     // ====== Validação de @Valid em DTOs (body) ======
@@ -36,12 +39,9 @@ public class GlobalExceptionHandler {
                 "Dados de entrada inválidos.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.VALIDATION_ERROR
-        );
+                ErrorType.VALIDATION_ERROR);
 
-        ex.getBindingResult().getFieldErrors().forEach(fe ->
-                resp.addFieldError(fe.getField(), fe.getDefaultMessage())
-        );
+        ex.getBindingResult().getFieldErrors().forEach(fe -> resp.addFieldError(fe.getField(), fe.getDefaultMessage()));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
     }
@@ -61,8 +61,7 @@ public class GlobalExceptionHandler {
                 "Dados de entrada inválidos.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.VALIDATION_ERROR
-        );
+                ErrorType.VALIDATION_ERROR);
 
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             String field = violation.getPropertyPath().toString();
@@ -87,8 +86,7 @@ public class GlobalExceptionHandler {
                 "Corpo da requisição inválido ou mal formatado.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.BAD_REQUEST
-        );
+                ErrorType.BAD_REQUEST);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
     }
@@ -110,8 +108,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getRequestURI(),
                 correlationId,
-                ex.getErrorType() != null ? ex.getErrorType() : ErrorType.BUSINESS_ERROR
-        );
+                ex.getErrorType() != null ? ex.getErrorType() : ErrorType.BUSINESS_ERROR);
 
         return ResponseEntity.status(status).body(resp);
     }
@@ -132,33 +129,32 @@ public class GlobalExceptionHandler {
                 "Usuário ou senha inválidos.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.AUTH_ERROR
-        );
+                ErrorType.AUTH_ERROR);
 
         return ResponseEntity.status(status).body(resp);
     }
 
     // ====== Violação de integridade (FK, unique, etc.) ======
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponseEntity<ErrorResponse> handleDataIntegrity(
-//            DataIntegrityViolationException ex,
-//            HttpServletRequest request) {
-//
-//        String correlationId = correlationId(request);
-//        HttpStatus status = HttpStatus.CONFLICT;
-//
-//        ErrorResponse resp = ErrorResponse.of(
-//                status.value(),
-//                status.getReasonPhrase(),
-//                "DATA_INTEGRITY_VIOLATION",
-//                "Operação não permitida devido a restrição de integridade.",
-//                request.getRequestURI(),
-//                correlationId,
-//                ErrorType.BUSINESS_ERROR
-//        );
-//
-//        return ResponseEntity.status(status).body(resp);
-//    }
+    // @ExceptionHandler(DataIntegrityViolationException.class)
+    // public ResponseEntity<ErrorResponse> handleDataIntegrity(
+    // DataIntegrityViolationException ex,
+    // HttpServletRequest request) {
+    //
+    // String correlationId = correlationId(request);
+    // HttpStatus status = HttpStatus.CONFLICT;
+    //
+    // ErrorResponse resp = ErrorResponse.of(
+    // status.value(),
+    // status.getReasonPhrase(),
+    // "DATA_INTEGRITY_VIOLATION",
+    // "Operação não permitida devido a restrição de integridade.",
+    // request.getRequestURI(),
+    // correlationId,
+    // ErrorType.BUSINESS_ERROR
+    // );
+    //
+    // return ResponseEntity.status(status).body(resp);
+    // }
 
     // ===== Erros do Spring (404/405 etc.) =====
     @ExceptionHandler(ErrorResponseException.class)
@@ -177,9 +173,12 @@ public class GlobalExceptionHandler {
                 : ex.getMessage();
 
         ErrorType type;
-        if (statusCode.is4xxClientError()) type = ErrorType.BAD_REQUEST;
-        else if (statusCode.is5xxServerError()) type = ErrorType.INTERNAL_ERROR;
-        else type = ErrorType.BUSINESS_ERROR;
+        if (statusCode.is4xxClientError())
+            type = ErrorType.BAD_REQUEST;
+        else if (statusCode.is5xxServerError())
+            type = ErrorType.INTERNAL_ERROR;
+        else
+            type = ErrorType.BUSINESS_ERROR;
 
         ErrorResponse resp = ErrorResponse.of(
                 statusCode.value(),
@@ -188,8 +187,7 @@ public class GlobalExceptionHandler {
                 message,
                 request.getRequestURI(),
                 correlationId,
-                type
-        );
+                type);
 
         return ResponseEntity.status(statusCode).body(resp);
     }
@@ -210,8 +208,7 @@ public class GlobalExceptionHandler {
                 "Erro interno inesperado.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.INTERNAL_ERROR
-        );
+                ErrorType.INTERNAL_ERROR);
 
         ex.printStackTrace(); // trocar por logger + correlationId
 
@@ -219,12 +216,14 @@ public class GlobalExceptionHandler {
     }
 
     private String correlationId(HttpServletRequest request) {
-        Object v = request.getAttribute(CorrelationIdFilter.REQ_ATTR);
+        Object v = request.getAttribute(CorrelationId.ATTRIBUTE);
+
         return (v != null ? v.toString() : null);
     }
 
     private HttpStatus mapToHttpStatus(ErrorType type) {
-        if (type == null) return HttpStatus.BAD_REQUEST;
+        if (type == null)
+            return HttpStatus.BAD_REQUEST;
         return switch (type) {
             case VALIDATION_ERROR, BAD_REQUEST -> HttpStatus.BAD_REQUEST;
             case NOT_FOUND -> HttpStatus.NOT_FOUND;

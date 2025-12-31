@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/pessoas")
-public class PessoaController {
+public class GatewayPessoaController {
 
     private final PessoaService service;
 
-    public PessoaController(PessoaService service) {
+    public GatewayPessoaController(PessoaService service) {
         this.service = service;
     }
 
@@ -50,7 +50,7 @@ public class PessoaController {
     @PreAuthorize("hasAuthority('CAD_PESSOA_EDITAR')")
     @PutMapping("/{id}")
     public PessoaDTO atualizar(@PathVariable Integer id,
-                               @Valid @RequestBody PessoaDTO dto) {
+            @Valid @RequestBody PessoaDTO dto) {
         return service.atualizar(id, dto);
     }
 

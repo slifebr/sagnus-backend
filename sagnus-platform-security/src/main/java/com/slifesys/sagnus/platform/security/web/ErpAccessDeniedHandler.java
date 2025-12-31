@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
+import com.slifesys.sagnus.shared.observability.CorrelationId;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -23,8 +24,8 @@ public class ErpAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request,
-                       HttpServletResponse response,
-                       AccessDeniedException accessDeniedException) throws IOException {
+            HttpServletResponse response,
+            AccessDeniedException accessDeniedException) throws IOException {
 
         String correlationId = (String) request.getAttribute(CorrelationId.ATTRIBUTE);
         if (correlationId == null || correlationId.isBlank()) {
@@ -38,8 +39,7 @@ public class ErpAccessDeniedHandler implements AccessDeniedHandler {
                 "Acesso negado.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.ACCESS_DENIED
-        );
+                ErrorType.ACCESS_DENIED);
 
         response.setStatus(HttpStatus.FORBIDDEN.value());
         response.setContentType("application/json;charset=UTF-8");

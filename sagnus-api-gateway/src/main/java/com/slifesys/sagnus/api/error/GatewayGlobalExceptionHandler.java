@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.UUID;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GatewayGlobalExceptionHandler {
 
     // ====== Validação de @Valid em DTOs (body) ======
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -35,12 +35,9 @@ public class GlobalExceptionHandler {
                 "Dados de entrada inválidos.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.VALIDATION_ERROR
-        );
+                ErrorType.VALIDATION_ERROR);
 
-        ex.getBindingResult().getFieldErrors().forEach(fe ->
-                resp.addFieldError(fe.getField(), fe.getDefaultMessage())
-        );
+        ex.getBindingResult().getFieldErrors().forEach(fe -> resp.addFieldError(fe.getField(), fe.getDefaultMessage()));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
     }
@@ -60,8 +57,7 @@ public class GlobalExceptionHandler {
                 "Dados de entrada inválidos.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.VALIDATION_ERROR
-        );
+                ErrorType.VALIDATION_ERROR);
 
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             String field = violation.getPropertyPath().toString();
@@ -86,8 +82,7 @@ public class GlobalExceptionHandler {
                 "Corpo da requisição inválido ou mal formatado.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.BAD_REQUEST
-        );
+                ErrorType.BAD_REQUEST);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
     }
@@ -110,8 +105,7 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getRequestURI(),
                 correlationId,
-                ex.getErrorType() != null ? ex.getErrorType() : ErrorType.BUSINESS_ERROR
-        );
+                ex.getErrorType() != null ? ex.getErrorType() : ErrorType.BUSINESS_ERROR);
 
         return ResponseEntity.status(status).body(resp);
     }
@@ -132,8 +126,7 @@ public class GlobalExceptionHandler {
                 "Usuário ou senha inválidos.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.AUTH_ERROR
-        );
+                ErrorType.AUTH_ERROR);
 
         return ResponseEntity.status(status).body(resp);
     }
@@ -153,13 +146,13 @@ public class GlobalExceptionHandler {
                 "Operação não permitida devido a restrição de integridade.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.BUSINESS_ERROR
-        );
+                ErrorType.BUSINESS_ERROR);
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(resp);
     }
 
-    // ===== Erros do Spring mais "genéricos" com status embutido (404, 405, etc.) =====
+    // ===== Erros do Spring mais "genéricos" com status embutido (404, 405, etc.)
+    // =====
     @ExceptionHandler(ErrorResponseException.class)
     public ResponseEntity<ApiErrorResponse> handleErrorResponseException(
             ErrorResponseException ex,
@@ -196,8 +189,7 @@ public class GlobalExceptionHandler {
                 message,
                 request.getRequestURI(),
                 correlationId,
-                type
-        );
+                type);
 
         return ResponseEntity.status(statusCode).body(resp);
     }
@@ -218,8 +210,7 @@ public class GlobalExceptionHandler {
                 "Erro interno inesperado.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.INTERNAL_ERROR
-        );
+                ErrorType.INTERNAL_ERROR);
 
         // aqui você pode logar com stack trace e correlationId
         ex.printStackTrace();

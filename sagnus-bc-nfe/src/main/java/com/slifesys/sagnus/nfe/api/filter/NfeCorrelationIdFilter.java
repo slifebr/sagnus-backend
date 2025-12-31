@@ -27,7 +27,7 @@ import java.util.UUID;
  * - response header X-Correlation-Id
  */
 @Component
-public class CorrelationIdFilter extends OncePerRequestFilter {
+public class NfeCorrelationIdFilter extends OncePerRequestFilter {
 
     public static final String HEADER_CORRELATION_ID = "X-Correlation-Id";
     public static final String HEADER_REQUEST_ID = "X-Request-Id";
@@ -35,8 +35,8 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
         String cid = firstNonBlank(request.getHeader(HEADER_CORRELATION_ID), request.getHeader(HEADER_REQUEST_ID));
         if (cid == null) {
@@ -59,8 +59,10 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
     }
 
     private static String firstNonBlank(String a, String b) {
-        if (a != null && !a.isBlank()) return a.trim();
-        if (b != null && !b.isBlank()) return b.trim();
+        if (a != null && !a.isBlank())
+            return a.trim();
+        if (b != null && !b.isBlank())
+            return b.trim();
         return null;
     }
 }

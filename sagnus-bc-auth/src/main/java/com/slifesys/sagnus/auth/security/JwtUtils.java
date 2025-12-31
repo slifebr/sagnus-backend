@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
-@Component
+@Component("authJwtUtils")
 @RequiredArgsConstructor
 public class JwtUtils {
 

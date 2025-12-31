@@ -12,27 +12,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
+@Service("gatewayTokenService")
 public class TokenService {
 
     private final JwtUtils jwtUtils;
     private final UsuarioSistemaRepository usuarioRepository;
 
-    public TokenService(JwtUtils jwtUtils,
-                        UsuarioSistemaRepository usuarioRepository) {
+    public TokenService(@org.springframework.beans.factory.annotation.Qualifier("gatewayJwtUtils") JwtUtils jwtUtils,
+            UsuarioSistemaRepository usuarioRepository) {
         this.jwtUtils = jwtUtils;
         this.usuarioRepository = usuarioRepository;
     }
 
     // DTO de retorno (usado no login e no /auth/refresh)
     public record TokenPair(String accessToken,
-                            String refreshToken,
-                            long expiresIn) {
+            String refreshToken,
+            long expiresIn) {
     }
 
     // ========= Usado no LOGIN =========
     public TokenPair generateTokensOnLogin(String username,
-                                        Collection<? extends GrantedAuthority> authorities) {
+            Collection<? extends GrantedAuthority> authorities) {
 
         UsuarioSistema usuario = usuarioRepository.findByLogin(username)
                 .orElseThrow(() -> new IllegalStateException(
@@ -51,8 +51,7 @@ public class TokenService {
         return new TokenPair(
                 accessToken,
                 refreshToken,
-                jwtUtils.getAccessTokenExpirationSeconds()
-        );
+                jwtUtils.getAccessTokenExpirationSeconds());
     }
 
     // ========= Usado no /auth/refresh =========
@@ -82,8 +81,7 @@ public class TokenService {
         return new TokenPair(
                 newAccessToken,
                 newRefreshToken,
-                jwtUtils.getAccessTokenExpirationSeconds()
-        );
+                jwtUtils.getAccessTokenExpirationSeconds());
     }
 
     // ========= Usado no JWTAuthorizationFilter =========

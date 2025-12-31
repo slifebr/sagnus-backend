@@ -14,17 +14,18 @@ import java.util.Optional;
  * - Ativo somente no profile "local"
  * - Sobe apenas se NÃO existir outro bean CorpPessoaGatewayPort.
  *
- * Importante: isso é apenas para desenvolvimento; em ambientes reais, NFe deve consumir CORP
+ * Importante: isso é apenas para desenvolvimento; em ambientes reais, NFe deve
+ * consumir CORP
  * via contrato (in-process) ou via HTTP/mensageria.
  */
 @Component
 @Profile("local")
-@ConditionalOnMissingBean(CorpPessoaGatewayPort.class)
 public class StubCorpPessoaGatewayAdapter implements CorpPessoaGatewayPort {
 
     @Override
     public Optional<PessoaResumoDTO> obterResumoPorId(Long pessoaId) {
-        if (pessoaId == null) return Optional.empty();
+        if (pessoaId == null)
+            return Optional.empty();
 
         // Exemplos fixos (para teste end-to-end rápido)
         if (pessoaId == 1L) {

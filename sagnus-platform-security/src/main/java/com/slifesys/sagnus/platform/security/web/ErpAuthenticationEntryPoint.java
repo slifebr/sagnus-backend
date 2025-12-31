@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+import com.slifesys.sagnus.shared.observability.CorrelationId;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -23,8 +24,8 @@ public class ErpAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request,
-                         HttpServletResponse response,
-                         AuthenticationException authException) throws IOException {
+            HttpServletResponse response,
+            AuthenticationException authException) throws IOException {
 
         String correlationId = (String) request.getAttribute(CorrelationId.ATTRIBUTE);
         if (correlationId == null || correlationId.isBlank()) {
@@ -38,8 +39,7 @@ public class ErpAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 "Não autenticado ou token inválido.",
                 request.getRequestURI(),
                 correlationId,
-                ErrorType.AUTH_ERROR
-        );
+                ErrorType.AUTH_ERROR);
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setHeader("WWW-Authenticate", "Bearer");

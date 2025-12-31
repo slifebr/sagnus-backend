@@ -11,8 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
-@Component
+@Component("gatewayJwtUtils")
 public class JwtUtils {
 
     // Lidos do application.properties
@@ -27,8 +26,8 @@ public class JwtUtils {
 
     // ====== ACCESS TOKEN ======
     public String gerarAccessToken(String username,
-                                   List<String> roles,
-                                   int tokenVersion) {
+            List<String> roles,
+            int tokenVersion) {
 
         Date agora = new Date();
         Date expira = new Date(agora.getTime() + accessTokenExpirationMillis);
@@ -39,7 +38,7 @@ public class JwtUtils {
                 .setExpiration(expira)
                 .addClaims(Map.of(
                         "roles", roles,
-                        "tv", tokenVersion      // tokenVersion
+                        "tv", tokenVersion // tokenVersion
                 ))
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
@@ -55,24 +54,23 @@ public class JwtUtils {
                 .setIssuedAt(agora)
                 .setExpiration(expira)
                 .addClaims(Map.of(
-                        "tv", tokenVersion
-                ))
+                        "tv", tokenVersion))
                 .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
 
     // ====== Validação genérica ======
     /*
-    public boolean isTokenValido(String token) {
-        try {
-            Claims claims = getClaims(token);
-            Date exp = claims.getExpiration();
-            return exp != null && exp.after(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    */
+     * public boolean isTokenValido(String token) {
+     * try {
+     * Claims claims = getClaims(token);
+     * Date exp = claims.getExpiration();
+     * return exp != null && exp.after(new Date());
+     * } catch (Exception e) {
+     * return false;
+     * }
+     * }
+     */
     public boolean isTokenValido(String token) {
         try {
             var jws = parseToken(token);
@@ -98,8 +96,10 @@ public class JwtUtils {
 
     public int getTokenVersion(String token) {
         Object tv = getClaims(token).get("tv");
-        if (tv instanceof Integer i) return i;
-        if (tv instanceof Number n) return n.intValue();
+        if (tv instanceof Integer i)
+            return i;
+        if (tv instanceof Number n)
+            return n.intValue();
         return 0;
     }
 
@@ -113,7 +113,6 @@ public class JwtUtils {
     public long getAccessTokenExpirationSeconds() {
         return accessTokenExpirationMillis / 1000;
     }
-
 
     public Jws<Claims> parseToken(String token) {
         return Jwts.parser()

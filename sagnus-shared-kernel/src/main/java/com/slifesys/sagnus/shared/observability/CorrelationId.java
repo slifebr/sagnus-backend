@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.platform.security.web;
+package com.slifesys.sagnus.shared.observability;
 
 /**
  * Contrato de correlação do Sagnus:
@@ -7,7 +7,8 @@ package com.slifesys.sagnus.platform.security.web;
  * - MDC key: correlationId
  */
 public final class CorrelationId {
-    private CorrelationId() {}
+    private CorrelationId() {
+    }
 
     public static final String HEADER = "X-Correlation-Id";
     public static final String ATTRIBUTE = "sagnusCorrelationId";

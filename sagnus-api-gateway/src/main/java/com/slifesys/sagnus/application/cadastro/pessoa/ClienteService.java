@@ -6,6 +6,7 @@ import com.slifesys.sagnus.api.error.ErrorType;
 import com.slifesys.sagnus.core.exception.BusinessException;
 import com.slifesys.sagnus.infrastructure.persistence.cadastro.pessoa.CadCliente;
 import com.slifesys.sagnus.infrastructure.persistence.cadastro.pessoa.CadPessoa;
+
 import com.slifesys.sagnus.infrastructure.persistence.cadastro.pessoa.repository.CadClienteRepository;
 
 import com.slifesys.sagnus.infrastructure.persistence.cadastro.pessoa.repository.CadPessoaRepository;

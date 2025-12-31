@@ -21,18 +21,7 @@ public class UnidadeEntity {
     @Column(name = "sigla")
     private String sigla;
 
-    @Column(name = "nome") // Assuming 'nome' exists or mapping to description if not? SQL said 'sigla',
-                           // 'descricao'. Let's check SQL again.
-    // SQL: sigla, descricao, pode_fracionar. No 'nome'. Wait, Domain Entity had
-    // 'nome'.
-    // I should check if I made a mistake in Domain Entity or if I should map
-    // 'descricao' to 'nome' or add 'nome' to table?
-    // SQL line 2864: sigla, descricao, pode_fracionar.
-    // I'll map 'descricao' to 'descricao' and 'sigla' to 'sigla'.
-    // I'll remove 'nome' from JPA entity if it's not in DB, or map it to something
-    // else?
-    // Let's assume 'descricao' is the name/description.
-    // I'll update Domain Entity later if needed, but for now JPA must match DB.
+    @Column(name = "descricao")
     private String descricao;
 
     @Column(name = "pode_fracionar")

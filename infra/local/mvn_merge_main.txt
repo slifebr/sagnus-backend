@@ -1,0 +1,23 @@
+Merge Feature to Main Plan
+Goal
+Merge code from feat/worker-asyncxml-retry-dlq to main.
+
+User Review Required
+Untracked Corp Files: There are untracked files in sagnus-bc-corp (e.g., TransportadoraController.java). Are these part of the worker feature?
+If NO, I will only commit the sagnus-bc-nfe changes.
+If YES, I will add them.
+Tracked Binary Files: sagnus-shared-kernel/target/ has tracked class files. I recommend removing them from git (but keeping them on disk).
+Proposed Changes
+Cleanup: Execute git rm --cached -r on sagnus-shared-kernel/target and other binary paths if found.
+Commit:
+Add sagnus-bc-nfe changes.
+Add sagnus-bc-corp changes (ONLY if confirmed).
+Commit with message "feat: worker async xml retry dlq implementation".
+Merge:
+Checkout main.
+Pull main.
+Merge feat/worker-asyncxml-retry-dlq.
+Push: Push main.
+Verification Plan
+Automated Tests
+Run mvn clean install -DskipTests to verify build.
