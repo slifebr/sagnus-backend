@@ -11,12 +11,6 @@
 
     <artifactId>sagnus-bc-nfe</artifactId>
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,7 +77,7 @@
         </dependency>
         <dependency>
             <groupId>com.slifesys.sagnus</groupId>
-            <artifactId>sagnus-bc-corp-api</artifactId>
+            <artifactId>sagnus-bc-contracts-corp</artifactId>
             <version>${project.version}</version>
         </dependency>
 

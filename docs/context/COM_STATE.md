@@ -10,7 +10,7 @@
 - **Branch/Tag (se houver):** 
 - **Commit hash (se houver):** 
 - **ZIP enviado:**  sagnus_20251219.zip
-- **Módulos incluídos no ZIP:** sagnus-bc-gateway, sagnus-bc-auth, sagnus-bc-corp, sagnus-bc-corp-api,sagnus-bc-nfe, 
+- **Módulos incluídos no ZIP:** sagnus-bc-gateway, sagnus-bc-auth, sagnus-bc-corp, sagnus-bc-contracts-corp,sagnus-bc-nfe, 
                                 sagnus-platform-security, sagnus-paltform-web, sagnus-shared-api-error, sagnus-shared-kernel
 
 ---

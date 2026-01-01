@@ -3,7 +3,7 @@ package com.slifesys.sagnus.nfe.infrastructure.event.spring;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slifesys.sagnus.nfe.application.config.NfeAuditProperties;
-import com.slifesys.sagnus.nfe.application.context.CorrelationIdHolder;
+import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
 import com.slifesys.sagnus.nfe.domain.event.CorrelatedDomainEvent;
 import com.slifesys.sagnus.nfe.domain.event.DomainEvent;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.entity.NfeAuditEventEntity;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  *
  * - grava em tabela nfe_audit_event
  * - armazena payload JSON do evento
- * - captura correlationId (do evento, quando disponível, ou do CorrelationIdHolder)
+ * - captura correlationId (do evento, quando disponível, ou do CorrelationIdContext)
  */
 @Slf4j
 @Component
@@ -48,7 +48,7 @@ public class DomainEventAuditPersistenceListener {
             correlationId = cde.getCorrelationId();
         }
         if (correlationId == null || correlationId.isBlank()) {
-            correlationId = CorrelationIdHolder.get();
+            correlationId = CorrelationIdContext.get();
         }
 
         String payload;

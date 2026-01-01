@@ -1,3 +1,18 @@
+# Sagnus ERP — VERSION BASELINE v260101 (2026-01-01)
+
+## v260101 — Consolidação do padrão DDD + cross-cutting
+
+- CorrelationId unificado via `sagnus-shared-kernel` (`CorrelationIdContext`) + `sagnus-platform-web` (`CorrelationIdFilter`).
+- Removida duplicação de `GlobalExceptionHandler` do `sagnus-shared-api-error` (ficou centralizado no `sagnus-platform-web`).
+- `sagnus-shared-api-error` passou a depender apenas de `spring-web` (evita puxar stack web completa).
+- POM raiz com versões centralizadas (jjwt/mapstruct/lombok) + pluginManagement para annotation processors.
+- Limpeza de artefatos locais (targets/logs/poms duplicados).
+- Adicionado `sagnus-bc-template` como template oficial (api/application/domain/infrastructure) para acelerar criação de novos BCs.
+
+---
+
+# Histórico
+
 # Sagnus ERP — VERSION BASELINE 2025-12-18-20:30h (VERSION.md)
 
 Baseline: 2025-12-18-20h 

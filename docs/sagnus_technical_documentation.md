@@ -40,7 +40,7 @@ The system is divided into autonomous business units:
 ### 2.3 Communication Between BCs
 
 - **Synchronous**: Via **Contracts** (`*-api` modules).
-  - Example: `bc-auth` depends on `bc-corp-api` to query user details. It does **NOT** depend on `bc-corp` implementation.
+  - Example: `bc-auth` depends on `bc-contracts-corp` to query user details. It does **NOT** depend on `bc-corp` implementation.
 - **Asynchronous**: Via Domain Events (future implementation).
 
 ---

@@ -25,7 +25,7 @@ psql --version
 
 ## 2) Estrutura do repositório (resumo)
 
-- `sagnus-bc-corp` / `sagnus-bc-corp-api`
+- `sagnus-bc-corp` / `sagnus-bc-contracts-corp`
 - `sagnus-bc-auth`
 - `sagnus-bc-nfe`
 - `sagnus-platform-security`
@@ -50,7 +50,7 @@ mvn -pl sagnus-bc-auth -am clean test -DskipTests
 
 ### 3.3 Instalar contrato CORP (quando o IDE “não enxerga”)
 ```bash
-mvn -pl sagnus-bc-corp-api clean install
+mvn -pl sagnus-bc-contracts-corp clean install
 ```
 
 ---
@@ -181,10 +181,10 @@ feat(bc-nfe): add pure domain and EmitirNfeUseCase foundation
 ## 11) Troubleshooting
 
 ### 11.1 “Package does not exist” em módulo contrato
-- Garanta que `sagnus-bc-corp-api` está em `<modules>` do POM pai
+- Garanta que `sagnus-bc-contracts-corp` está em `<modules>` do POM pai
 - Rode:
 ```bash
-mvn -pl sagnus-bc-corp-api clean install
+mvn -pl sagnus-bc-contracts-corp clean install
 ```
 - Recarregue o Maven no IDE
 

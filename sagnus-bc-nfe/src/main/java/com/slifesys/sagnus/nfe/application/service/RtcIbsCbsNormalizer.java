@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.nfe.application.service;
 
 import com.slifesys.sagnus.nfe.application.config.RtcIbsCbsProperties;
-import com.slifesys.sagnus.nfe.application.context.CorrelationIdHolder;
+import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
 import com.slifesys.sagnus.nfe.application.port.DomainEventPublisher;
 import com.slifesys.sagnus.nfe.domain.exception.NfeDomainException;
 import com.slifesys.sagnus.nfe.domain.event.RtcIbsCbsReconciledEvent;
@@ -141,7 +141,7 @@ public class RtcIbsCbsNormalizer {
         log.warn("RTC reconciliação {} configured={} resolved={} base={} aliq={} valor={} expected={} diff={} tol={} -> base={} aliq={} valor={}",
                 label, configured, resolved, base0, aliquota0, valor0, expected, diff, tol, base, aliquota, valor);
 
-        String cid = CorrelationIdHolder.get();
+        String cid = CorrelationIdContext.get();
         eventPublisher.publish(new RtcIbsCbsReconciledEvent(
                 cid,
                 label,

@@ -2,7 +2,7 @@ package com.slifesys.sagnus.nfe.infrastructure.outbox.rabbit.worker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slifesys.sagnus.nfe.application.config.NfeOutboxRabbitProperties;
-import com.slifesys.sagnus.nfe.application.context.CorrelationIdHolder;
+import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
 import com.slifesys.sagnus.nfe.application.port.OutboxMessage;
 import com.slifesys.sagnus.nfe.infrastructure.outbox.inbox.InboxIdempotencyService;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +70,7 @@ public class OutboxRabbitWorkerListener {
         try {
             if (correlationId != null && !correlationId.isBlank()) {
                 MDC.put("correlationId", correlationId);
-                CorrelationIdHolder.set(correlationId);
+                CorrelationIdContext.set(correlationId);
             }
 
             if (inbox.alreadyProcessed(envelope.eventId())) {
@@ -112,7 +112,7 @@ public class OutboxRabbitWorkerListener {
                 channel.basicNack(tag, false, false); // requeue=false -> DLX -> retryQueue
             }
         } finally {
-            CorrelationIdHolder.clear();
+            CorrelationIdContext.clear();
             MDC.remove("correlationId");
         }
     }

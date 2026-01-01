@@ -8,7 +8,7 @@ import com.slifesys.sagnus.nfe.application.port.DomainEventPublisher;
 import com.slifesys.sagnus.nfe.application.port.NfeRepository;
 import com.slifesys.sagnus.nfe.application.result.EmitirNfeResult;
 import com.slifesys.sagnus.nfe.application.service.RtcIbsCbsNormalizer;
-import com.slifesys.sagnus.nfe.application.context.CorrelationIdHolder;
+import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
 import com.slifesys.sagnus.nfe.domain.event.NfeEmitidaEvent;
 import com.slifesys.sagnus.nfe.domain.exception.NfeDomainException;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.Dinheiro;
@@ -89,7 +89,7 @@ public class EmitirNfeUseCase {
         Nfe saved = nfeRepository.save(nfe);
 
         // 5) publica evento (gera XML, auditoria, etc.)
-        String cid = CorrelationIdHolder.get();
+        String cid = CorrelationIdContext.get();
         eventPublisher.publish(NfeEmitidaEvent.builder()
                 .correlationId(cid)
                 .nfeId(saved.getId().getValue())

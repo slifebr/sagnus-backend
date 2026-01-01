@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * Adapter "in-process" para o BC CORP via contrato Java (sagnus-bc-corp-api).
+ * Adapter "in-process" para o BC CORP via contrato Java (sagnus-bc-contracts-corp).
  *
  * Este adapter só sobe se existir um bean CorpPessoaQueryPort no contexto.
  * (ex.: quando CORP está no mesmo monorepo e foi carregado na mesma aplicação)
