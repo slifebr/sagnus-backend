@@ -1,36 +1,24 @@
-# sagnus-bc-template (Template Oficial)
+# Sagnus - Bounded Context Administrativo (`sagnus-bc-adm`)
 
-Este módulo existe para você **copiar/renomear** e criar novos Bounded Contexts (BCs) mantendo o padrão DDD do Sagnus.
+Este Bounded Context (BC) é o coração administrativo da plataforma Sagnus. Ele é responsável por gerenciar as entidades e processos centrais que dão suporte às operações de outros contextos, garantindo a consistência e a integridade dos dados mestres.
 
-## Como criar um novo BC a partir deste template
+## Propósito e Responsabilidades
 
-1. **Copie** a pasta:
-   - de: `sagnus-bc-template`
-   - para: `sagnus-bc-<seu-bc>`
+O `sagnus-bc-adm` tem como principal responsabilidade a gestão de dados e funcionalidades administrativas essenciais, que são utilizadas por toda a plataforma.
 
-2. Ajuste o `pom.xml` do novo módulo:
-   - `<artifactId>sagnus-bc-<seu-bc></artifactId>`
-   - `<name>` / `<description>`
+Atualmente, sua principal funcionalidade é o **Módulo de Agenda**, que inclui:
 
-3. Renomeie os packages:
-   - de: `com.slifesys.sagnus.template`
-   - para: `com.slifesys.sagnus.<seu_bc>`
+*   **Gestão de Compromissos:** Criação e consulta de compromissos para os colaboradores.
+*   **Categorias de Compromisso:** Organização dos compromissos em categorias personalizáveis (ex: Reunião, Foco, Pessoal).
+*   **Convites e Notificações:** Gerenciamento de convidados para compromissos e envio de notificações.
 
-4. Inclua o módulo novo no `pom.xml` raiz em `<modules>`.
+## Arquitetura
 
-## Padrão de camadas (obrigatório)
+Este BC segue o padrão de Arquitetura Limpa (Clean Architecture) adotado no Sagnus, com uma separação clara entre as camadas:
 
-- `api` (Controllers, DTOs, Mappers) — **entrada**
-- `application` (UseCases, Commands/Queries, Ports) — **orquestração**
-- `domain` (Aggregates, VOs, regras, eventos, exceptions) — **núcleo**
-- `infrastructure` (Adapters: persistence, messaging, http clients) — **saída**
+*   `api`: Controladores REST, DTOs e Mappers para a interação com o mundo externo.
+*   `application`: Casos de uso que orquestram a lógica de negócio.
+*   `domain`: Modelos de domínio, regras de negócio e eventos.
+*   `infrastructure`: Implementações de persistência, mensageria e outros serviços externos.
 
-### Regras simples
-- `domain` **não importa Spring**
-- `application` importa o mínimo (ex.: `@Service`), sem `RestController` e sem `Entity`
-- Tudo que acessa banco/fila/http fica em `infrastructure`
-
-## Próximos upgrades recomendados para BC real
-- Outbox Pattern + Rabbit/Kafka
-- Persistência JPA (Entity separada do domínio)
-- ArchUnit para garantir as regras
+Este módulo serve como um exemplo canônico da nossa arquitetura e deve ser usado como referência para a criação de novos Bounded Contexts.
