@@ -1,22 +1,6 @@
-# sagnus-bc-template (Template Oficial)
+# Sagnus BC Estoque
 
-Este módulo existe para você **copiar/renomear** e criar novos Bounded Contexts (BCs) mantendo o padrão DDD do Sagnus.
-
-## Como criar um novo BC a partir deste template
-
-1. **Copie** a pasta:
-   - de: `sagnus-bc-template`
-   - para: `sagnus-bc-<seu-bc>`
-
-2. Ajuste o `pom.xml` do novo módulo:
-   - `<artifactId>sagnus-bc-<seu-bc></artifactId>`
-   - `<name>` / `<description>`
-
-3. Renomeie os packages:
-   - de: `com.slifesys.sagnus.template`
-   - para: `com.slifesys.sagnus.<seu_bc>`
-
-4. Inclua o módulo novo no `pom.xml` raiz em `<modules>`.
+Bounded Context para Gestão de Estoque, Inventário e Movimentações.
 
 ## Padrão de camadas (obrigatório)
 
@@ -24,13 +8,3 @@ Este módulo existe para você **copiar/renomear** e criar novos Bounded Context
 - `application` (UseCases, Commands/Queries, Ports) — **orquestração**
 - `domain` (Aggregates, VOs, regras, eventos, exceptions) — **núcleo**
 - `infrastructure` (Adapters: persistence, messaging, http clients) — **saída**
-
-### Regras simples
-- `domain` **não importa Spring**
-- `application` importa o mínimo (ex.: `@Service`), sem `RestController` e sem `Entity`
-- Tudo que acessa banco/fila/http fica em `infrastructure`
-
-## Próximos upgrades recomendados para BC real
-- Outbox Pattern + Rabbit/Kafka
-- Persistência JPA (Entity separada do domínio)
-- ArchUnit para garantir as regras
