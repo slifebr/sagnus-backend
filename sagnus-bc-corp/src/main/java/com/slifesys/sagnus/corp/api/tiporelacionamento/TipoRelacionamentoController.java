@@ -7,12 +7,11 @@ import com.slifesys.sagnus.corp.application.usecase.ObterTipoRelacionamentoUseCa
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
 @RestController
-@RequestMapping("/corp/tipos-relacionamento")
+@RequestMapping("/api/v1/corp/tipos-relacionamento")
 @RequiredArgsConstructor
 public class TipoRelacionamentoController {
 
@@ -28,9 +27,9 @@ public class TipoRelacionamentoController {
 
     @PostMapping
     public ResponseEntity<TipoRelacionamentoResponse> create(@RequestBody TipoRelacionamentoCreateRequest req) {
-        req.setUsuario(CorpSecurityUtils.getCurrentUser());
+        req.setUsuario(null);
         TipoRelacionamentoResult saved = cadastrarTipoRelacionamento.execute(req.toCommand());
-        return ResponseEntity.created(URI.create("/corp/tipos-relacionamento/" + saved.getId()))
+        return ResponseEntity.created(URI.create("/api/v1/corp/tipos-relacionamento/" + saved.getId()))
                 .body(TipoRelacionamentoResponse.from(saved));
     }
 

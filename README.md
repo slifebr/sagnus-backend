@@ -54,7 +54,7 @@ sagnus
 ├─ sagnus-platform-security        # Segurança JWT centralizada
 │
 ├─ sagnus-bc-corp                  # BC CORP (cadastros centrais)
-├─ sagnus-bc-contracts-corp              # Contratos CORP (ports + DTOs)
+├─ sagnus-bc-corp-contracts              # Contratos CORP (ports + DTOs)
 │
 ├─ sagnus-bc-auth                  # BC AUTH (login, JWT, usuários)
 ├─ sagnus-bc-nfe                   # BC NFe (domínio fiscal)
@@ -118,7 +118,7 @@ Formato padrão:
 Fonte de verdade para dados corporativos:
 - Pessoa Física / Jurídica
 - Base para AUTH e NFe
-- Exposição apenas via contrato (`sagnus-bc-contracts-corp`)
+- Exposição apenas via contrato (`sagnus-bc-corp-contracts`)
 
 ### 🔷 AUTH
 Responsável por autenticação e autorização:

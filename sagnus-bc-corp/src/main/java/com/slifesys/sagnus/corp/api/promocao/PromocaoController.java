@@ -11,10 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 @RestController
-@RequestMapping("/api/v1/promocoes")
+@RequestMapping("/api/v1/corp/promocoes")
 @RequiredArgsConstructor
 public class PromocaoController {
 
@@ -29,7 +28,7 @@ public class PromocaoController {
                 request.getDataInicio(),
                 request.getDataFim(),
                 request.getPrecoPromocional(),
-                CorpSecurityUtils.getCurrentUser()));
+                null));
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(result));
     }
 
@@ -42,7 +41,7 @@ public class PromocaoController {
                 request.getDataInicio(),
                 request.getDataFim(),
                 request.getPrecoPromocional(),
-                CorpSecurityUtils.getCurrentUser()));
+                null));
         return ResponseEntity.ok(toResponse(result));
     }
 

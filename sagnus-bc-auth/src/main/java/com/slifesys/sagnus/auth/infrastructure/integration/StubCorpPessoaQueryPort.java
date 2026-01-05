@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.auth.infrastructure.integration;
 
-import com.slifesys.sagnus.corp.api.contract.pessoa.CorpPessoaQueryPort;
-import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.CorpPessoaQueryPort;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

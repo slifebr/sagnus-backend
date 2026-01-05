@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.infrastructure.integration;
 
-import com.slifesys.sagnus.corp.api.contract.pessoa.CorpPessoaQueryPort;
-import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.CorpPessoaQueryPort;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
 import com.slifesys.sagnus.corp.domain.model.pessoa.PessoaId;
 import com.slifesys.sagnus.corp.domain.model.pessoa.TipoPessoa;

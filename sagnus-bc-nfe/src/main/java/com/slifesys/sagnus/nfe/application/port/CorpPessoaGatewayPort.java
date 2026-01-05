@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.nfe.application.port;
 
-import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
 
 import java.util.Optional;
 

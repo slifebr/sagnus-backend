@@ -6,7 +6,7 @@ import com.slifesys.sagnus.auth.infrastructure.persistence.jpa.repo.UsuarioSprin
 import com.slifesys.sagnus.auth.security.TokenService;
 import com.slifesys.sagnus.shared.error.BusinessException;
 
-import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

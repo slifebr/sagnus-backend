@@ -38,7 +38,7 @@ sagnus
 ├─ sagnus-platform-security        # Infra de segurança comum (JWT, filtros, config)
 │
 ├─ sagnus-bc-corp                  # BC CORP (cadastros centrais)
-├─ sagnus-bc-contracts-corp              # Contratos CORP (ports + DTOs estáveis)
+├─ sagnus-bc-corp-contracts              # Contratos CORP (ports + DTOs estáveis)
 │
 ├─ sagnus-bc-auth                  # BC AUTH (autenticação/autorização)
 ├─ sagnus-bc-nfe                   # BC NFe (fiscal)
@@ -58,7 +58,7 @@ sagnus
 - Exemplo: Pessoa (Física/Jurídica), endereços e derivados
 - CORP é a “fonte de verdade” para dados usados por AUTH e NFe
 
-**Contratos:** `sagnus-bc-contracts-corp` expõe portas e DTOs mínimos e estáveis, por exemplo:
+**Contratos:** `sagnus-bc-corp-contracts` expõe portas e DTOs mínimos e estáveis, por exemplo:
 - `CorpPessoaQueryPort`
 - `PessoaResumoDTO` (nome, documento, tipo… apenas o necessário)
 
@@ -66,7 +66,7 @@ sagnus
 **Responsabilidade:** login, emissão/validação de tokens, usuários do sistema (AUTH_USUARIO).
 
 - AUTH **não conhece** entidades/tabelas do CORP
-- AUTH usa CORP apenas via contrato (`sagnus-bc-contracts-corp`) para:
+- AUTH usa CORP apenas via contrato (`sagnus-bc-corp-contracts`) para:
   - validar `pessoa_id`
   - montar “resumo do usuário logado” com dados básicos da pessoa
 
@@ -113,8 +113,8 @@ A organização padrão dentro de um BC segue:
 ## 5. Regras de dependência (importante)
 
 ### 5.1 Dependências permitidas (regra prática)
-- `bc-auth` → pode depender de `bc-contracts-corp` (contrato), **não** de `bc-corp`
-- `bc-nfe` → pode depender de `bc-contracts-corp` (contrato), **não** de `bc-corp`
+- `bc-auth` → pode depender de `bc-corp-contracts` (contrato), **não** de `bc-corp`
+- `bc-nfe` → pode depender de `bc-corp-contracts` (contrato), **não** de `bc-corp`
 - BCs podem depender de módulos de plataforma:
   - `sagnus-shared-api-error`
   - `sagnus-platform-web`

@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.nfe.application.usecase;
 
-import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
 import com.slifesys.sagnus.nfe.application.command.EmitirNfeCommand;
 import com.slifesys.sagnus.nfe.application.command.EmitirNfeItemCommand;
 import com.slifesys.sagnus.nfe.application.port.CorpPessoaGatewayPort;

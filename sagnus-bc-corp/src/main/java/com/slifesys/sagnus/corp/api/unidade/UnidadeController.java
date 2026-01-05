@@ -7,12 +7,11 @@ import com.slifesys.sagnus.corp.application.usecase.ObterUnidadeUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
 @RestController
-@RequestMapping("/corp/unidades")
+@RequestMapping("/api/v1/corp/unidades")
 @RequiredArgsConstructor
 public class UnidadeController {
 
@@ -28,9 +27,9 @@ public class UnidadeController {
 
     @PostMapping
     public ResponseEntity<UnidadeResponse> create(@RequestBody UnidadeCreateRequest req) {
-        req.setUsuario(CorpSecurityUtils.getCurrentUser());
+        req.setUsuario(null);
         UnidadeResult saved = cadastrarUnidade.execute(req.toCommand());
-        return ResponseEntity.created(URI.create("/corp/unidades/" + saved.getId()))
+        return ResponseEntity.created(URI.create("/api/v1/corp/unidades/" + saved.getId()))
                 .body(UnidadeResponse.from(saved));
     }
 

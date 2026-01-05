@@ -11,10 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 @RestController
-@RequestMapping("/api/v1/transportadoras")
+@RequestMapping("/api/v1/corp/transportadoras")
 @RequiredArgsConstructor
 public class TransportadoraController {
 
@@ -28,7 +27,7 @@ public class TransportadoraController {
                 request.getIdPessoa(),
                 request.getPlacaVeiculo(),
                 request.getRntc(),
-                CorpSecurityUtils.getCurrentUser()));
+                null));
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(result));
     }
 
@@ -40,7 +39,7 @@ public class TransportadoraController {
                 request.getIdPessoa(),
                 request.getPlacaVeiculo(),
                 request.getRntc(),
-                CorpSecurityUtils.getCurrentUser()));
+                null));
         return ResponseEntity.ok(toResponse(result));
     }
 

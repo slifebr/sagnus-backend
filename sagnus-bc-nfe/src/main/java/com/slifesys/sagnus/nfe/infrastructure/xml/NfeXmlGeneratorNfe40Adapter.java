@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
@@ -113,13 +114,13 @@ public class NfeXmlGeneratorNfe40Adapter implements NfeXmlGeneratorPort {
 
     private static String fmt(BigDecimal v) {
         if (v == null) return "0.00";
-        return v.setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString();
+        return v.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
 
     private static String fmtAliq(BigDecimal v) {
         if (v == null) return "0.0000";
-        return v.setScale(4, BigDecimal.ROUND_HALF_UP).toPlainString();
+        return v.setScale(4, RoundingMode.HALF_UP).toPlainString();
     }
 
     private static BigDecimal calcVTotTrib(TributosItem trib) {

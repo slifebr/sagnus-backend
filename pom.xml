@@ -91,7 +91,7 @@
         <module>sagnus-shared-api-error</module>
         <module>sagnus-platform-security</module>
         <module>sagnus-platform-web</module>
-        <module>sagnus-bc-contracts-corp</module>
+        <module>sagnus-bc-corp-contracts</module>
         <module>sagnus-bc-auth</module>
 
         <module>sagnus-bc-corp</module>
@@ -133,7 +133,7 @@
             </dependency>
             <dependency>
                 <groupId>com.slifesys.sagnus</groupId>
-                <artifactId>sagnus-bc-contracts-corp</artifactId>
+                <artifactId>sagnus-bc-corp-contracts</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

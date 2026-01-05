@@ -23,7 +23,7 @@ public class ObterUsuarioResumoUseCase {
 
         var pessoaOpt = (usuario.getPessoaId() != null)
                 ? corpPessoaGateway.obterResumoPorPessoaId(usuario.getPessoaId())
-                : java.util.Optional.<com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO>empty();
+                : java.util.Optional.<com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO>empty();
 
         return UsuarioResumoResult.builder()
                 .usuarioId(usuario.getId())

@@ -7,12 +7,11 @@ import com.slifesys.sagnus.corp.application.usecase.ObterUFUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.slifesys.sagnus.corp.infrastructure.security.CorpSecurityUtils;
 
 import java.net.URI;
 
 @RestController
-@RequestMapping("/corp/ufs")
+@RequestMapping("/api/v1/corp/ufs")
 @RequiredArgsConstructor
 public class UFController {
 
@@ -28,9 +27,9 @@ public class UFController {
 
     @PostMapping
     public ResponseEntity<UFResponse> create(@RequestBody UFCreateRequest req) {
-        req.setUsuario(CorpSecurityUtils.getCurrentUser());
+        req.setUsuario(null);
         UFResult saved = cadastrarUF.execute(req.toCommand());
-        return ResponseEntity.created(URI.create("/corp/ufs/" + saved.getId()))
+        return ResponseEntity.created(URI.create("/api/v1/corp/ufs/" + saved.getId()))
                 .body(UFResponse.from(saved));
     }
 

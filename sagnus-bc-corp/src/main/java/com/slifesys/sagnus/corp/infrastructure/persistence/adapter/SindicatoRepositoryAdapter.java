@@ -4,8 +4,14 @@ import com.slifesys.sagnus.corp.application.port.SindicatoRepository;
 import com.slifesys.sagnus.corp.domain.model.sindicato.Sindicato;
 import com.slifesys.sagnus.corp.infrastructure.persistence.repository.JpaSindicatoRepository;
 import com.slifesys.sagnus.corp.infrastructure.persistence.mapper.CorpPersistenceMapper;
+import com.slifesys.sagnus.shared.paging.PageDirection;
+import com.slifesys.sagnus.shared.paging.PageRequest;
+import com.slifesys.sagnus.shared.paging.PageResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import java.util.Optional;
 
@@ -23,5 +29,39 @@ public class SindicatoRepositoryAdapter implements SindicatoRepository {
     @Override
     public Optional<Sindicato> findById(Long id) {
         return jpa.findById(id).map(CorpPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public PageResult<Sindicato> list(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            return PageResult.empty(PageRequest.of(0, 20, null, null));
+        }
+
+        Sort sort = Sort.unsorted();
+        if (pageRequest.getSortBy() != null && !pageRequest.getSortBy().isBlank()) {
+            Sort.Direction dir = (pageRequest.getDirection() == PageDirection.DESC) ? Sort.Direction.DESC : Sort.Direction.ASC;
+            String sortBy = switch (pageRequest.getSortBy()) {
+                case "nome" -> "nome";
+                case "cnpj" -> "cnpj";
+                case "uf" -> "uf";
+                case "email" -> "email";
+                case "pisoSalarial" -> "pisoSalarial";
+                default -> "id";
+            };
+            sort = Sort.by(dir, sortBy);
+        }
+
+        org.springframework.data.domain.PageRequest pageable = org.springframework.data.domain.PageRequest.of(
+                pageRequest.getPage(), pageRequest.getSize(), sort);
+
+        Page<com.slifesys.sagnus.corp.infrastructure.persistence.entity.SindicatoEntity> page = jpa.findAll(pageable);
+
+        return PageResult.<Sindicato>builder()
+                .items(page.getContent().stream().map(CorpPersistenceMapper::toDomain).toList())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .page(page.getNumber())
+                .size(page.getSize())
+                .build();
     }
 }

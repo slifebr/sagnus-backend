@@ -8,6 +8,7 @@ import com.slifesys.sagnus.nfe.domain.event.RtcIbsCbsReconciledEvent;
 import com.slifesys.sagnus.nfe.domain.model.imposto.TributosItem;
 import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.CClassTrib;
 import com.slifesys.sagnus.nfe.domain.model.imposto.ibscbs.CstIbsCbs;
+import com.slifesys.sagnus.nfe.domain.service.CalculadoraIvaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,16 +36,25 @@ public class RtcIbsCbsNormalizer {
 
     private final RtcIbsCbsProperties props;
     private final DomainEventPublisher eventPublisher;
+    private final CalculadoraIvaService calculadoraIva;
 
     @Autowired
     public RtcIbsCbsNormalizer(RtcIbsCbsProperties props, DomainEventPublisher eventPublisher) {
         this.props = props;
         this.eventPublisher = eventPublisher != null ? eventPublisher : event -> {};
+        this.calculadoraIva = new CalculadoraIvaService();
     }
 
     /** Construtor auxiliar para testes unitários (usa publisher NO-OP). */
     public RtcIbsCbsNormalizer(RtcIbsCbsProperties props) {
         this(props, event -> {});
+    }
+    
+    /** Construtor para testes com CalculadoraIvaService injetado. */
+    public RtcIbsCbsNormalizer(RtcIbsCbsProperties props, DomainEventPublisher eventPublisher, CalculadoraIvaService calculadoraIva) {
+        this.props = props;
+        this.eventPublisher = eventPublisher != null ? eventPublisher : event -> {};
+        this.calculadoraIva = calculadoraIva != null ? calculadoraIva : new CalculadoraIvaService();
     }
 /** Tripla normalizada (base, alíquota, valor). */
     public record TaxTriplet(BigDecimal base, BigDecimal aliquota, BigDecimal valor) {}
@@ -59,33 +69,34 @@ public class RtcIbsCbsNormalizer {
         if (aliquota != null && aliquota.signum() < 0) throw new NfeDomainException("RTC " + label + ": aliquota não pode ser negativa");
         if (valor != null && valor.signum() < 0) throw new NfeDomainException("RTC " + label + ": valor não pode ser negativo");
 
-        // completa o que faltar
+        // completa o que faltar usando CalculadoraIvaService
         if (valor == null) {
             if (base == null || aliquota == null) {
                 throw new NfeDomainException("RTC " + label + ": para calcular valor, informe base e aliquota");
             }
-            valor = calcValor(base, aliquota);
+            valor = calculadoraIva.calcularValor(base, aliquota);
         } else if (base == null) {
             if (aliquota == null) throw new NfeDomainException("RTC " + label + ": para calcular base, informe aliquota");
             if (aliquota.signum() == 0) {
                 if (valor.signum() != 0) throw new NfeDomainException("RTC " + label + ": aliquota 0 com valor > 0 é inconsistente");
                 base = BigDecimal.ZERO;
             } else {
-                base = valor.multiply(new BigDecimal("100")).divide(aliquota, 2, RoundingMode.HALF_UP);
+                base = calculadoraIva.calcularBase(valor, aliquota);
             }
         } else if (aliquota == null) {
             if (base.signum() == 0) {
                 if (valor.signum() != 0) throw new NfeDomainException("RTC " + label + ": base 0 com valor > 0 é inconsistente");
                 aliquota = BigDecimal.ZERO;
             } else {
-                aliquota = valor.multiply(new BigDecimal("100")).divide(base, 4, RoundingMode.HALF_UP);
+                aliquota = calculadoraIva.calcularAliquota(valor, base);
             }
         }
 
-        // normaliza escalas
-        base = base.setScale(2, RoundingMode.HALF_UP);
-        aliquota = aliquota.setScale(4, RoundingMode.HALF_UP);
-        valor = valor.setScale(2, RoundingMode.HALF_UP);
+        // normaliza escalas usando CalculadoraIvaService
+        CalculadoraIvaService.TriplaNormalizada tripla = calculadoraIva.normalizarTripla(base, aliquota, valor);
+        base = tripla.base();
+        aliquota = tripla.aliquota();
+        valor = tripla.valor();
 
         // reconciliação: se os 3 foram informados, checa divergência
         if (count == 3) {
@@ -94,7 +105,7 @@ public class RtcIbsCbsNormalizer {
     BigDecimal aliquota0 = aliquota;
     BigDecimal valor0 = valor;
 
-    BigDecimal expected = calcValor(base, aliquota).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal expected = calculadoraIva.calcularValor(base, aliquota);
     BigDecimal diff = expected.subtract(valor).abs();
     BigDecimal tol = props.getValorTolerance() == null ? new BigDecimal("0.01") : props.getValorTolerance();
 
@@ -121,11 +132,11 @@ public class RtcIbsCbsNormalizer {
             }
             case BASE_VALOR -> {
                 // Mantém base+valor, ajusta aliquota
-                aliquota = calcAliquotaFromValorBase(label, valor, base);
+                aliquota = calculadoraIva.calcularAliquota(valor, base);
             }
             case ALIQUOTA_VALOR -> {
                 // Mantém aliquota+valor, ajusta base
-                base = calcBaseFromValorAliquota(label, valor, aliquota);
+                base = calculadoraIva.calcularBase(valor, aliquota);
             }
             case AUTO_MIN_ADJUST -> {
                 // resolveStrategy retorna sempre uma das 3 acima; aqui é apenas segurança
@@ -133,10 +144,11 @@ public class RtcIbsCbsNormalizer {
             }
         }
 
-        // normaliza escalas após ajuste
-        base = base.setScale(2, RoundingMode.HALF_UP);
-        aliquota = aliquota.setScale(4, RoundingMode.HALF_UP);
-        valor = valor.setScale(2, RoundingMode.HALF_UP);
+        // normaliza escalas após ajuste usando CalculadoraIvaService
+        CalculadoraIvaService.TriplaNormalizada triplaAjustada = calculadoraIva.normalizarTripla(base, aliquota, valor);
+        base = triplaAjustada.base();
+        aliquota = triplaAjustada.aliquota();
+        valor = triplaAjustada.valor();
 
         log.warn("RTC reconciliação {} configured={} resolved={} base={} aliq={} valor={} expected={} diff={} tol={} -> base={} aliq={} valor={}",
                 label, configured, resolved, base0, aliquota0, valor0, expected, diff, tol, base, aliquota, valor);
@@ -157,32 +169,8 @@ public class RtcIbsCbsNormalizer {
 return new TaxTriplet(base, aliquota, valor);
     }
 
-    private static BigDecimal calcValor(BigDecimal base, BigDecimal aliquota) {
-        // valor = base * aliquota / 100
-        return base.multiply(aliquota).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
-    }
 
-private static BigDecimal calcAliquotaFromValorBase(String label, BigDecimal valor, BigDecimal base) {
-    if (base.signum() == 0) {
-        if (valor.signum() != 0) {
-            throw new NfeDomainException("RTC " + label + ": base 0 com valor > 0 é inconsistente");
-        }
-        return BigDecimal.ZERO.setScale(4, RoundingMode.HALF_UP);
-    }
-    return valor.multiply(new BigDecimal("100")).divide(base, 4, RoundingMode.HALF_UP);
-}
-
-private static BigDecimal calcBaseFromValorAliquota(String label, BigDecimal valor, BigDecimal aliquota) {
-    if (aliquota.signum() == 0) {
-        if (valor.signum() != 0) {
-            throw new NfeDomainException("RTC " + label + ": aliquota 0 com valor > 0 é inconsistente");
-        }
-        return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-    }
-    return valor.multiply(new BigDecimal("100")).divide(aliquota, 2, RoundingMode.HALF_UP);
-}
-
-private static RtcIbsCbsProperties.ReconcileStrategy resolveStrategy(
+private RtcIbsCbsProperties.ReconcileStrategy resolveStrategy(
         RtcIbsCbsProperties.ReconcileStrategy strategy,
         BigDecimal base,
         BigDecimal aliquota,
@@ -194,8 +182,8 @@ private static RtcIbsCbsProperties.ReconcileStrategy resolveStrategy(
     }
 
     // Candidatos: ajustar (valor) OU (aliquota) OU (base)
-    BigDecimal expectedAliquota = calcAliquotaFromValorBase("IBS/CBS", valor, base);
-    BigDecimal expectedBase = calcBaseFromValorAliquota("IBS/CBS", valor, aliquota);
+    BigDecimal expectedAliquota = calculadoraIva.calcularAliquota(valor, base);
+    BigDecimal expectedBase = calculadoraIva.calcularBase(valor, aliquota);
 
     BigDecimal relValor = relDiff(expectedValor, valor, new BigDecimal("0.01"));
     BigDecimal relAliq = relDiff(expectedAliquota, aliquota, new BigDecimal("0.0001"));

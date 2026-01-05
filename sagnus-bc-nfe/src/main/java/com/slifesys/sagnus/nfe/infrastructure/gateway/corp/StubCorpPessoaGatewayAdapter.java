@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.nfe.infrastructure.gateway.corp;
 
-import com.slifesys.sagnus.corp.api.contract.pessoa.PessoaResumoDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
 import com.slifesys.sagnus.nfe.application.port.CorpPessoaGatewayPort;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Profile;

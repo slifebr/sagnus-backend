@@ -1,0 +1,196 @@
+"""BFF GraphQL (fino) - composição e acesso aos UseCases dos BCs.
+Regras:
+- Sem domínio/usecases próprios
+- Sem persistência
+- Apenas delegação/composição read-only
+"""
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  "Obter pessoa (CORP)"
+  corpPessoa(id: ID!): CorpPessoa
+
+  "DTO read-only otimizado para a Tela de Cadastro de Pessoa (CORP)"
+  telaCadastroPessoa(id: ID!): TelaCadastroPessoa!
+
+  "Listar/pesquisar pessoas (CORP) - paginado (GraphQL-ready)"
+  corpPessoas(filter: CorpPessoaFilterInput, page: PageInput): CorpPessoaPage!
+
+  "Obter marca (CORP)"
+  corpMarca(id: ID!): CorpMarca
+
+  "Obter transportadora (CORP)"
+  corpTransportadora(id: ID!): CorpTransportadora
+
+  "Listar transportadoras (CORP) - paginado"
+  corpTransportadoras(page: PageInput): CorpTransportadoraPage!
+
+  "Obter vendedor (CORP)"
+  corpVendedor(id: ID!): CorpVendedor
+
+  "Listar vendedores (CORP) - paginado"
+  corpVendedores(page: PageInput): CorpVendedorPage!
+
+  "Obter sindicato (CORP)"
+  corpSindicato(id: ID!): CorpSindicato
+
+  "Listar sindicatos (CORP) - paginado"
+  corpSindicatos(page: PageInput): CorpSindicatoPage!
+}
+
+type Mutation {
+  "Criar pessoa (CORP)"
+  corpCriarPessoa(input: CorpPessoaCreateInput!): CorpPessoa
+
+  "Alterar pessoa (CORP)"
+  corpAlterarPessoa(id: ID!, input: CorpPessoaUpdateInput!): CorpPessoa
+
+  "Emitir NFe (NFE) - comando explícito"
+  nfeEmitir(input: NfeEmitirInput!): NfeEmitirPayload
+}
+
+"""Pessoa exposta pelo BFF (baseada no resultado do CORP)."""
+type CorpPessoa {
+  id: ID
+  nome: String
+  tipo: String
+  documento: String
+  site: String
+  email: String
+  ativa: Boolean
+}
+
+type CorpMarca {
+  id: ID
+  nome: String
+  ativa: Boolean
+}
+
+type CorpTransportadora {
+  id: ID
+  idPessoa: ID
+  placaVeiculo: String
+  rntc: String
+}
+
+type CorpTransportadoraPage {
+  items: [CorpTransportadora!]!
+  pageInfo: PageInfo!
+}
+
+type CorpVendedor {
+  id: ID
+  idPessoa: ID
+  comissao: String
+  meta: String
+}
+
+type CorpVendedorPage {
+  items: [CorpVendedor!]!
+  pageInfo: PageInfo!
+}
+
+type CorpSindicato {
+  id: ID
+  nome: String
+  cnpj: String
+  uf: String
+  email: String
+  pisoSalarial: String
+}
+
+type CorpSindicatoPage {
+  items: [CorpSindicato!]!
+  pageInfo: PageInfo!
+}
+
+"DTO read-only para uso direto na tela de Cadastro de Pessoa"
+type TelaCadastroPessoa {
+  pessoa: CorpPessoa!
+}
+
+"Filtro de busca de pessoas"
+input CorpPessoaFilterInput {
+  nome: String
+  documento: String
+}
+
+"Entrada genérica de paginação"
+input PageInput {
+  page: Int = 0
+  size: Int = 20
+  sortBy: String
+  sortDir: String = "ASC"
+}
+
+type PageInfo {
+  page: Int
+  size: Int
+  totalElements: Float
+  totalPages: Int
+}
+
+type CorpPessoaPage {
+  items: [CorpPessoa!]!
+  pageInfo: PageInfo!
+}
+
+input CorpPessoaCreateInput {
+  nome: String
+  tipo: String
+  documento: String
+  site: String
+  email: String
+}
+
+input CorpPessoaUpdateInput {
+  nome: String
+  tipo: String
+  documento: String
+  site: String
+  email: String
+  ativa: Boolean
+}
+
+"""Comando de emissão de NFe."""
+input NfeEmitirInput {
+  emitentePessoaId: ID!
+  destinatarioPessoaId: ID!
+  itens: [NfeEmitirItemInput!]!
+}
+
+input NfeEmitirItemInput {
+  nItem: Int!
+  produtoId: ID!
+  descricao: String!
+  ncm: String!
+  cfop: String!
+  uCom: String!
+  "BigDecimal como String (evita problemas de precisão e serialização)"
+  quantidade: String!
+  "BigDecimal como String (evita problemas de precisão e serialização)"
+  valorUnitario: String!
+  desconto: String
+  frete: String
+  seguro: String
+  outras: String
+  cstIbsCbs: String
+  cClassTrib: String
+  ibsBase: String
+  ibsAliquota: String
+  ibsValor: String
+  cbsBase: String
+  cbsAliquota: String
+  cbsValor: String
+  regimeIbsCbs: String
+}
+
+type NfeEmitirPayload {
+  nfeId: ID
+  status: String
+  mensagem: String
+}

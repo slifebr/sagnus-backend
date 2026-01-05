@@ -24,7 +24,7 @@ The project is organized as a multi-module Maven project:
 
 ### Contracts (`*-api`)
 
-- **`sagnus-bc-contracts-corp`**: Defines interfaces and DTOs for accessing Corporate data. Used by other BCs like AUTH and NFE.
+- **`sagnus-bc-corp-contracts`**: Defines interfaces and DTOs for accessing Corporate data. Used by other BCs like AUTH and NFE.
 
 ### Platform & Shared Modules
 

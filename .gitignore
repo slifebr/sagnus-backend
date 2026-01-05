@@ -3,10 +3,12 @@
 
 # Maven
 target/
-
+prompt/
+.idx/
 # IntelliJ
 .idea/
 *.iml
+.cursorrules
 
 # Logs
 *.log
