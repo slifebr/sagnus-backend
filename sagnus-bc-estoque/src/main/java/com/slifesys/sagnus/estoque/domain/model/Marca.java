@@ -1,38 +1,25 @@
 package com.slifesys.sagnus.estoque.domain.model;
 
-import java.math.BigDecimal;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Entity
-@Table(name = "supr_estq_local")
+@Table(name = "supr_estq_marca")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class EstoqueLocal {
+public class Marca {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_almoxarifado", nullable = false)
-    private Almoxarifado almoxarifado;
+    private String codigo;
 
-    @ManyToOne
-    @JoinColumn(name = "id_grade", nullable = false)
-    private Grade grade;
-
-    private BigDecimal quantidade;
-
-    private BigDecimal estqMax;
-
-    private BigDecimal estqMin;
+    private String nome;
 }
