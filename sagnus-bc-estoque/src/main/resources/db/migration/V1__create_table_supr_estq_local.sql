@@ -1,0 +1,5 @@
+CREATE TABLE sagnus.supr_estq_local (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
+);

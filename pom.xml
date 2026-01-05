@@ -97,11 +97,11 @@
         <module>sagnus-bc-corp</module>
         <module>sagnus-bc-nfe</module>
         <module>sagnus-bc-adm</module>
+        <module>sagnus-bc-estoque</module>
         <!--        <module>sagnus-bc-faturamento-nfe</module>-->
 
         <!--        <module>sagnus-bc-financeiro-ctpagar</module>-->
         <!--        <module>sagnus-bc-financeiro-ctreceber</module>-->
-        <!--        <module>sagnus-bc-estoque</module>-->
         <!--        <module>sagnus-bc-compra</module>-->
         <!--        <module>sagnus-bc-fiscal</module>-->
         <!--        <module>sagnus-bc-contabil</module>-->
@@ -139,6 +139,11 @@
             <dependency>
                 <groupId>com.slifesys.sagnus</groupId>
                 <artifactId>sagnus-bc-nfe</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.slifesys.sagnus</groupId>
+                <artifactId>sagnus-bc-estoque</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
