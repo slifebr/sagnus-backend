@@ -1,5 +1,6 @@
 package com.slifesys.sagnus.nfe.domain.event;
 
+import com.slifesys.sagnus.shared.domain.event.CorrelatedDomainEvent;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,9 +16,7 @@ import lombok.ToString;
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class NfeEmitidaEvent extends AbstractDomainEvent implements CorrelatedDomainEvent {
-
-    private final String correlationId;
+public class NfeEmitidaEvent extends CorrelatedDomainEvent {
 
     private final String nfeId;
     private final Long emitentePessoaId;
@@ -25,21 +24,14 @@ public class NfeEmitidaEvent extends AbstractDomainEvent implements CorrelatedDo
     private final String status;
 
     @Builder
-    public NfeEmitidaEvent(String correlationId,
-                           String nfeId,
+    public NfeEmitidaEvent(String nfeId,
                            Long emitentePessoaId,
                            Long destinatarioPessoaId,
                            String status) {
         super();
-        this.correlationId = correlationId;
         this.nfeId = nfeId;
         this.emitentePessoaId = emitentePessoaId;
         this.destinatarioPessoaId = destinatarioPessoaId;
         this.status = status;
-    }
-
-    @Override
-    public String getCorrelationId() {
-        return correlationId;
     }
 }

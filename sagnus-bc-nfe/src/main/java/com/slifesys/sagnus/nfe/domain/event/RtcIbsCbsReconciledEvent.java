@@ -1,5 +1,6 @@
 package com.slifesys.sagnus.nfe.domain.event;
 
+import com.slifesys.sagnus.shared.domain.event.CorrelatedDomainEvent;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -9,9 +10,7 @@ import java.util.Objects;
  *
  * Útil para auditoria/observabilidade e futura persistência via Outbox.
  */
-public class RtcIbsCbsReconciledEvent extends AbstractDomainEvent implements CorrelatedDomainEvent {
-
-    private final String correlationId;
+public class RtcIbsCbsReconciledEvent extends CorrelatedDomainEvent {
 
     private final String label;
     private final String configuredStrategy;
@@ -30,7 +29,6 @@ public class RtcIbsCbsReconciledEvent extends AbstractDomainEvent implements Cor
     private final BigDecimal tolerance;
 
     public RtcIbsCbsReconciledEvent(
-            String correlationId,
             String label,
             String configuredStrategy,
             String resolvedStrategy,
@@ -45,7 +43,6 @@ public class RtcIbsCbsReconciledEvent extends AbstractDomainEvent implements Cor
             BigDecimal tolerance
     ) {
         super();
-        this.correlationId = correlationId;
         this.label = Objects.requireNonNull(label, "label");
         this.configuredStrategy = Objects.requireNonNull(configuredStrategy, "configuredStrategy");
         this.resolvedStrategy = Objects.requireNonNull(resolvedStrategy, "resolvedStrategy");
@@ -62,11 +59,6 @@ public class RtcIbsCbsReconciledEvent extends AbstractDomainEvent implements Cor
 
     public String getLabel() {
         return label;
-    }
-
-    @Override
-    public String getCorrelationId() {
-        return correlationId;
     }
 
     public String getConfiguredStrategy() {
