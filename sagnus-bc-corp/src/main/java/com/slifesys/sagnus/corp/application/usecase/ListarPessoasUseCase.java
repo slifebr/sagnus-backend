@@ -19,15 +19,7 @@ public class ListarPessoasUseCase {
     public PageResult<PessoaResult> execute(String nome, String documento, PageRequest pageRequest) {
         PageResult<Pessoa> page = repo.search(nome, documento, pageRequest);
         return PageResult.<PessoaResult>builder()
-                .items(page.getItems().stream().map(p -> PessoaResult.builder()
-                        .id(p.getId() != null ? p.getId().getValue() : null)
-                        .tipo(p.getTipo())
-                        .documento(p.getDocumento().getValue())
-                        .nome(p.getNome().getValue())
-                        .email(p.getEmail() != null ? p.getEmail().getValue() : null)
-                        .site(p.getSite())
-                        .ativa(p.isAtiva())
-                        .build()).toList())
+                .items(page.getItems().stream().map(PessoaResult::from).toList())
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
                 .page(page.getPage())

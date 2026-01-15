@@ -20,14 +20,6 @@ public class ObterPessoaUseCase {
         Pessoa pessoa = repo.findById(PessoaId.of(id))
                 .orElseThrow(() -> new NotFoundException("CORP-404", "Pessoa não encontrada."));
 
-        return PessoaResult.builder()
-                .id(pessoa.getId() != null ? pessoa.getId().getValue() : null)
-                .tipo(pessoa.getTipo())
-                .documento(pessoa.getDocumento().getValue())
-                .nome(pessoa.getNome().getValue())
-                .email(pessoa.getEmail() != null ? pessoa.getEmail().getValue() : null)
-                .site(pessoa.getSite())
-                .ativa(pessoa.isAtiva())
-                .build();
+        return PessoaResult.from(pessoa);
     }
 }
