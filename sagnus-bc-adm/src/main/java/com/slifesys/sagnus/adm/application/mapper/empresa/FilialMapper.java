@@ -11,9 +11,7 @@ public interface FilialMapper {
 
     FilialMapper INSTANCE = Mappers.getMapper(FilialMapper.class);
 
-    @Mapping(source = "empresa.id", target = "empresaId")
     FilialDTO toDto(Filial filial);
 
-    @Mapping(source = "empresaId", target = "empresa.id")
     Filial toEntity(FilialDTO filialDTO);
 }

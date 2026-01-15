@@ -31,4 +31,32 @@ public class ParametroSistemaEntity {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getChave() { return chave; }
+    public void setChave(String chave) { this.chave = chave; }
+
+    public String getValor() { return valor; }
+    public void setValor(String valor) { this.valor = valor; }
+
+    public String getEscopo() { return escopo; }
+    public void setEscopo(String escopo) { this.escopo = escopo; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParametroSistemaEntity that = (ParametroSistemaEntity) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

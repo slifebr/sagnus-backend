@@ -44,7 +44,7 @@ public class FilialRepositoryAdapter implements FilialRepository {
 
     @Override
     public PageResult<Filial> findAll(Long empresaId, String nome, PageRequest pageRequest) {
-        Sort sort = Sort.by(Sort.Direction.fromString(pageRequest.getSortDirection().name()), pageRequest.getSortBy());
+        Sort sort = Sort.by(Sort.Direction.fromString(pageRequest.getDirection().name()), pageRequest.getSortBy());
         Pageable pageable = org.springframework.data.domain.PageRequest.of(pageRequest.getPage(), pageRequest.getSize(),
                 sort);
 

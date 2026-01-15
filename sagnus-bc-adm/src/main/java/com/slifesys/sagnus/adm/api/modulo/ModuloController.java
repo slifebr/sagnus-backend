@@ -24,7 +24,7 @@ public class ModuloController {
     @GetMapping
     public List<ModuloResponse> listar() {
         return listModulosUseCase.execute().stream()
-                .map(m -> new ModuloResponse(m.id().value(), m.codigo(), m.nome(), m.descricao()))
+                .map(m -> new ModuloResponse(m.getId().getValue(), m.getCodigo(), m.getNome(), m.getDescricao()))
                 .toList();
     }
 

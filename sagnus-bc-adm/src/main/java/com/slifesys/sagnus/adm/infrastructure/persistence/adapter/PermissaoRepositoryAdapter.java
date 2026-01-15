@@ -43,7 +43,7 @@ public class PermissaoRepositoryAdapter implements PermissaoRepository {
 
     @Override
     public PageResult<Permissao> findAll(String codigo, PageRequest pageRequest) {
-        Sort sort = Sort.by(Sort.Direction.fromString(pageRequest.getSortDirection().name()), pageRequest.getSortBy());
+        Sort sort = Sort.by(Sort.Direction.fromString(pageRequest.getDirection().name()), pageRequest.getSortBy());
         Pageable pageable = org.springframework.data.domain.PageRequest.of(pageRequest.getPage(), pageRequest.getSize(),
                 sort);
         Page<PermissaoEntity> page = jpaRepository.findAllByFilter(codigo, pageable);

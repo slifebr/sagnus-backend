@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.adm.application.usecase;
 
 import com.slifesys.sagnus.adm.application.port.ModuloRepositoryPort;
-import com.slifesys.sagnus.adm.domain.model.Modulo;
+import com.slifesys.sagnus.adm.domain.model.modulo.Modulo;
 
 import org.springframework.stereotype.Service;
 

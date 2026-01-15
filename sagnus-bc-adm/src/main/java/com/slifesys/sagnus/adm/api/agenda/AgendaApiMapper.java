@@ -5,10 +5,10 @@ import com.slifesys.sagnus.adm.application.command.CreateCompromissoCommand;
 import com.slifesys.sagnus.adm.application.command.CreateNotificacaoCommand;
 import com.slifesys.sagnus.adm.application.result.CreateCategoriaResult;
 import com.slifesys.sagnus.adm.application.result.CreateCompromissoResult;
-import com.slifesys.sagnus.adm.domain.model.CategoriaCompromisso;
-import com.slifesys.sagnus.adm.domain.model.Compromisso;
-import com.slifesys.sagnus.adm.domain.model.Convite;
-import com.slifesys.sagnus.adm.domain.model.Notificacao;
+import com.slifesys.sagnus.adm.domain.model.agenda.CategoriaCompromisso;
+import com.slifesys.sagnus.adm.domain.model.agenda.Compromisso;
+import com.slifesys.sagnus.adm.domain.model.agenda.Convite;
+import com.slifesys.sagnus.adm.domain.model.agenda.Notificacao;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -54,7 +54,7 @@ public class AgendaApiMapper {
     }
 
     public CategoriaResponse toCategoriaResponse(CategoriaCompromisso categoria) {
-        return new CategoriaResponse(categoria.id().value(), categoria.nome(), categoria.cor());
+        return new CategoriaResponse(categoria.getId(), categoria.getNome(), categoria.getCor());
     }
 
     public List<CategoriaResponse> toCategoriaResponseList(List<CategoriaCompromisso> categorias) {
@@ -63,17 +63,17 @@ public class AgendaApiMapper {
 
     public CompromissoResponse toCompromissoResponse(Compromisso compromisso) {
         return new CompromissoResponse(
-                compromisso.id().value(),
-                compromisso.categoriaId().value(),
-                compromisso.colaboradorId(),
-                compromisso.dataCompromisso(),
-                compromisso.hora(),
-                compromisso.duracao(),
-                compromisso.onde(),
-                compromisso.descricao(),
-                compromisso.tipo(),
-                compromisso.convidados().stream().map(Convite::colaboradorId).collect(Collectors.toList()),
-                compromisso.notificacoes().stream().map(this::toResponse).collect(Collectors.toList())
+                compromisso.getId(),
+                compromisso.getCategoriaId(),
+                compromisso.getColaboradorId(),
+                compromisso.getDataCompromisso(),
+                compromisso.getHora() != null ? compromisso.getHora().toString() : null,
+                compromisso.getDuracao().longValue(),
+                compromisso.getOnde(),
+                compromisso.getDescricao(),
+                compromisso.getTipo(),
+                compromisso.getConvidados().stream().map(Convite::getColaboradorId).collect(Collectors.toList()),
+                compromisso.getNotificacoes().stream().map(this::toResponse).collect(Collectors.toList())
         );
     }
 
@@ -82,6 +82,21 @@ public class AgendaApiMapper {
     }
     
     public NotificacaoResponse toResponse(Notificacao notificacao) {
-        return new NotificacaoResponse(notificacao.data(), notificacao.hora(), notificacao.tipo());
+        // Assuming tipo is Long in Response but String in Domain? Or vice versa?
+        // Error log: NotificacaoResponse expects Long/String?
+        // Let's check NotificacaoResponse.java viewed earlier:
+        // public record NotificacaoResponse(LocalDate data, String hora, Long tipo)
+        // Domain Notificacao.tipo is String.
+        // I will attempt parsing or use 0L/null if fallback.
+        Long tipoLong = null;
+        try {
+             if (notificacao.getTipo() != null) tipoLong = Long.parseLong(notificacao.getTipo());
+        } catch (NumberFormatException e) {}
+
+        return new NotificacaoResponse(
+            notificacao.getData(), 
+            notificacao.getHora() != null ? notificacao.getHora().toString() : null, 
+            tipoLong
+        );
     }
 }

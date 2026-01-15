@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.adm.application.usecase;
 
 import com.slifesys.sagnus.adm.application.port.AgendaRepositoryPort;
-import com.slifesys.sagnus.adm.domain.model.Compromisso;
+import com.slifesys.sagnus.adm.domain.model.agenda.Compromisso;
 
 import org.springframework.stereotype.Service;
 

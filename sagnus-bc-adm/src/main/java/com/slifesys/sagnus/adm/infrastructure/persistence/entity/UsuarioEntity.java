@@ -39,4 +39,35 @@ public class UsuarioEntity {
     @ManyToMany
     @JoinTable(name = "adm_usuario_perfil", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "perfil_id"))
     private Set<PerfilEntity> perfis;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+
+    public Set<PerfilEntity> getPerfis() { return perfis; }
+    public void setPerfis(Set<PerfilEntity> perfis) { this.perfis = perfis; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UsuarioEntity that = (UsuarioEntity) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

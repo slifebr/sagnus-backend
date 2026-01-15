@@ -2,19 +2,25 @@ package com.slifesys.sagnus.adm.application.service.parametro;
 
 import com.slifesys.sagnus.adm.application.dto.parametro.ParametroSistemaDTO;
 import com.slifesys.sagnus.adm.application.mapper.parametro.ParametroSistemaMapper;
+import com.slifesys.sagnus.adm.application.port.ParametroRepositoryPort;
 import com.slifesys.sagnus.adm.domain.model.parametro.ParametroSistema;
-import com.slifesys.sagnus.adm.infrastructure.repository.ParametroSistemaRepository;
-import lombok.AllArgsConstructor;
+// This import is redundant if in same package, but they are in same package?
+// ParametroSistemaServiceImpl is in application.service.parametro
+// ParametroSistemaService is in application.service.parametro
+// So I can just remove the incorrect import.
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ParametroSistemaServiceImpl implements ParametroSistemaService {
 
-    private final ParametroSistemaRepository parametroSistemaRepository;
+    private final ParametroRepositoryPort parametroSistemaRepository;
 
     private final ParametroSistemaMapper parametroSistemaMapper = ParametroSistemaMapper.INSTANCE;
 

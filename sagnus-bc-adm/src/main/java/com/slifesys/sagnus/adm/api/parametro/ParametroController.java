@@ -24,13 +24,13 @@ public class ParametroController {
     @GetMapping
     public Optional<ParametroResponse> get() {
         return getParametrosUseCase.execute().map(p -> new ParametroResponse(
-                p.id().value(),
-                p.finParcelaAberto(),
-                p.finParcelaQuitado(),
-                p.finParcelaQuitadoParcial(),
-                p.finTipoRecebimentoEdi(),
-                p.compraFinDocOrigem(),
-                p.compraContaCaixa()
+                p.getId(),
+                p.getFinParcelaAberto(),
+                p.getFinParcelaQuitado(),
+                p.getFinParcelaQuitadoParcial(),
+                p.getFinTipoRecebimentoEdi(),
+                p.getCompraFinDocOrigem(),
+                p.getCompraContaCaixa()
         ));
     }
 

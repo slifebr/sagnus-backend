@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.adm.application.usecase;
 
 import com.slifesys.sagnus.adm.application.dto.ParametroResult;
-import com.slifesys.sagnus.adm.application.port.ParametroSistemaRepository;
+import com.slifesys.sagnus.adm.application.port.ParametroRepositoryPort;
 import com.slifesys.sagnus.adm.domain.model.parametro.ParametroSistema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ObterParametrosUseCase {
 
-    private final ParametroSistemaRepository repository;
+    private final ParametroRepositoryPort repository;
 
     @Transactional(readOnly = true)
     public List<ParametroResult> execute(String escopo) {

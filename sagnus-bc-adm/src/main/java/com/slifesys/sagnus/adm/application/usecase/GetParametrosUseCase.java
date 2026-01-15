@@ -1,8 +1,7 @@
 package com.slifesys.sagnus.adm.application.usecase;
 
 import com.slifesys.sagnus.adm.application.port.ParametroRepositoryPort;
-import com.slifesys.sagnus.adm.domain.model.Parametro;
-
+import com.slifesys.sagnus.adm.domain.model.parametro.ParametroConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,7 +15,7 @@ public class GetParametrosUseCase {
         this.repo = repo;
     }
 
-    public Optional<Parametro> execute() {
+    public Optional<ParametroConfig> execute() {
         return repo.findCurrent();
     }
 }

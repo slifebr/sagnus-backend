@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.adm.domain.model.enums;
 
-public enum EscopoParametro {
+public enum EscopoParametroSistema {
     EMPRESA,
     FILIAL,
     GLOBAL

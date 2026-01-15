@@ -11,9 +11,7 @@ public interface UsuarioMapper {
 
     UsuarioMapper INSTANCE = Mappers.getMapper(UsuarioMapper.class);
 
-    @Mapping(source = "empresa.id", target = "empresaId")
     UsuarioDTO toDto(Usuario usuario);
 
-    @Mapping(source = "empresaId", target = "empresa.id")
     Usuario toEntity(UsuarioDTO usuarioDTO);
 }
