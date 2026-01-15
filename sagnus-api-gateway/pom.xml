@@ -47,22 +47,38 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <!-- Sagnus -->
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-shared-api-error</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-shared-kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Dependências para enxergar os BCs -->
         <dependency>
             <groupId>com.slifesys.sagnus</groupId>
             <artifactId>sagnus-bc-auth</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.slifesys.sagnus</groupId>
             <artifactId>sagnus-bc-corp</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.slifesys.sagnus</groupId>
             <artifactId>sagnus-bc-corp-contracts</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.slifesys.sagnus</groupId>
             <artifactId>sagnus-bc-nfe</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <!--
         <dependency>

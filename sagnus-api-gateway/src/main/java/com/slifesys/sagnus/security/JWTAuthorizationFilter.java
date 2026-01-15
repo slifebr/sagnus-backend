@@ -4,69 +4,59 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import java.io.IOException;
 
-public class JWTAuthorizationFilter extends OncePerRequestFilter {
+@Slf4j
+public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final TokenService tokenService;
+    private final UserDetailsService userDetailsService;
 
-    public JWTAuthorizationFilter(TokenService tokenService) {
+    public JWTAuthorizationFilter(AuthenticationManager authenticationManager, TokenService tokenService, UserDetailsService userDetailsService) {
+        super(authenticationManager);
         this.tokenService = tokenService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest req,
+                                    HttpServletResponse res,
+                                    FilterChain chain) throws IOException, ServletException {
+        String header = req.getHeader("Authorization");
 
-        String header = request.getHeader("Authorization");
-
-        // Cabeçalho presente e com Bearer → tenta autenticar
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-
-            try {
-                var authentication = tokenService.getAuthenticationFromToken(token);
-
-                if (authentication != null) {
-                    // Token válido → contexto autenticado
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    // Token presente, mas inválido (TokenService retornou null)
-                    // Deixa sem authentication e marca mensagem específica
-                    request.setAttribute(
-                            RestAuthenticationEntryPoint.ATTR_JWT_ERROR_MESSAGE,
-                            "Token JWT inválido."
-                    );
-                    request.setAttribute(
-                            RestAuthenticationEntryPoint.ATTR_JWT_ERROR_CODE,
-                            "SAG-AUTH-401-JWT-INVALID"
-                    );
-                }
-
-            } catch (Exception ex) {
-                // Qualquer erro ao processar o token (expirado, malformado, etc.)
-                // pode cair aqui enquanto você não tem exceções específicas
-                request.setAttribute(
-                        RestAuthenticationEntryPoint.ATTR_JWT_ERROR_MESSAGE,
-                        "Falha ao processar o token JWT."
-                );
-                request.setAttribute(
-                        RestAuthenticationEntryPoint.ATTR_JWT_ERROR_CODE,
-                        "SAG-AUTH-401-JWT-ERROR"
-                );
-
-                // Garante que não fica nenhum resquício de authentication
-                SecurityContextHolder.clearContext();
-            }
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(req, res);
+            return;
         }
 
-        // Sempre segue o fluxo: se não tiver authentication suficiente,
-        // lá na frente o Spring chama o RestAuthenticationEntryPoint.
-        filterChain.doFilter(request, response);
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        chain.doFilter(req, res);
+    }
+
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null) {
+            // parse the token.
+            String user = tokenService.extractUsername(token.replace("Bearer ", ""));
+
+            if (user != null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(user);
+                if (tokenService.isTokenValid(token.replace("Bearer ", ""), userDetails)) {
+                    return new UsernamePasswordAuthenticationToken(user, null, userDetails.getAuthorities());
+                }
+            }
+            return null;
+        }
+        return null;
     }
 }

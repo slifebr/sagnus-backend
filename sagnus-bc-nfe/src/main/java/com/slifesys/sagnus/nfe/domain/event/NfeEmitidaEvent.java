@@ -24,11 +24,12 @@ public class NfeEmitidaEvent extends CorrelatedDomainEvent {
     private final String status;
 
     @Builder
-    public NfeEmitidaEvent(String nfeId,
+    public NfeEmitidaEvent(String correlationId,
+                           String nfeId,
                            Long emitentePessoaId,
                            Long destinatarioPessoaId,
                            String status) {
-        super();
+        super(correlationId);
         this.nfeId = nfeId;
         this.emitentePessoaId = emitentePessoaId;
         this.destinatarioPessoaId = destinatarioPessoaId;

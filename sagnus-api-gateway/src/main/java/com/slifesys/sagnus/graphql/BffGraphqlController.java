@@ -154,12 +154,8 @@ public class BffGraphqlController {
         AlterarPessoaCommand cmd = AlterarPessoaCommand.builder()
                 .id(id)
                 .nome(input.nome)
-                .tipo(input.parseTipo())
-                .documento(input.documento)
                 .site(input.site)
                 .email(input.email)
-                .ativa(input.ativa)
-                .usuAlteracao("SYSTEM")
                 .build();
 
         PessoaResult saved = alterarPessoaUseCase.execute(cmd);
@@ -259,9 +255,9 @@ public class BffGraphqlController {
         }
     }
 
-    public record CorpMarca(Long id, String nome, Boolean ativa) {
+    public record CorpMarca(Long id, String nome) {
         static CorpMarca from(MarcaResult r) {
-            return new CorpMarca(r.getId(), r.getNome(), r.isAtiva());
+            return new CorpMarca(r.getId(), r.getNome());
         }
     }
 
