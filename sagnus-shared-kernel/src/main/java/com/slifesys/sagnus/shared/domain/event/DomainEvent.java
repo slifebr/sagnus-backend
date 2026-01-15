@@ -4,7 +4,9 @@ import java.time.Instant;
 
 public interface DomainEvent {
 
-    String eventId();
+    String getEventId();
 
-    Instant occurredOn();
+    Instant getOccurredAt();
+
+    String getEventType();
 }

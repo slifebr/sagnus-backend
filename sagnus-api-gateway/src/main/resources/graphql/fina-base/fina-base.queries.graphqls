@@ -1,0 +1,5 @@
+"""Queries (stub) do BC fina-base no Gateway GraphQL (BFF fino)."""
+
+extend type Query {
+  fina-basePing: String!
+}

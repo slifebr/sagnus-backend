@@ -1,0 +1,5 @@
+"""Mutations (stub) do BC fin-ctpag no Gateway GraphQL (BFF fino)."""
+
+extend type Mutation {
+  fin-ctpagPingMut: String!
+}

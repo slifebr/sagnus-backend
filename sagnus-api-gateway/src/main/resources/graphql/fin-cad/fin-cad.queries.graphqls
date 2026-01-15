@@ -1,0 +1,5 @@
+"""Queries (stub) do BC fin-cad no Gateway GraphQL (BFF fino)."""
+
+extend type Query {
+  fin-cadPing: String!
+}

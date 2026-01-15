@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slifesys.sagnus.nfe.application.config.NfeOutboxProperties;
 import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
-import com.slifesys.sagnus.nfe.domain.event.CorrelatedDomainEvent;
-import com.slifesys.sagnus.nfe.domain.event.DomainEvent;
+import com.slifesys.sagnus.shared.domain.event.CorrelatedDomainEvent;
+import com.slifesys.sagnus.shared.domain.event.DomainEvent;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.entity.NfeOutboxEventEntity;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.repository.NfeOutboxEventJpaRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +28,8 @@ public class DomainEventOutboxWriterListener {
     private final NfeOutboxProperties props;
 
     public DomainEventOutboxWriterListener(NfeOutboxEventJpaRepository repo,
-                                          ObjectMapper objectMapper,
-                                          NfeOutboxProperties props) {
+            ObjectMapper objectMapper,
+            NfeOutboxProperties props) {
         this.repo = repo;
         this.objectMapper = objectMapper;
         this.props = props;

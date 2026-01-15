@@ -1,7 +1,15 @@
 param(
   [Parameter(Mandatory=$true)][string]$BcName,
   [string]$PackageSuffix = "",
-  [string]$Feature = ""
+  [string]$Feature = "",
+  [switch]$WithContracts,
+  [switch]$NoContracts,
+  [switch]$WithContractsPorts,
+  [switch]$NoContractsPorts,
+  [switch]$WithGatewayGraphqlStub,
+  [switch]$NoGatewayGraphqlStub,
+  [switch]$WithFlyway,
+  [switch]$NoFlyway
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,104 +17,231 @@ $ErrorActionPreference = "Stop"
 function To-PascalCase([string]$s) {
   if (-not $s) { return $s }
   $parts = $s -split '[-_\.]'
-  ($parts | ForEach-Object { if ($_.Length -gt 0) { $_.Substring(0,1).ToUpper() + $_.Substring(1) } }) -join ''
+  ($parts | ForEach-Object {
+    if ($_.Length -gt 0) { $_.Substring(0,1).ToUpper() + $_.Substring(1) }
+  }) -join ''
 }
+
+function Add-ModuleToPom([string]$PomPath, [string]$ModuleName) {
+  $pom = Get-Content -Raw -Encoding UTF8 $PomPath
+  if ($pom -notmatch "<module>$([regex]::Escape($ModuleName))</module>") {
+    $pom = $pom -replace "(?s)</modules>", "`n        <module>$ModuleName</module>`n    </modules>"
+  }
+  $pom | Set-Content -Encoding UTF8 $PomPath
+}
+
+# Defaults
+if (-not $Feature) { $Feature = $BcName }
+
+$createContracts = $true
+if ($NoContracts) { $createContracts = $false }
+elseif ($WithContracts) { $createContracts = $true }
+
+$createContractsPorts = $false
+if ($NoContractsPorts) { $createContractsPorts = $false }
+elseif ($WithContractsPorts) { $createContractsPorts = $true }
+
+$createGatewayStub = $false
+if ($NoGatewayGraphqlStub) { $createGatewayStub = $false }
+elseif ($WithGatewayGraphqlStub) { $createGatewayStub = $true }
+
+$createFlyway = $true
+if ($NoFlyway) { $createFlyway = $false }
+elseif ($WithFlyway) { $createFlyway = $true }
 
 $root = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $root
 
-if (-not $Feature -or $Feature.Trim().Length -eq 0) { $Feature = $BcName }
+$templateFolder = Join-Path $root "sagnus-bc-template"
+$contractsTemplateFolder = Join-Path $root "sagnus-bc-contracts-template"
+$pomPath = Join-Path $root "pom.xml"
 
-$bcFolder = "sagnus-bc-$BcName"
-$templateFolder = "sagnus-bc-template"
+$bcFolder = Join-Path $root ("sagnus-bc-" + $BcName)
+$contractsFolder = Join-Path $root ("sagnus-bc-" + $BcName + "-contracts")
 
-if (-not (Test-Path $templateFolder)) {
-  throw "Template não encontrado: $templateFolder"
-}
-if (Test-Path $bcFolder) {
-  throw "Módulo já existe: $bcFolder"
-}
+if (Test-Path $bcFolder) { throw "Já existe: $bcFolder" }
+if ($createContracts -and (Test-Path $contractsFolder)) { throw "Já existe: $contractsFolder" }
 
-# 1) Copia template
-Copy-Item $templateFolder $bcFolder -Recurse
+# base package
+$basePkg = ("com.slifesys.sagnus." + ($BcName -replace "-", "."))
+if ($PackageSuffix) { $basePkg = ("com.slifesys.sagnus." + $PackageSuffix) }
 
-# 2) Ajusta artifactId
-$pom = Join-Path $bcFolder "pom.xml"
-(Get-Content $pom -Raw) `
-  -replace "<artifactId>$templateFolder</artifactId>", "<artifactId>$bcFolder</artifactId>" `
-  | Set-Content -Encoding UTF8 $pom
+# 1) BC principal
+Copy-Item -Recurse -Force $templateFolder $bcFolder
 
-# 3) Base package
-$basePkg = "com.slifesys.sagnus"
-$srcBase = Join-Path $bcFolder "src\main\java"
-$testBase = Join-Path $bcFolder "src\test\java"
-
-if ($PackageSuffix -and $PackageSuffix.Trim().Length -gt 0) {
-  $newPkg = "$basePkg.$PackageSuffix"
-} else {
-  $newPkg = "$basePkg.$BcName"
+# replace placeholders in files
+Get-ChildItem -Recurse -File $bcFolder | ForEach-Object {
+  (Get-Content -Raw -Encoding UTF8 $_.FullName) `
+    -replace "sagnus-bc-template", ("sagnus-bc-" + $BcName) `
+    -replace "com\.slifesys\.sagnus\.template", $basePkg `
+    -replace "api/example", ("api/" + $Feature) |
+    Set-Content -Encoding UTF8 $_.FullName
 }
 
-# Template package (assumido)
-$templatePkg = "$basePkg.template"
-
-# Move diretórios do package raiz
-function Move-PackageTree([string]$javaRoot, [string]$fromPkg, [string]$toPkg) {
-  $fromPath = Join-Path $javaRoot ($fromPkg -replace '\.', '\')
-  $toPath   = Join-Path $javaRoot ($toPkg -replace '\.', '\')
-
-  if (-not (Test-Path $fromPath)) { return }
-
-  New-Item -ItemType Directory -Force -Path (Split-Path $toPath) | Out-Null
-  Move-Item -Path $fromPath -Destination $toPath -Force
+# move package folder
+$oldPkgDir = Join-Path $bcFolder "src/main/java/com/slifesys/sagnus/template"
+$newPkgDir = Join-Path $bcFolder ("src/main/java/" + ($basePkg -replace "\.", "/"))
+if (Test-Path $oldPkgDir) {
+  New-Item -ItemType Directory -Force -Path (Split-Path $newPkgDir) | Out-Null
+  Move-Item -Force $oldPkgDir $newPkgDir
 }
 
-Move-PackageTree $srcBase  $templatePkg $newPkg
-Move-PackageTree $testBase $templatePkg $newPkg
-
-# Replace package/imports em todos os .java
-Get-ChildItem $bcFolder -Recurse -File -Include *.java | ForEach-Object {
-  (Get-Content $_.FullName -Raw) `
-    -replace [regex]::Escape($templatePkg), $newPkg `
-    | Set-Content -Encoding UTF8 $_.FullName
+# move api/example -> api/<feature>
+$exampleDir = Join-Path $newPkgDir "api/example"
+if (Test-Path $exampleDir) {
+  $featureDir = Join-Path $newPkgDir ("api/" + $Feature)
+  New-Item -ItemType Directory -Force -Path $featureDir | Out-Null
+  Get-ChildItem -File $exampleDir | Move-Item -Destination $featureDir -Force
+  Remove-Item $exampleDir -Force -Recurse
 }
 
-# Ajusta spring.application.name e rota /v1/template
-$featurePath = "/v1/$BcName"
-Get-ChildItem $bcFolder -Recurse -File -Include *.java,*.yml,*.yaml,*.properties | ForEach-Object {
-  $txt = Get-Content $_.FullName -Raw
-  $txt = $txt -replace "spring\.application\.name:\s*template", "spring.application.name: $BcName"
-  $txt = $txt -replace "/v1/template", $featurePath
-  $txt | Set-Content -Encoding UTF8 $_.FullName
-}
-
-# API vertical: renomeia api/example -> api/<feature> e classe ExampleController -> <FeaturePascal>Controller
+# rename ExampleController -> <Feature>Controller
 $featurePascal = To-PascalCase $Feature
-
-$apiDir = Join-Path $srcBase ($newPkg -replace '\.', '\')
-$apiExamplePath = Join-Path $apiDir "api\example"
-$apiFeaturePath = Join-Path $apiDir ("api\" + $Feature)
-
-if (Test-Path $apiExamplePath) {
-  New-Item -ItemType Directory -Force -Path (Split-Path $apiFeaturePath) | Out-Null
-  Move-Item -Path $apiExamplePath -Destination $apiFeaturePath -Force
+$exampleController = Join-Path $newPkgDir ("api/" + $Feature + "/ExampleController.java")
+$targetController  = Join-Path $newPkgDir ("api/" + $Feature + "/" + $featurePascal + "Controller.java")
+if (Test-Path $exampleController -and -not (Test-Path $targetController)) {
+  Move-Item -Force $exampleController $targetController
+}
+if (Test-Path $targetController) {
+  (Get-Content -Raw -Encoding UTF8 $targetController) `
+    -replace "class ExampleController", ("class " + $featurePascal + "Controller") |
+    Set-Content -Encoding UTF8 $targetController
 }
 
-# Renomeia arquivos/classe ExampleController -> <FeaturePascal>Controller (se existir)
-Get-ChildItem $bcFolder -Recurse -File -Include *ExampleController.java | ForEach-Object {
-  $newName = ($featurePascal + "Controller.java")
-  Rename-Item -Path $_.FullName -NewName $newName -Force
+# Flyway folder opcional
+if ($createFlyway) {
+  $migDir = Join-Path $bcFolder "src/main/resources/db/migration"
+  New-Item -ItemType Directory -Force -Path $migDir | Out-Null
+  $keep = Join-Path $migDir ".keep"
+  if (-not (Test-Path $keep)) { "# keep" | Set-Content -Encoding UTF8 $keep }
 }
 
-# Troca nomes dentro do código (classe e referências)
-Get-ChildItem $bcFolder -Recurse -File -Include *.java | ForEach-Object {
-  $raw = Get-Content $_.FullName -Raw
-  $raw = $raw -replace "\bExampleController\b", ($featurePascal + "Controller")
-  $raw = $raw -replace "\.api\.example\b", (".api." + $Feature)
-  $raw | Set-Content -Encoding UTF8 $_.FullName
+Add-ModuleToPom $pomPath ("sagnus-bc-" + $BcName)
+
+# 2) Contracts
+if ($createContracts) {
+  if (-not (Test-Path $contractsTemplateFolder)) { throw "Contracts template não encontrado: $contractsTemplateFolder" }
+  Copy-Item -Recurse -Force $contractsTemplateFolder $contractsFolder
+
+  Get-ChildItem -Recurse -File $contractsFolder | ForEach-Object {
+    (Get-Content -Raw -Encoding UTF8 $_.FullName) `
+      -replace "sagnus-bc-contracts-template", ("sagnus-bc-" + $BcName + "-contracts") `
+      -replace "com\.slifesys\.sagnus\.template", $basePkg |
+      Set-Content -Encoding UTF8 $_.FullName
+  }
+
+  $oldCPkgDir = Join-Path $contractsFolder "src/main/java/com/slifesys/sagnus/template"
+  $newCPkgDir = Join-Path $contractsFolder ("src/main/java/" + ($basePkg -replace "\.", "/"))
+  if (Test-Path $oldCPkgDir) {
+    New-Item -ItemType Directory -Force -Path (Split-Path $newCPkgDir) | Out-Null
+    Move-Item -Force $oldCPkgDir $newCPkgDir
+  }
+
+  if ($createContractsPorts) {
+    $bcPascal = To-PascalCase $BcName
+    $portDir = Join-Path $newCPkgDir "contract/core"
+    New-Item -ItemType Directory -Force -Path $portDir | Out-Null
+
+    @"
+package $basePkg.contract.core;
+
+import java.util.Optional;
+
+/**
+ * Port de consulta do BC $($BcName.ToUpper()).
+ * Outros BCs dependem APENAS deste contrato.
+ *
+ * Obs.: ajuste nomes/assuntos conforme o domínio real do BC.
+ */
+public interface $bcPascal`QueryPort {
+    Optional<ResumoDTO> obterResumoPorId(Long id);
+    Optional<ResumoDTO> obterResumoPorCodigo(String codigo);
+}
+"@ | Set-Content -Encoding UTF8 (Join-Path $portDir ($bcPascal + "QueryPort.java"))
+
+    @"
+package $basePkg.contract.core;
+
+/**
+ * DTO mínimo (read-only) para referências cruzadas entre BCs.
+ * Evite expor entidades do domínio diretamente.
+ */
+public record ResumoDTO(
+        Long id,
+        String codigo,
+        String nome,
+        Boolean ativo
+) {}
+"@ | Set-Content -Encoding UTF8 (Join-Path $portDir "ResumoDTO.java")
+  }
+
+  Add-ModuleToPom $pomPath ("sagnus-bc-" + $BcName + "-contracts")
+}
+
+# 3) Stub GraphQL no gateway
+if ($createGatewayStub) {
+  # Organização: resources/graphql/<bc>/*.graphqls
+  $gqlRoot = Join-Path $root "sagnus-api-gateway/src/main/resources/graphql"
+  $gqlDir  = Join-Path $gqlRoot $BcName
+  $javaDir = Join-Path $root "sagnus-api-gateway/src/main/java/com/slifesys/sagnus/graphql/bc"
+  New-Item -ItemType Directory -Force -Path $gqlDir | Out-Null
+  New-Item -ItemType Directory -Force -Path $javaDir | Out-Null
+
+  @"
+"""Queries (stub) do BC $BcName no Gateway GraphQL (BFF fino)."""
+
+extend type Query {
+  ${BcName}Ping: String!
+}
+"@ | Set-Content -Encoding UTF8 (Join-Path $gqlDir ($BcName + ".queries.graphqls"))
+
+  @"
+"""Mutations (stub) do BC $BcName no Gateway GraphQL (BFF fino)."""
+
+extend type Mutation {
+  ${BcName}PingMut: String!
+}
+"@ | Set-Content -Encoding UTF8 (Join-Path $gqlDir ($BcName + ".mutations.graphqls"))
+
+  @"
+"""Types (stub) do BC $BcName no Gateway GraphQL (BFF fino)."""
+
+# Adicione aqui inputs/enums/types específicos do BC.
+"@ | Set-Content -Encoding UTF8 (Join-Path $gqlDir ($BcName + ".types.graphqls"))
+
+  $bcPascal = To-PascalCase $BcName
+  @"
+package com.slifesys.sagnus.graphql.bc;
+
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
+
+/**
+ * Stub inicial do BC $BcName no Gateway GraphQL (BFF fino).
+ * Substitua/adapte para chamar use cases/ports reais do BC.
+ */
+@Controller
+public class ${bcPascal}GraphqlStubController {
+
+    @QueryMapping(name = "${BcName}Ping")
+    public String ping() {
+        return "OK";
+    }
+
+    @MutationMapping(name = "${BcName}PingMut")
+    public String pingMut() {
+        return "OK";
+    }
+}
+"@ | Set-Content -Encoding UTF8 (Join-Path $javaDir ($bcPascal + "GraphqlStubController.java"))
 }
 
 Write-Host "OK: criado $bcFolder"
-Write-Host " - package base: $newPkg"
+Write-Host " - package base: $basePkg"
 Write-Host " - api feature: api/$Feature"
-Write-Host " - endpoint base: $featurePath"
+Write-Host " - contracts: $createContracts"
+Write-Host " - contracts ports: $createContractsPorts"
+Write-Host " - flyway folder: $createFlyway"
+Write-Host " - gateway graphql stub: $createGatewayStub"
+Write-Host "OK: atualizado pom: $pomPath"

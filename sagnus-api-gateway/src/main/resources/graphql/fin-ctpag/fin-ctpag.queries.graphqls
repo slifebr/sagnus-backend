@@ -1,0 +1,5 @@
+"""Queries (stub) do BC fin-ctpag no Gateway GraphQL (BFF fino)."""
+
+extend type Query {
+  fin-ctpagPing: String!
+}

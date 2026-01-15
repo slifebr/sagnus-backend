@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.nfe.infrastructure.event.spring;
 
 import com.slifesys.sagnus.nfe.application.port.DomainEventPublisher;
-import com.slifesys.sagnus.nfe.domain.event.DomainEvent;
+import com.slifesys.sagnus.shared.domain.event.DomainEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 

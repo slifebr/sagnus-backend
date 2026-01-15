@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slifesys.sagnus.nfe.application.config.NfeAuditProperties;
 import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
-import com.slifesys.sagnus.nfe.domain.event.CorrelatedDomainEvent;
-import com.slifesys.sagnus.nfe.domain.event.DomainEvent;
+import com.slifesys.sagnus.shared.domain.event.CorrelatedDomainEvent;
+import com.slifesys.sagnus.shared.domain.event.DomainEvent;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.entity.NfeAuditEventEntity;
 import com.slifesys.sagnus.nfe.infrastructure.persistence.jpa.repository.NfeAuditEventJpaRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,8 @@ import org.springframework.stereotype.Component;
  *
  * - grava em tabela nfe_audit_event
  * - armazena payload JSON do evento
- * - captura correlationId (do evento, quando disponível, ou do CorrelationIdContext)
+ * - captura correlationId (do evento, quando disponível, ou do
+ * CorrelationIdContext)
  */
 @Slf4j
 @Component
@@ -30,8 +31,8 @@ public class DomainEventAuditPersistenceListener {
     private final NfeAuditProperties props;
 
     public DomainEventAuditPersistenceListener(NfeAuditEventJpaRepository repo,
-                                               ObjectMapper objectMapper,
-                                               NfeAuditProperties props) {
+            ObjectMapper objectMapper,
+            NfeAuditProperties props) {
         this.repo = repo;
         this.objectMapper = objectMapper;
         this.props = props;
@@ -57,7 +58,8 @@ public class DomainEventAuditPersistenceListener {
         } catch (JsonProcessingException e) {
             // não falha o fluxo por auditoria
             payload = "{\"error\":\"payload_serialization_failed\",\"eventType\":\"" + event.getEventType() + "\"}";
-            log.warn("[AUDIT] falha ao serializar DomainEvent para JSON. eventType={}, correlationId={}", event.getEventType(), correlationId, e);
+            log.warn("[AUDIT] falha ao serializar DomainEvent para JSON. eventType={}, correlationId={}",
+                    event.getEventType(), correlationId, e);
         }
 
         NfeAuditEventEntity row = new NfeAuditEventEntity();

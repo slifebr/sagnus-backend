@@ -13,12 +13,18 @@ public abstract class AbstractDomainEvent implements DomainEvent {
         this.occurredOn = Instant.now();
     }
 
-    public String eventId() {
+    @Override
+    public String getEventId() {
         return eventId;
     }
 
     @Override
-    public Instant occurredOn() {
+    public Instant getOccurredAt() {
         return occurredOn;
+    }
+
+    @Override
+    public String getEventType() {
+        return this.getClass().getSimpleName();
     }
 }

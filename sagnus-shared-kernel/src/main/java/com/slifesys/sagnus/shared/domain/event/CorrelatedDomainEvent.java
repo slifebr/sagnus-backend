@@ -10,7 +10,7 @@ public abstract class CorrelatedDomainEvent extends AbstractDomainEvent {
         this.correlationId = CorrelationIdContext.get();
     }
 
-    public String correlationId() {
+    public String getCorrelationId() {
         return correlationId;
     }
 }

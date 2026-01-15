@@ -79,3 +79,36 @@ O extrator fica em `scripts/tools/extract_ddl.py` e inclui:
 - CREATE INDEX / CREATE UNIQUE INDEX
 - COMMENT ON TABLE/COLUMN
 - SEQUENCES relevantes (quando aplicável)
+
+
+## Contracts
+
+Por padrão, `new-bc` e `new-bc-from-sql` criam também o módulo `sagnus-bc-<bc>-contracts`.
+
+- Bash:
+  - `--with-contracts` (default)
+  - `--no-contracts`
+
+- PowerShell:
+  - `-WithContracts` (força)
+  - `-NoContracts`
+
+O template fica em `sagnus-bc-contracts-template/`.
+
+
+## new-bc v2 flags
+
+- `--with-contracts` / `--no-contracts` (default: with)
+- `--with-contracts-ports` / `--no-contracts-ports` (default: no)
+- `--with-gateway-graphql-stub` / `--no-gateway-graphql-stub` (default: no)
+- `--with-flyway` / `--no-flyway` (default: with)
+
+Quando `--with-gateway-graphql-stub` é usado, o script cria:
+- `sagnus-api-gateway/src/main/resources/graphql/<bc>/*.graphqls` (separado em queries/mutations/types)
+- `sagnus-api-gateway/src/main/java/com/slifesys/sagnus/graphql/bc/<Bc>GraphqlStubController.java`
+
+Exemplo:
+
+```bash
+./scripts/new-bc.sh adm "" "" --with-contracts-ports --with-gateway-graphql-stub
+```
