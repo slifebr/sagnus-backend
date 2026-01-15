@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.api.tabelapreco;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTabelaPrecoCommand;
-import com.slifesys.sagnus.corp.application.dto.CadastrarTabelaPrecoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTabelaPrecoCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarTabelaPrecoCommand;
 import com.slifesys.sagnus.corp.application.dto.TabelaPrecoResult;
 import com.slifesys.sagnus.corp.application.usecase.AlterarTabelaPrecoUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarTabelaPrecoUseCase;

@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.tiporelacionamento;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarTipoRelacionamentoCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarTipoRelacionamentoCommand;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

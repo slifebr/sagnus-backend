@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.unidade;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarUnidadeCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarUnidadeCommand;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.marca;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarMarcaCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarMarcaCommand;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

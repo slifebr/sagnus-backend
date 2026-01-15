@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarVendedorCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarVendedorCommand;
 import com.slifesys.sagnus.corp.application.dto.VendedorResult;
 import com.slifesys.sagnus.corp.application.port.VendedorRepository;
 import com.slifesys.sagnus.corp.domain.model.vendedor.Vendedor;

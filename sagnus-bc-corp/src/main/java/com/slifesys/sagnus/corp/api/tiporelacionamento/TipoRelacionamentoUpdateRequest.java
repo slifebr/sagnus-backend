@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.tiporelacionamento;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTipoRelacionamentoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTipoRelacionamentoCommand;
 import lombok.Data;
 
 @Data

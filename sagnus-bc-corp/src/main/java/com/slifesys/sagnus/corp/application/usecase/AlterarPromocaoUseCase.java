@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarPromocaoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarPromocaoCommand;
 import com.slifesys.sagnus.corp.application.dto.PromocaoResult;
 import com.slifesys.sagnus.corp.application.port.PromocaoRepository;
 import com.slifesys.sagnus.corp.domain.model.promocao.Promocao;

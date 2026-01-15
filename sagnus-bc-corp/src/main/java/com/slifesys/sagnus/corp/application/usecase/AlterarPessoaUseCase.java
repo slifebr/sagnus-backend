@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarPessoaCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarPessoaCommand;
 import com.slifesys.sagnus.corp.application.dto.PessoaResult;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
 import com.slifesys.sagnus.corp.domain.model.pessoa.PessoaId;

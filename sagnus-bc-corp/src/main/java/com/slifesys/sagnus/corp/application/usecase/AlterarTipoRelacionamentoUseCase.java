@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTipoRelacionamentoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTipoRelacionamentoCommand;
 import com.slifesys.sagnus.corp.application.dto.TipoRelacionamentoResult;
 import com.slifesys.sagnus.corp.application.port.TipoRelacionamentoRepository;
 import com.slifesys.sagnus.corp.domain.model.tiporelacionamento.TipoRelacionamento;

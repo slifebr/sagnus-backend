@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.uf;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarUFCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarUFCommand;
 import lombok.Data;
 
 import java.math.BigDecimal;

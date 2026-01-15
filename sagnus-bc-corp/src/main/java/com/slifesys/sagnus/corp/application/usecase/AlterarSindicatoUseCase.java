@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarSindicatoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarSindicatoCommand;
 import com.slifesys.sagnus.corp.application.dto.SindicatoResult;
 import com.slifesys.sagnus.corp.application.port.SindicatoRepository;
 import com.slifesys.sagnus.corp.domain.model.sindicato.Sindicato;

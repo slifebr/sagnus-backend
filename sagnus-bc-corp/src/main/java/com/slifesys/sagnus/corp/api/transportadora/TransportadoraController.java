@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.api.transportadora;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTransportadoraCommand;
-import com.slifesys.sagnus.corp.application.dto.CadastrarTransportadoraCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTransportadoraCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarTransportadoraCommand;
 import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
 import com.slifesys.sagnus.corp.application.usecase.AlterarTransportadoraUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarTransportadoraUseCase;

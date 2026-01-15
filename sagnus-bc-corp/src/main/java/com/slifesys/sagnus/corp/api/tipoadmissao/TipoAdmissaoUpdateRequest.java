@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.tipoadmissao;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTipoAdmissaoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTipoAdmissaoCommand;
 import lombok.Data;
 
 @Data

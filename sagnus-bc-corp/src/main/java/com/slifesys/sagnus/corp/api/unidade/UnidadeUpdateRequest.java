@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.unidade;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarUnidadeCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarUnidadeCommand;
 import lombok.Data;
 
 @Data

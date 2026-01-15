@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.setor;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarSetorCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarSetorCommand;
 import lombok.Data;
 
 @Data

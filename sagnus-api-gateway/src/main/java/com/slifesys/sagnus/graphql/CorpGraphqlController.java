@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.graphql;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarPessoaCommand;
-import com.slifesys.sagnus.corp.application.dto.CadastrarPessoaCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarPessoaCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarPessoaCommand;
 import com.slifesys.sagnus.corp.application.dto.MarcaResult;
 import com.slifesys.sagnus.corp.application.dto.PessoaResult;
 import com.slifesys.sagnus.corp.application.dto.SindicatoResult;

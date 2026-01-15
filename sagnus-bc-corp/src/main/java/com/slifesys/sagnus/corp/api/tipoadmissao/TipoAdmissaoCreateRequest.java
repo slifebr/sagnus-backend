@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.tipoadmissao;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarTipoAdmissaoCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarTipoAdmissaoCommand;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

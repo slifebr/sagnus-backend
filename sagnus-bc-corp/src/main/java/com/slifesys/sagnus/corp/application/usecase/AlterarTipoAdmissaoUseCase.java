@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTipoAdmissaoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTipoAdmissaoCommand;
 import com.slifesys.sagnus.corp.application.dto.TipoAdmissaoResult;
 import com.slifesys.sagnus.corp.application.port.TipoAdmissaoRepository;
 import com.slifesys.sagnus.corp.domain.model.tipoadmissao.TipoAdmissao;

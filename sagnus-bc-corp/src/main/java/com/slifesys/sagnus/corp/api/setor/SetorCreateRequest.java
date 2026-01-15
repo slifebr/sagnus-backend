@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.setor;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarSetorCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarSetorCommand;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

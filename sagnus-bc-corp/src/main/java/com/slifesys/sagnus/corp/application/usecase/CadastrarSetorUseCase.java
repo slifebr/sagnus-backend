@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarSetorCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarSetorCommand;
 import com.slifesys.sagnus.corp.application.dto.SetorResult;
 import com.slifesys.sagnus.corp.application.port.SetorRepository;
 import com.slifesys.sagnus.corp.domain.model.setor.Setor;

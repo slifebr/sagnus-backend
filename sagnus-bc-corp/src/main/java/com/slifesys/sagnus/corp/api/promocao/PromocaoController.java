@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.api.promocao;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarPromocaoCommand;
-import com.slifesys.sagnus.corp.application.dto.CadastrarPromocaoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarPromocaoCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarPromocaoCommand;
 import com.slifesys.sagnus.corp.application.dto.PromocaoResult;
 import com.slifesys.sagnus.corp.application.usecase.AlterarPromocaoUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarPromocaoUseCase;

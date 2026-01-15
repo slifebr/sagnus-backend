@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTabelaPrecoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTabelaPrecoCommand;
 import com.slifesys.sagnus.corp.application.dto.TabelaPrecoResult;
 import com.slifesys.sagnus.corp.application.port.TabelaPrecoRepository;
 import com.slifesys.sagnus.corp.domain.model.tabelapreco.TabelaPreco;

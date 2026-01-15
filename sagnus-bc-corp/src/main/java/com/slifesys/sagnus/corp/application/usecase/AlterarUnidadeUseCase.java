@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarUnidadeCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarUnidadeCommand;
 import com.slifesys.sagnus.corp.application.dto.UnidadeResult;
 import com.slifesys.sagnus.corp.application.port.UnidadeRepository;
 import com.slifesys.sagnus.corp.domain.model.unidade.Unidade;

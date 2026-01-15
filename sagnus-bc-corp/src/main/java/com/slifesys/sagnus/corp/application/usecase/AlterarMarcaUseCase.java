@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarMarcaCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarMarcaCommand;
 import com.slifesys.sagnus.corp.application.dto.MarcaResult;
 import com.slifesys.sagnus.corp.application.port.MarcaRepository;
 import com.slifesys.sagnus.corp.domain.model.marca.Marca;

@@ -1,0 +1,16 @@
+package com.slifesys.sagnus.corp.application.command;
+
+import lombok.Builder;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+
+@Getter
+@Builder
+public class CadastrarUFCommand {
+    private String sigla;
+    private String nome;
+    private BigDecimal icmsInterno;
+    private BigDecimal icmsInterestadual;
+    private String usuCriacao;
+}

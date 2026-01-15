@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarTransportadoraCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarTransportadoraCommand;
 import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
 import com.slifesys.sagnus.corp.application.port.TransportadoraRepository;
 import com.slifesys.sagnus.corp.domain.model.transportadora.Transportadora;

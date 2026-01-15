@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.marca;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarMarcaCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarMarcaCommand;
 import lombok.Data;
 
 @Data

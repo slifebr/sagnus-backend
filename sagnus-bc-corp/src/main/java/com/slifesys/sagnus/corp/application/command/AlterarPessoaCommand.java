@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.corp.application.dto;
+package com.slifesys.sagnus.corp.application.command;
 
 import lombok.Builder;
 import lombok.Value;

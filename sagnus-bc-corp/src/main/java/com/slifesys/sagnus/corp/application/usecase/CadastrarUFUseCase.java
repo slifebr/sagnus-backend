@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarUFCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarUFCommand;
 import com.slifesys.sagnus.corp.application.dto.UFResult;
 import com.slifesys.sagnus.corp.application.port.UFRepository;
 import com.slifesys.sagnus.corp.domain.model.uf.UF;

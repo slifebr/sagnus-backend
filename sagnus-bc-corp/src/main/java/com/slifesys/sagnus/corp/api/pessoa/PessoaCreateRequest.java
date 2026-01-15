@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.pessoa;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarPessoaCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarPessoaCommand;
 import com.slifesys.sagnus.corp.domain.model.pessoa.TipoPessoa;
 import lombok.Data;
 

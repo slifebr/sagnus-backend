@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.api.vendedor;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarVendedorCommand;
-import com.slifesys.sagnus.corp.application.dto.CadastrarVendedorCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarVendedorCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarVendedorCommand;
 import com.slifesys.sagnus.corp.application.dto.VendedorResult;
 import com.slifesys.sagnus.corp.application.usecase.AlterarVendedorUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarVendedorUseCase;

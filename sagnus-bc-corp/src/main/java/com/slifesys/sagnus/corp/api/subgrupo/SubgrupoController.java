@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.api.subgrupo;
 
-import com.slifesys.sagnus.corp.application.dto.AlterarSubgrupoCommand;
-import com.slifesys.sagnus.corp.application.dto.CadastrarSubgrupoCommand;
+import com.slifesys.sagnus.corp.application.command.AlterarSubgrupoCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarSubgrupoCommand;
 import com.slifesys.sagnus.corp.application.dto.SubgrupoResult;
 import com.slifesys.sagnus.corp.application.usecase.AlterarSubgrupoUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarSubgrupoUseCase;

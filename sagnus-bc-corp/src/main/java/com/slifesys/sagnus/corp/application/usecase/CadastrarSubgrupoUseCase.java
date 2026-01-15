@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarSubgrupoCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarSubgrupoCommand;
 import com.slifesys.sagnus.corp.application.dto.SubgrupoResult;
 import com.slifesys.sagnus.corp.application.port.SubgrupoRepository;
 import com.slifesys.sagnus.corp.domain.model.subgrupo.Subgrupo;

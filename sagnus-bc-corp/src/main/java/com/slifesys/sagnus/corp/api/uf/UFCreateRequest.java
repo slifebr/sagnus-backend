@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.api.uf;
 
-import com.slifesys.sagnus.corp.application.dto.CadastrarUFCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarUFCommand;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
