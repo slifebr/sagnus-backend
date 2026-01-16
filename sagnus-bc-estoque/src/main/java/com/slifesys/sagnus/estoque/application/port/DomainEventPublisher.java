@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.sagnus-bc-estoque.application.port;
+package com.slifesys.sagnus.estoque.application.port;
 
 /**
  * Porta de saída (outbound port) para publicação de eventos de domínio/integração.

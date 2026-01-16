@@ -1,7 +1,7 @@
-package com.slifesys.sagnus.sagnus-bc-estoque.application.port;
+package com.slifesys.sagnus.estoque.application.port;
 
-import com.slifesys.sagnus.sagnus-bc-estoque.domain.model.Example;
-import com.slifesys.sagnus.sagnus-bc-estoque.domain.model.ExampleId;
+import com.slifesys.sagnus.estoque.domain.model.Example;
+import com.slifesys.sagnus.estoque.domain.model.ExampleId;
 
 import java.util.Optional;
 

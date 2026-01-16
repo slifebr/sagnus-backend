@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/adm/agenda")
+@RequestMapping("/api/v1/adm/agenda")
 public class AgendaController {
 
     private final CreateCategoriaUseCase createCategoriaUseCase;

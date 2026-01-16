@@ -1,10 +1,10 @@
-package com.slifesys.sagnus.sagnus-bc-estoque.application.usecase;
+package com.slifesys.sagnus.estoque.application.usecase;
 
-import com.slifesys.sagnus.sagnus-bc-estoque.application.command.CreateExampleCommand;
-import com.slifesys.sagnus.sagnus-bc-estoque.application.port.DomainEventPublisher;
-import com.slifesys.sagnus.sagnus-bc-estoque.application.port.ExampleRepository;
-import com.slifesys.sagnus.sagnus-bc-estoque.application.result.CreateExampleResult;
-import com.slifesys.sagnus.sagnus-bc-estoque.domain.model.Example;
+import com.slifesys.sagnus.estoque.application.command.CreateExampleCommand;
+import com.slifesys.sagnus.estoque.application.port.DomainEventPublisher;
+import com.slifesys.sagnus.estoque.application.port.ExampleRepository;
+import com.slifesys.sagnus.estoque.application.result.CreateExampleResult;
+import com.slifesys.sagnus.estoque.domain.model.Example;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

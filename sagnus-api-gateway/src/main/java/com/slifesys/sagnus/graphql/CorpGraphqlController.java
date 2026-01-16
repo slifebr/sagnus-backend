@@ -1,14 +1,16 @@
 package com.slifesys.sagnus.graphql;
 
-import com.slifesys.sagnus.corp.application.command.AlterarPessoaCommand;
-import com.slifesys.sagnus.corp.application.command.CadastrarPessoaCommand;
 import com.slifesys.sagnus.corp.application.dto.MarcaResult;
 import com.slifesys.sagnus.corp.application.dto.PessoaResult;
 import com.slifesys.sagnus.corp.application.dto.SindicatoResult;
 import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
 import com.slifesys.sagnus.corp.application.dto.VendedorResult;
+
+import com.slifesys.sagnus.corp.application.command.AlterarPessoaCommand;
+import com.slifesys.sagnus.corp.application.command.CadastrarPessoaCommand;
 import com.slifesys.sagnus.corp.application.usecase.AlterarPessoaUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarPessoaUseCase;
+
 import com.slifesys.sagnus.corp.application.usecase.ListarPessoasUseCase;
 import com.slifesys.sagnus.corp.application.usecase.ListarSindicatosUseCase;
 import com.slifesys.sagnus.corp.application.usecase.ListarTransportadorasUseCase;

@@ -1,8 +1,8 @@
-package com.slifesys.sagnus.sagnus-bc-estoque.infrastructure.repository;
+package com.slifesys.sagnus.estoque.infrastructure.repository;
 
-import com.slifesys.sagnus.sagnus-bc-estoque.application.port.ExampleRepository;
-import com.slifesys.sagnus.sagnus-bc-estoque.domain.model.Example;
-import com.slifesys.sagnus.sagnus-bc-estoque.domain.model.ExampleId;
+import com.slifesys.sagnus.estoque.application.port.ExampleRepository;
+import com.slifesys.sagnus.estoque.domain.model.Example;
+import com.slifesys.sagnus.estoque.domain.model.ExampleId;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
