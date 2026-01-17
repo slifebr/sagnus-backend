@@ -1,8 +1,11 @@
 package com.slifesys.sagnus.auth.domain.usuario;
+
 import lombok.*;
+
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class AuthUsuario {
   private Long id;

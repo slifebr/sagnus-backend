@@ -9,4 +9,10 @@ public class RefreshResponse {
     String accessToken;
     String tokenType;
     Long expiresInSeconds;
+
+    public RefreshResponse(String accessToken, String tokenType, Long expiresInSeconds) {
+        this.accessToken = accessToken;
+        this.tokenType = tokenType;
+        this.expiresInSeconds = expiresInSeconds;
+    }
 }

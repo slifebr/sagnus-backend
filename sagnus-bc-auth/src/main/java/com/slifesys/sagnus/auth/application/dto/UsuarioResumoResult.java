@@ -1,5 +1,6 @@
 package com.slifesys.sagnus.auth.application.dto;
 
+import com.slifesys.sagnus.auth.domain.usuario.AuthUsuarioStatus;
 import lombok.Builder;
 import lombok.Value;
 
@@ -9,9 +10,9 @@ import java.util.Set;
 @Builder
 public class UsuarioResumoResult {
     Long usuarioId;
-    String username;
-    boolean ativo;
-    Set<String> roles;
+    String login;
+    AuthUsuarioStatus status;
+    Set<String> perfis;
 
     Long pessoaId;
     String pessoaNome;

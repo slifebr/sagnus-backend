@@ -1,6 +1,5 @@
-package com.slifesys.sagnus.security;
+itpackage com.slifesys.sagnus.security;
 
-import com.slifesys.sagnus.auth.domain.model.usuario.UsuarioSistema;
 import com.slifesys.sagnus.auth.domain.usuario.AuthUsuario;
 import com.slifesys.sagnus.auth.domain.usuario.AuthUsuarioRepository;
 import com.slifesys.sagnus.shared.observability.CorrelationIdContext;

@@ -15,6 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class AutenticarUseCase {
@@ -33,11 +35,13 @@ public class AutenticarUseCase {
                 new UsernamePasswordAuthenticationToken(username.trim().toLowerCase(), password)
         );
 
-        var u = usuarioJpa.findByUsername(username.trim().toLowerCase())
+        var u = usuarioJpa.findByLogin(username.trim().toLowerCase())
                 .orElseThrow(() -> new BadCredentialsException("Usuário/senha inválidos"));
 
-        String access = tokenService.createAccessToken(u.getUsername(), java.util.Set.of(u.getRole()));
-        String refresh = tokenService.createRefreshToken(u.getUsername());
+        var roles = u.getPerfis().stream().map(p -> p.getNome()).collect(Collectors.toSet());
+
+        String access = tokenService.createAccessToken(u.getLogin(), roles);
+        String refresh = tokenService.createRefreshToken(u.getLogin());
 
         var pessoaOpt = (u.getPessoaId() != null)
                 ? corpPessoaGateway.obterResumoPorPessoaId(u.getPessoaId())
@@ -48,12 +52,12 @@ public class AutenticarUseCase {
                 .refreshToken(refresh)
                 .tokenType("Bearer")
                 .expiresInSeconds(tokenService.accessExpiresSeconds())
-                .username(u.getUsername())
-                .roles(java.util.Set.of(u.getRole()))
+                .login(u.getLogin())
+                .perfis(roles)
                 .pessoaId(u.getPessoaId())
-                .pessoaNome(pessoaOpt.map(p -> p.getNome()).orElse(null))
-                .pessoaTipo(pessoaOpt.map(p -> p.getTipo()).orElse(null))
-                .pessoaDocumento(pessoaOpt.map(p -> p.getDocumento()).orElse(null))
+                .pessoaNome(pessoaOpt.map(PessoaResumoDTO::getNome).orElse(null))
+                .pessoaTipo(pessoaOpt.map(PessoaResumoDTO::getTipo).orElse(null))
+                .pessoaDocumento(pessoaOpt.map(PessoaResumoDTO::getDocumento).orElse(null))
                 .build();
     }
 }

@@ -13,8 +13,8 @@ public class LoginResponse {
     String tokenType;
     Long expiresInSeconds;
 
-    String username;
-    Set<String> roles;
+    String login;
+    Set<String> perfis;
 
     Long pessoaId;
     String pessoaNome;

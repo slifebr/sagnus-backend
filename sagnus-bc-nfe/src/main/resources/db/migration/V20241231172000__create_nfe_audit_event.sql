@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS nfe_audit_event (
     id              BIGSERIAL PRIMARY KEY,
     event_id         VARCHAR(64)  NOT NULL,
     event_type       VARCHAR(128) NOT NULL,
-    occurred_at      TIMESTAMPTZ  NOT NULL,
+    occurred_at      TIMESTAMP  NOT NULL,
     correlation_id   VARCHAR(128) NULL,
     payload_json     TEXT         NULL
 );

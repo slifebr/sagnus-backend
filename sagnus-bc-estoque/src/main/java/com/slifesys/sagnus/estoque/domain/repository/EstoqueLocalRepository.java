@@ -13,7 +13,8 @@ public interface EstoqueLocalRepository {
 
     List<EstoqueLocal> findAll();
 
+    void deleteById(Long id);
+
     // Adicione aqui SOMENTE o que o domínio precisa:
     // Optional<EstoqueLocal> findByCodigo(String codigo);
-    // void deleteById(Long id);
 }
