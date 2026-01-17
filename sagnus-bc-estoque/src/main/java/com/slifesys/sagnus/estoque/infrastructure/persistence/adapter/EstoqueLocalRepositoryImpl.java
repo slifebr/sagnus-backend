@@ -2,7 +2,7 @@ package com.slifesys.sagnus.estoque.infrastructure.persistence.adapter;
 
 import com.slifesys.sagnus.estoque.domain.model.EstoqueLocal;
 import com.slifesys.sagnus.estoque.domain.repository.EstoqueLocalRepository;
-import com.slifesys.sagnus.estoque.infrastructure.persistence.mappers.EstoqueLocalMapper;
+import com.slifesys.sagnus.estoque.infrastructure.persistence.mapper.EstoqueLocalMapper;
 import com.slifesys.sagnus.estoque.infrastructure.persistence.repository.EstoqueLocalJpaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -37,5 +37,10 @@ public class EstoqueLocalRepositoryImpl implements EstoqueLocalRepository {
         return estoqueLocalJpaRepository.findAll().stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        estoqueLocalJpaRepository.deleteById(id);
     }
 }

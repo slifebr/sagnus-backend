@@ -36,9 +36,32 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-nfe</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-corp</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
@@ -48,6 +71,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>maven-spring-boot-plugin</artifactId>
+                <version>3.3.4</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

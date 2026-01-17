@@ -1,5 +1,14 @@
 package com.slifesys.sagnus.estoque.infrastructure.persistence.entity;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Entity
+@Table(name = "supr_estq_produto")
+@Data
 public class EstProdutoEntity implements Serializable{
         private static final long serialVersionUID = 1L;
     
@@ -48,9 +57,10 @@ public class EstProdutoEntity implements Serializable{
         private BigDecimal quantidadeEstoque;
     
         @Temporal(TemporalType.DATE)
-    @Column(name="data_cadastro")
+        @Column(name="data_cadastro")
         private Date dataCadastro;
     
+        /*
         @ManyToOne 
         @JoinColumn(name="id_produto_unidade")
         private ProdutoUnidadeModel produtoUnidadeModel; 
@@ -62,4 +72,5 @@ public class EstProdutoEntity implements Serializable{
         @ManyToOne 
         @JoinColumn(name="id_produto_subgrupo")
         private ProdutoSubgrupoModel produtoSubgrupoModel; 
+        */ 
 }

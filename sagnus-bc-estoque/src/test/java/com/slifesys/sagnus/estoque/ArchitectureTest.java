@@ -1,9 +1,8 @@
-package com.slifesys.sagnus.sagnus-bc-estoque;
+package com.slifesys.sagnus.estoque;
 
-import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
-import com.tngtech.archunit.junit5.AnalyzeClasses;
-import com.tngtech.archunit.junit5.ArchTest;
+
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
@@ -18,10 +17,10 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
  *  - ..infrastructure..  (adapters: db, messaging, clients)
  *  - ..api..             (controllers, DTOs, mappers)
  */
-@AnalyzeClasses(packages = "com.slifesys.sagnus.sagnus-bc-estoque")
+@AnalyzeClasses(packages = "com.slifesys.sagnus.estoque")
 class ArchitectureTest {
 
-    private static final String BASE = "com.slifesys.sagnus.sagnus-bc-estoque..";
+    private static final String BASE = "com.slifesys.sagnus.estoque..";
 
     @ArchTest
     static final ArchRule domain_must_not_depend_on_spring_or_persistence =

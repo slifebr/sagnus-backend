@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.estoque.infrastructure.persistence.mappers;
+package com.slifesys.sagnus.estoque.infrastructure.persistence.mapper;
 
 import com.slifesys.sagnus.estoque.domain.model.EstoqueLocal;
 import com.slifesys.sagnus.estoque.infrastructure.persistence.entity.EstoqueLocalEntity;

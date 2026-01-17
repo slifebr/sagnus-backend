@@ -1,6 +1,6 @@
-package com.slifesys.sagnus.sagnus-bc-estoque.infrastructure.event;
+package com.slifesys.sagnus.estoque.infrastructure.event;
 
-import com.slifesys.sagnus.sagnus-bc-estoque.application.port.DomainEventPublisher;
+import com.slifesys.sagnus.estoque.application.port.DomainEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

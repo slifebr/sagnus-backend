@@ -1,7 +1,6 @@
-itpackage com.slifesys.sagnus.security;
+package com.slifesys.sagnus.security;
 
-import com.slifesys.sagnus.auth.domain.usuario.AuthUsuario;
-import com.slifesys.sagnus.auth.domain.usuario.AuthUsuarioRepository;
+
 import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,13 +22,10 @@ import java.util.function.Function;
 @Service
 public class TokenService {
 
-    private final AuthUsuarioRepository usuarioSistemaRepository;
-
     @Value("${sagnus.security.jwt.secret-key}")
     private String secretKey;
 
-    public TokenService(AuthUsuarioRepository usuarioSistemaRepository) {
-        this.usuarioSistemaRepository = usuarioSistemaRepository;
+    public TokenService() {
     }
 
     public String extractUsername(String token) {
@@ -68,10 +64,10 @@ public class TokenService {
 
         return Jwts
                 .builder()
-                .addClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(expiration))
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(expiration))
                 .claim("authorities", authorities)
                 .signWith(getSignInKey())
                 .compact();
@@ -92,11 +88,11 @@ public class TokenService {
 
     private Claims extractAllClaims(String token) {
         return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
+                .parser()
+                .verifyWith(getSignInKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey getSignInKey() {
@@ -104,14 +100,5 @@ public class TokenService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    /**
-     * Mock para simular a obtenção de um usuário do sistema a partir do token.
-     *
-     * @param token
-     * @return
-     */
-    public AuthUsuario getUsuarioDoToken(String token) {
-        final String username = extractUsername(token);
-        return usuarioSistemaRepository.findByLogin(username).orElse(null);
-    }
+
 }

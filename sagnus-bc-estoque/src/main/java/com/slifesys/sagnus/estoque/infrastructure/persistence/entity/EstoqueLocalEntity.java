@@ -12,8 +12,19 @@ public class EstoqueLocalEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String nome;
+    @ManyToOne
+    @JoinColumn(name = "id_almoxarifado", nullable = false)
+    private com.slifesys.sagnus.estoque.domain.model.Almoxarifado almoxarifado;
 
-    private boolean ativo = true;
+    @ManyToOne
+    @JoinColumn(name = "id_grade", nullable = false)
+    private com.slifesys.sagnus.estoque.domain.model.Grade grade;
+
+    private java.math.BigDecimal quantidade;
+
+    @Column(name = "estq_max")
+    private java.math.BigDecimal estqMax;
+
+    @Column(name = "estq_min")
+    private java.math.BigDecimal estqMin;
 }

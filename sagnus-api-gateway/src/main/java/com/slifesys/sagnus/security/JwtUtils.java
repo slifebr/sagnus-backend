@@ -3,10 +3,11 @@ package com.slifesys.sagnus.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +34,14 @@ public class JwtUtils {
         Date expira = new Date(agora.getTime() + accessTokenExpirationMillis);
 
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(agora)
-                .setExpiration(expira)
-                .addClaims(Map.of(
+                .subject(username)
+                .issuedAt(agora)
+                .expiration(expira)
+                .claims(Map.of(
                         "roles", roles,
                         "tv", tokenVersion // tokenVersion
                 ))
-                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
+                .signWith(getKeys())
                 .compact();
     }
 
@@ -50,12 +51,12 @@ public class JwtUtils {
         Date expira = new Date(agora.getTime() + refreshTokenExpirationMillis);
 
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(agora)
-                .setExpiration(expira)
-                .addClaims(Map.of(
+                .subject(username)
+                .issuedAt(agora)
+                .expiration(expira)
+                .claims(Map.of(
                         "tv", tokenVersion))
-                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
+                .signWith(getKeys())
                 .compact();
     }
 
@@ -74,7 +75,7 @@ public class JwtUtils {
     public boolean isTokenValido(String token) {
         try {
             var jws = parseToken(token);
-            Date exp = jws.getBody().getExpiration();
+            Date exp = jws.getPayload().getExpiration();
             return exp != null && exp.after(new Date());
         } catch (Exception e) {
             return false;
@@ -105,9 +106,10 @@ public class JwtUtils {
 
     private Claims getClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(secret.getBytes())
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(getKeys())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public long getAccessTokenExpirationSeconds() {
@@ -116,8 +118,13 @@ public class JwtUtils {
 
     public Jws<Claims> parseToken(String token) {
         return Jwts.parser()
-                .setSigningKey(secret.getBytes())
-                .parseClaimsJws(token);
+                .verifyWith(getKeys())
+                .build()
+                .parseSignedClaims(token);
+    }
+
+    private SecretKey getKeys() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
 }

@@ -15,15 +15,13 @@ public class CorrelationIdFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String correlationId = httpServletRequest.getHeader(CorrelationId.CORRELATION_ID_HEADER);
+        String correlationId = httpServletRequest.getHeader(CorrelationId.HEADER);
 
-        CorrelationId.set(correlationId);
-        CorrelationIdContext.setCorrelationId(CorrelationId.get());
+        CorrelationIdContext.set(correlationId);
 
         try {
             chain.doFilter(request, response);
         } finally {
-            CorrelationId.remove();
             CorrelationIdContext.clear();
         }
     }
