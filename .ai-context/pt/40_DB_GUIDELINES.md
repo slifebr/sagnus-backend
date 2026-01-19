@@ -1,0 +1,4 @@
+- Banco agnóstico (Oracle/PostgreSQL)
+- Sem quoted identifiers
+- Nomes em português
+- Migrações versionadas

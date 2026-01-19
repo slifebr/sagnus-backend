@@ -1,0 +1,5 @@
+- Java 21
+- Spring Boot 3.x
+- Lombok mandatory
+- MapStruct mandatory
+- Packages: domain, application, infrastructure

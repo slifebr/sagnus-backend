@@ -1,0 +1,4 @@
+- Database agnostic (Oracle/PostgreSQL)
+- No quoted identifiers
+- Naming in Portuguese
+- Versioned migrations

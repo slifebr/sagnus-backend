@@ -1,0 +1,7 @@
+- DDD + Arquitetura Hexagonal
+- Um Bounded Context por módulo
+- Domínio em Java puro
+- Sem Spring ou JPA no domínio
+- Repositórios são PORTS
+- Infraestrutura implementa ADAPTERS
+- Controllers não contêm lógica de negócio
