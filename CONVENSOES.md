@@ -1,361 +1,294 @@
-## Regras obrigatórias
-1. **Ports do domínio**
-   - Devem ficar em `domain/repository`.
-   - Ex.: `domain/repository/ProdutoRepository.java`
+# Sagnus ERP — Convenções de Arquitetura (DDD + Hexagonal)
 
-2. **Persistência (JPA/JDBC)**
-   - Spring Data: `infrastructure/persistence/repository/*JpaRepository.java`
-   - Implementação do port: `infrastructure/persistence/adapter/*RepositoryImpl.java`
-   - Entity JPA: `infrastructure/persistence/entity/*Entity.java`
-   - Mapper Entity <-> Domain: `infrastructure/persistence/mapper/*EntityMapper.java`
+**Data:** 2026-01-19  
+**Objetivo:** Definir o padrão oficial de organização de pacotes, persistência e nomenclatura para todos os Bounded Contexts do projeto Sagnus.
 
-3. **Quando criar infrastructure/persistence**
-   - Apenas quando o BC possui persistência real (tabelas e/ou integração DB).
-   - Se o BC ainda não tem DB, NÃO criar `persistence/`.
-   - Stubs ficam em `infrastructure/repository/InMemory*`.
+---
 
-## Convenções de nomes
-- Port do domínio: `XxxRepository`
-- Spring Data: `XxxJpaRepository`
-- Adapter: `XxxRepositoryImpl`
-- Entity JPA: `XxxEntity`
-- Mapper entity-domain: `XxxEntityMapper`
-- Mapper dto-app: `XxxDtoMapper`
+## 1. Estrutura de Pacotes (Canônica)
 
-com.slifesys.sagnus.<bc>/
-  api/
-    controller/                (REST)
-    graphql/                   (futuro / opcional)
-    dto/
-    mapper/                    (DTO <-> Application)
-  application/
-    usecase/
-    service/                   (orquestração, se precisar)
-    port/
-      in/                      (interfaces de casos de uso, se quiser)
-      out/                     (opcional, se você preferir ports aqui)
-  domain/
-    model/                     (Aggregates, Entities, ValueObjects)
-    repository/                (PORTS de persistência)
-    service/                   (Domain services)
-    event/                     (Domain events)
-    exception/
-  infrastructure/
-    config/                    (Spring config, beans)
-    event/                     (outbox listener, handlers, publisher)
-    persistence/               (SÓ SE houver banco)
-      entity/                  (JPA entity)
-      repository/              (Spring Data interfaces)
-      mapper/                  (Entity <-> Domain)
-      adapter/                 (implementa domain.repository.*)
-    repository/                (SÓ stubs: InMemory*, Fake*, etc.)
-    http/                      (clients externos: Feign/WebClient)
-    messaging/                 (Rabbit/Kafka adapters)
-Se quiser o nome mais “purista hexagonal”, pode renomear persistence/adapter 
-para adapters/persistence e manter o resto igual. Mas o layout acima já está ótimo e pragmático.
+Este projeto adota **DDD + Arquitetura Hexagonal** para manter o domínio independente de frameworks e banco de dados.
 
-Regras oficiais (para acabar com a “inconsistência”)
+### Princípios
 
-# Regra A — Ports (contratos) do repositório
-
-✅ Ficam aqui:
-
-domain/repository/* (recomendado no Sagnus)
-
-Exemplo:
-
-domain/repository/EstoqueLocalRepository.java (interface/port)
-
-# Regra B — Spring Data NÃO é “o repositório do domínio”
-
-✅ Fica aqui:
-
-infrastructure/persistence/repository/*JpaRepository.java
-
-Exemplo:
-
-EstoqueLocalJpaRepository extends JpaRepository<EstoqueLocalEntity, Long>
-
-Esse “repository” é do Spring Data, não do domínio.
-
-# Regra C — Implementação do port do domínio (adapter)
-
-✅ Fica aqui:
-
-infrastructure/persistence/adapter/*RepositoryImpl.java
-
-Exemplo:
-
-EstoqueLocalRepositoryImpl implements domain.repository.EstoqueLocalRepository
-
-# Regra D — Mappers
-
-DTO <-> Application: api/mapper
-
-Entity <-> Domain: infrastructure/persistence/mapper
-
-# Regra E — Quando criar infrastructure/persistence
-
-Só cria quando:
-
-existe tabela / persistência real / JPA / JDBC / MyBatis etc.
-
-Se o BC ainda é “base/stub”, não cria.
-
-Use infrastructure/repository/InMemory* se precisar.
-
-## Checklist de revisão rápida (para você validar BC por BC)
-
-# DDD / Hexagonal
-
-✅ Domain não depende de Spring, JPA, Jackson, Feign, etc.
-
- ✅Ports estão em domain/repository (ou application/port/out se você decidir isso globalmente).
-
- infrastructure/persistence/entity não é importada no domain/application.
-
-# Persistência
-
- ✅ infrastructure/persistence/repository/*JpaRepository existe apenas se há DB
-
- ✅ infrastructure/persistence/adapter/*Impl implementa exatamente o port do domínio
-
- ✅ Mapper Entity <-> Domain existe (evitar “domain com annotation JPA”)
-
-# Stubs
-
- Se o BC ainda não tem banco:
-
- ✅ infrastructure/repository/InMemory* pode existir
-
- não existe infrastructure/persistence/*
-
-# API
-
- ✅ Controller usa application/usecase
-
- ✅ DTOs não vazam para Domain
-
-
-Ajuste específico para  (bc-estoque vs bc-fina-base)
-bc-estoque (já está quase no padrão)
-
-✅ Já tem infrastructure/persistence/...
-
-Sugestão pequena para consolidar:
-
-mover EstoqueLocalRepositoryImpl para:
-
-infrastructure/persistence/adapter/
-
-deixar infrastructure/persistence/repository/ só para Spring Data
-
-Fica bem claro:
-
-repository/ = Spring Data
-
-adapter/ = implementação do port do domínio
-
-bc-fina-base (a diferença é natural)
-
-✅ Hoje ele não tem persistência real — então não deve ter persistence/.
-
-Quando entrar a primeira tabela persistida:
-
-cria infrastructure/persistence/{entity,repository,mapper,adapter}
-
-Como o new-bc-from-sql deve gerar (contrato para o template)
-Se o SQL tiver tabelas do BC
-
-Gerar automaticamente:
-
-domain/repository/<Entidade>Repository.java
-
-infrastructure/persistence/entity/<Entidade>Entity.java
-
-infrastructure/persistence/repository/<Entidade>JpaRepository.java
-
-infrastructure/persistence/mapper/<Entidade>EntityMapper.java
-
-infrastructure/persistence/adapter/<Entidade>RepositoryImpl.java
-
-Se o BC for “base / sem SQL”
-
-Gerar:
-
-infrastructure/repository/InMemoryExampleRepository.java (opcional)
-
-NÃO gerar infrastructure/persistence
-
-##  Convenções de nomes (para evitar deriva)
-
-✅ Port do domínio: XxxRepository
-
-✅ Spring Data: XxxJpaRepository
-
-✅ Adapter: XxxRepositoryImpl
-
-✅ Entity JPA: XxxEntity
-
-✅ Mapper entity-domain: XxxEntityMapper
-
-✅ Mapper dto-app: XxxDtoMapper
-
-
-
-# (1) um trecho pronto de README (copiar/colar) 
-# (2) um “diff conceitual” (lista objetiva de mudanças) para aplicar no bc-estoque e deixar o padrão 100% consolidado.
-
-1) Texto pronto para README do Template (Sagnus BC Standard)
-
-Cole isso no README do template (ou num docs/ARCHITECTURE_BC_STANDARD.md):
-
-# Sagnus – Padrão Oficial de Pacotes por Bounded Context (DDD + Hexagonal)
-
-Este projeto adota DDD + Arquitetura Hexagonal para manter o domínio independente de frameworks e de banco de dados.
-
-## Princípios
 - **Domain** contém regras e contratos (ports). Não depende de Spring/JPA/Jackson.
 - **Application** orquestra casos de uso (use cases). Conhece o domínio e suas interfaces.
 - **Infrastructure** contém detalhes técnicos (adapters): persistência, mensageria, HTTP clients, cache etc.
 - A pasta **infrastructure/persistence** só existe quando há persistência real (JPA/JDBC/etc).
 - A pasta **infrastructure/repository** é reservada a stubs/in-memory/fakes (quando não há DB).
 
-## Estrutura padrão do BC
-# Sagnus – Padrão Oficial de Pacotes por Bounded Context (DDD + Hexagonal)
+### Layout Padrão
 
-
-
+```
 com.slifesys.sagnus.<bc>/
-api/
-controller/
-dto/
-mapper/ # DTO <-> Application
-graphql/ # opcional/futuro
-application/
-usecase/
-port/
-in/ # opcional
-out/ # opcional (se ports não estiverem no domain)
-domain/
-model/
-repository/ # PORTS (interfaces do domínio)
-service/
-event/
-exception/
-infrastructure/
-config/
-event/
-persistence/ # SÓ se houver DB
-entity/ # JPA Entities
-repository/ # Spring Data (JpaRepository)
-mapper/ # Entity <-> Domain
-adapter/ # Implementa domain.repository.*
-repository/ # SOMENTE stubs (InMemory*, Fake*)
-http/ # clients externos (Feign/WebClient)
-messaging/ # Rabbit/Kafka adapters
+  api/
+    controller/                # REST controllers
+    dto/                       # Request/Response DTOs
+    mapper/                    # DTO <-> Application (Command/Query)
+    graphql/                   # opcional/futuro
+  application/
+    usecase/                   # Use cases (orquestração)
+    service/                   # Application services (se necessário)
+    port/
+      in/                      # Ports de entrada (opcional)
+      out/                     # Ports de integração externa (ver ADR-0010)
+  domain/
+    model/                     # Aggregates, Entities, Value Objects
+    repository/                # PORTS de persistência (interfaces)
+    service/                   # Domain services
+    event/                     # Domain events
+    exception/                 # Domain exceptions
+  infrastructure/
+    config/                    # Spring config, beans
+    event/                     # Outbox listener, handlers, publisher
+    persistence/               # SÓ SE houver banco
+      entity/                  # JPA Entities
+      repository/              # Spring Data (JpaRepository)
+      mapper/                  # Entity <-> Domain
+      adapter/                 # Implementa domain.repository.*
+    repository/                # SOMENTE stubs (InMemory*, Fake*)
+    http/                      # Clients externos (Feign/WebClient)
+    messaging/                 # Rabbit/Kafka adapters
+```
 
+---
 
-## Regras obrigatórias
-1. **Ports do domínio**
-   - Devem ficar em `domain/repository`.
-   - Ex.: `domain/repository/ProdutoRepository.java`
+## 2. Regras de Persistência
 
-2. **Persistência (JPA/JDBC)**
-   - Spring Data: `infrastructure/persistence/repository/*JpaRepository.java`
-   - Implementação do port: `infrastructure/persistence/adapter/*RepositoryImpl.java`
-   - Entity JPA: `infrastructure/persistence/entity/*Entity.java`
-   - Mapper Entity <-> Domain: `infrastructure/persistence/mapper/*EntityMapper.java`
+### 2.1. Ports do Domínio
 
-3. **Quando criar infrastructure/persistence**
-   - Apenas quando o BC possui persistência real (tabelas e/ou integração DB).
-   - Se o BC ainda não tem DB, NÃO criar `persistence/`.
-   - Stubs ficam em `infrastructure/repository/InMemory*`.
+✅ **Localização:** `domain/repository/`
 
-## Convenções de nomes
-- Port do domínio: `XxxRepository`
-- Spring Data: `XxxJpaRepository`
-- Adapter: `XxxRepositoryImpl`
-- Entity JPA: `XxxEntity`
-- Mapper entity-domain: `XxxEntityMapper`
-- Mapper dto-app: `XxxDtoMapper`
+**Exemplo:**
+```java
+// domain/repository/ProdutoRepository.java
+public interface ProdutoRepository {
+    Produto findById(ProdutoId id);
+    void save(Produto produto);
+}
+```
 
-2) “Diff conceitual” para alinhar o bc-estoque ao padrão
+📌 **Regra:** Ports de repositório são **contratos do domínio**, não do Spring Data.
 
-O bc-estoque já tem infrastructure/persistence, mas está misturando “repository” (Spring Data) com “RepositoryImpl”.
+### 2.2. Spring Data (JPA)
 
-# Mudança 1 — Criar pasta adapter dentro de infrastructure/persistence
+✅ **Localização:** `infrastructure/persistence/repository/*JpaRepository.java`
 
-✅ ANTES:
+**Exemplo:**
+```java
+// infrastructure/persistence/repository/ProdutoJpaRepository.java
+public interface ProdutoJpaRepository extends JpaRepository<ProdutoEntity, Long> {
+}
+```
 
-infrastructure/persistence/repository/EstoqueLocalRepositoryImpl.java
-infrastructure/persistence/repository/EstoqueLocalJpaRepository.java
+📌 **Regra:** Spring Data é um **detalhe de infraestrutura**, não um port do domínio.
 
-✅ DEPOIS (padrão oficial):
+### 2.3. Adapter (Implementação do Port)
 
-infrastructure/persistence/adapter/EstoqueLocalRepositoryImpl.java
-infrastructure/persistence/repository/EstoqueLocalJpaRepository.java
+✅ **Localização:** `infrastructure/persistence/adapter/*RepositoryImpl.java`
 
-📌 Regra:
+**Exemplo:**
+```java
+// infrastructure/persistence/adapter/ProdutoRepositoryImpl.java
+@Component
+public class ProdutoRepositoryImpl implements ProdutoRepository {
+    private final ProdutoJpaRepository jpaRepository;
+    private final ProdutoEntityMapper mapper;
+    
+    @Override
+    public Produto findById(ProdutoId id) {
+        return jpaRepository.findById(id.getValue())
+            .map(mapper::toDomain)
+            .orElse(null);
+    }
+}
+```
 
-repository/ = somente Spring Data
+📌 **Regra:** O adapter **implementa o port do domínio** e usa Spring Data internamente.
 
-adapter/ = implementa o port do domínio
+### 2.4. JPA Entity
 
-# Mudança 2 — Ajustar imports e package do RepositoryImpl
+✅ **Localização:** `infrastructure/persistence/entity/*Entity.java`
 
-No EstoqueLocalRepositoryImpl:
+**Exemplo:**
+```java
+// infrastructure/persistence/entity/ProdutoEntity.java
+@Entity
+@Table(name = "produto")
+public class ProdutoEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    // ...
+}
+```
 
-alterar package com.slifesys.sagnus.estoque.infrastructure.persistence.repository;
-para
+📌 **Regra:** Entidades JPA **não devem vazar para o domínio**.
 
-package com.slifesys.sagnus.estoque.infrastructure.persistence.adapter;
+### 2.5. Mapper (Entity <-> Domain)
 
-E atualizar onde ele é referenciado (geralmente é Spring component, então só o package muda).
+✅ **Localização:** `infrastructure/persistence/mapper/*EntityMapper.java`
 
-# Mudança 3 — Validar que o port do domínio está no lugar certo
+**Exemplo:**
+```java
+// infrastructure/persistence/mapper/ProdutoEntityMapper.java
+@Mapper(componentModel = "spring")
+public interface ProdutoEntityMapper {
+    Produto toDomain(ProdutoEntity entity);
+    ProdutoEntity toEntity(Produto domain);
+}
+```
 
-Confirmar que existe algo como:
+📌 **Regra:** Mappers de persistência ficam em **infrastructure**, não em domain.
 
-com.slifesys.sagnus.estoque.domain.repository.EstoqueLocalRepository
+### 2.6. Quando Criar `infrastructure/persistence`
 
-E que o EstoqueLocalRepositoryImpl faz:
+✅ **Criar quando:**
+- O BC possui tabelas no banco de dados
+- Há persistência real (JPA/JDBC/MyBatis)
 
-implements EstoqueLocalRepository
+❌ **NÃO criar quando:**
+- O BC ainda não tem banco de dados
+- Está usando apenas stubs/in-memory
 
-✅ Isso mantém o contrato “posse do domínio”.
+📌 **Alternativa:** Use `infrastructure/repository/InMemory*` para stubs.
 
-# Mudança 4 — Confirmar isolamento do domínio
+---
 
-Garantir que:
+## 3. Convenções de Nomenclatura
 
-domain/model/* não tem @Entity, @Table, @Column
+| Tipo | Sufixo/Padrão | Localização | Exemplo |
+|------|---------------|-------------|---------|
+| **Port do domínio** | `Repository` | `domain/repository/` | `ProdutoRepository` |
+| **Spring Data** | `JpaRepository` | `infrastructure/persistence/repository/` | `ProdutoJpaRepository` |
+| **Adapter** | `RepositoryImpl` | `infrastructure/persistence/adapter/` | `ProdutoRepositoryImpl` |
+| **JPA Entity** | `Entity` | `infrastructure/persistence/entity/` | `ProdutoEntity` |
+| **Mapper Entity-Domain** | `EntityMapper` | `infrastructure/persistence/mapper/` | `ProdutoEntityMapper` |
+| **Mapper DTO-App** | `DtoMapper` ou `ApiMapper` | `api/mapper/` | `ProdutoDtoMapper` |
+| **Use Case** | `UseCase` | `application/usecase/` | `CriarProdutoUseCase` |
+| **Domain Service** | `Service` | `domain/service/` | `CalculadoraPrecoService` |
 
-domain/* não importa org.springframework.* nem jakarta.persistence.*
+---
 
-Se tiver, mover anotação e campos técnicos para infrastructure/persistence/entity.
+## 4. Localização de Ports por Tipo (ADR-0010)
 
-3) Ajuste equivalente para bc-fina-base (se quiser 100% “padrão” visual)
+Consulte `DECISIONS.md` ADR-0010 para detalhes completos.
 
-Hoje o bc-fina-base parece estar “base”, então é correto não ter persistence/.
+| Tipo de Port | Localização | Exemplo |
+|--------------|-------------|---------|
+| **Repositório** | `domain/repository/` | `ProdutoRepository` |
+| **Integração externa** | `application/port/out/` | `SefazPort`, `EmailPort` |
+| **Caso de uso** (opcional) | `application/port/in/` | `CriarProdutoPort` |
 
-Mas para não confundir a equipe, sugiro colocar uma nota no README do próprio BC:
+📌 **Regra:** Ports de **repositório** são sempre do domínio. Ports de **integração externa** podem ficar em `application/port/out/`.
 
-“Este BC ainda não possui persistência real. Enquanto isso, pode conter stubs em infrastructure/repository.”
+---
 
-E só quando entrar tabela/DB nele:
+## 5. Checklist de Revisão por BC
 
-criar infrastructure/persistence/{entity,repository,mapper,adapter}
+Use este checklist para validar se um BC está seguindo o padrão:
 
-Próximo passo sugerido (objetivo)
+### DDD / Hexagonal
 
-Aplicar a mudança do bc-estoque (mover RepositoryImpl para adapter/).
+- [ ] Domain não depende de Spring, JPA, Jackson, Feign, etc.
+- [ ] Ports estão em `domain/repository/` (repositórios) ou `application/port/out/` (integrações)
+- [ ] `infrastructure/persistence/entity` não é importada em `domain/` ou `application/`
 
-Colar o README padrão no template (e/ou docs).
+### Persistência
 
-Ajustar o new-bc-from-sql para:
+- [ ] `infrastructure/persistence/repository/*JpaRepository` existe apenas se há DB
+- [ ] `infrastructure/persistence/adapter/*Impl` implementa exatamente o port do domínio
+- [ ] Mapper Entity <-> Domain existe (evitar "domain com annotation JPA")
 
-quando houver tabelas: gerar persistence/*
+### Stubs
 
-quando não houver: não gerar persistence/* (somente stubs)
+- [ ] Se o BC ainda não tem banco: `infrastructure/repository/InMemory*` pode existir
+- [ ] Se o BC ainda não tem banco: **não existe** `infrastructure/persistence/*`
 
+### API
+
+- [ ] Controller usa `application/usecase`
+- [ ] DTOs não vazam para Domain
+- [ ] Mappers DTO <-> Application estão em `api/mapper/`
+
+---
+
+## 6. Exemplos Práticos
+
+### 6.1. BC com Persistência (bc-estoque)
+
+✅ **Estrutura atual (após ajuste):**
+
+```
+com.slifesys.sagnus.estoque/
+  domain/
+    repository/EstoqueLocalRepository.java          # Port do domínio
+  infrastructure/
+    persistence/
+      entity/EstoqueLocalEntity.java                # JPA Entity
+      repository/EstoqueLocalJpaRepository.java     # Spring Data
+      mapper/EstoqueLocalEntityMapper.java          # Entity <-> Domain
+      adapter/EstoqueLocalRepositoryImpl.java       # Implementa port
+```
+
+📌 **Mudança aplicada:** Mover `RepositoryImpl` de `repository/` para `adapter/` para separar claramente:
+- `repository/` = Spring Data
+- `adapter/` = Implementação do port do domínio
+
+### 6.2. BC sem Persistência (bc-fina-base)
+
+✅ **Estrutura atual:**
+
+```
+com.slifesys.sagnus.fina.base/
+  domain/
+    repository/ContaRepository.java                 # Port do domínio
+  infrastructure/
+    repository/InMemoryContaRepository.java         # Stub in-memory
+```
+
+📌 **Regra:** Não criar `infrastructure/persistence/` até que haja tabelas reais.
+
+📌 **Quando entrar DB:** Criar `persistence/{entity,repository,mapper,adapter}` seguindo o padrão do bc-estoque.
+
+---
+
+## 7. Geração de Novos BCs (new-bc-from-sql)
+
+### Se o SQL tiver tabelas do BC
+
+Gerar automaticamente:
+
+```
+domain/repository/<Entidade>Repository.java
+infrastructure/persistence/entity/<Entidade>Entity.java
+infrastructure/persistence/repository/<Entidade>JpaRepository.java
+infrastructure/persistence/mapper/<Entidade>EntityMapper.java
+infrastructure/persistence/adapter/<Entidade>RepositoryImpl.java
+```
+
+### Se o BC for "base / sem SQL"
+
+Gerar:
+
+```
+infrastructure/repository/InMemoryExampleRepository.java  # opcional
+```
+
+**NÃO gerar** `infrastructure/persistence/`
+
+---
+
+## 8. Referências
+
+- **Decisões arquiteturais:** Consulte `DECISIONS.md` para ADRs completas
+- **Regras do Cursor AI:** Consulte `.cursorrules` para diretrizes de desenvolvimento
+- **Estrutura de pacotes:** Esta seção (CONVENSOES.md § 1)
+- **Persistência:** Esta seção (CONVENSOES.md § 2)
+
+---
+
+## 9. Histórico de Mudanças
+
+- **2026-01-19:** Consolidação do documento, remoção de duplicações, adição de referências a ADRs
+- **2025-12-16:** Versão inicial com múltiplas seções (consolidadas nesta versão)

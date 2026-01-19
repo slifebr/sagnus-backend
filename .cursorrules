@@ -1,0 +1,148 @@
+# ============================================================
+# .cursorrules — Sagnus ERP (Monorepo Maven / DDD / Hexagonal)
+# Data: 2026-01-04
+# ============================================================
+# ---------------------------
+# DECISÕES ARQUITETURAIS (DECISIONS.md)
+# ---------------------------
+- Toda decisão estrutural/arquitetural (novos módulos, mudança de camadas, comunicação entre BCs, padrão de segurança, etc.) deve respeitar as ADRs documentadas em `DECISIONS.md` e `CONVENSOES.md` .
+- Antes de:
+  - criar novos Bounded Contexts ou contratos `*-api`,
+  - alterar regras de domínio compartilhadas,
+  - modificar padrões de segurança, erros ou integração,
+  o desenvolvedor/assistente deve consultar `DECISIONS.md`  e `CONVENSOES.md` e alinhar a mudança às ADRs existentes.
+- Se for necessário desviar de uma ADR existente:
+  - criar uma nova ADR em `DECISIONS.md` (ex.: `ADR-00XX — ...`) registrando a mudança,
+  - manter compatibilidade retroativa sempre que possível.
+- O assistente (Cursor AI) deve:
+  1) Ler/considerar `DECISIONS.md` e `CONVENSOES.md` sempre que houver dúvida arquitetural.
+  2) Evitar propor soluções que entrem em conflito com as ADRs sem antes sugerir uma nova ADR.
+
+# ---------------------------
+# CONTEXTO DO REPO
+# ---------------------------
+Repository is a Maven multi-module monorepo.
+Main modules:
+- Platform/Shared: sagnus-shared-kernel, sagnus-shared-api-error, sagnus-platform-security, sagnus-platform-web
+- Bounded Contexts: sagnus-bc-corp, sagnus-bc-contracts-corp, sagnus-bc-auth, sagnus-bc-nfe, sagnus-bc-adm, sagnus-bc-template
+- Edge/BFF: sagnus-api-gateway
+
+Target architecture:
+- DDD + Bounded Contexts + Hexagonal (Ports & Adapters)
+- Domain must be framework-agnostic
+- Inter-BC dependency ONLY via contracts modules (e.g., sagnus-bc-contracts-corp)
+
+Stack:
+- Java 21, Spring Boot 3.3.x, Maven
+- Lombok + MapStruct are standard
+- Fiscal domain exists (NFe/IVA Dual IBS/CBS) and must be correct
+
+# ---------------------------
+# REGRAS DE CAMADAS (OBRIGATÓRIO)
+# ---------------------------
+Within each BC (e.g. sagnus-bc-corp, sagnus-bc-nfe, sagnus-bc-adm, sagnus-bc-auth):
+- domain: pure domain model (entities, value objects, domain services, domain events, domain exceptions)
+  - NO Spring annotations
+  - NO JPA annotations
+  - NO HTTP/JWT concerns
+- application: use cases + ports + orchestration
+  - UseCases must be explicit classes ending with UseCase (e.g., EmitirNfeUseCase)
+  - Ports are interfaces describing external capabilities (db, external service, other BC via contract)
+  - See ADR-0010 in DECISIONS.md for port location rules
+- infrastructure: adapters implementing ports
+  - JPA/JDBC, HTTP clients, messaging, XML generation, persistence entities, repositories
+  - See CONVENSOES.md § 2 for persistence structure details
+- api: controllers/resolvers and request/response DTOs
+  - MUST NOT contain business rules
+  - MUST call application use cases only
+
+# ---------------------------
+# CONTRATOS ENTRE BOUNDED CONTEXTS (CRÍTICO)
+# ---------------------------
+- Inter-BC communication MUST use contracts modules:
+  - Example: bc-auth and bc-nfe can depend on sagnus-bc-contracts-corp
+  - They MUST NOT import com.slifesys.sagnus.corp.domain.* or access CORP tables directly
+- Contracts module rules (e.g., sagnus-bc-contracts-corp):
+  - Contains ONLY: ports (interfaces), stable DTOs, enums/types
+  - No Spring, no controllers, no persistence, no business logic
+  - Prefer package naming: com.slifesys.sagnus.<bc>.contract.* (recommended)
+
+# ---------------------------
+# API GATEWAY RULES (CRÍTICO)
+# ---------------------------
+sagnus-api-gateway is an EDGE/BFF module:
+- MUST NOT implement its own domain/application/infrastructure persistence logic
+- MUST NOT own business rules or database access
+- Should only route/aggregate endpoints and delegate to BCs
+- Can perform read-only aggregation via BC contracts (see ADR-0011)
+- Aggregation must remain thin (composition of BC calls), no duplication of domain
+
+# ---------------------------
+# BANCO / DB-INDEPENDENCE
+# ---------------------------
+- Do not use vendor-specific SQL unless isolated inside infrastructure and documented.
+- No quoted identifiers in migrations (avoid "ID" vs id issues).
+- Prefer Flyway/Liquibase conventions (if present) and snake_case identifiers in DB.
+- Any native SQL must be in infrastructure layer only.
+
+# ---------------------------
+# FISCAL / IVA DUAL (NFE)
+# ---------------------------
+- All IVA Dual calculations (IBS/CBS) MUST be centralized in:
+  com.slifesys.sagnus.nfe.domain.service.CalculadoraIvaService (Domain Service - see ADR-0012)
+- Never duplicate rounding/scale rules in adapters or use cases.
+- Money handling rules:
+  - Use BigDecimal with explicit scale and RoundingMode.HALF_UP
+  - Avoid deprecated constants (e.g., BigDecimal.ROUND_HALF_UP)
+
+# ---------------------------
+# CÓDIGO JAVA (PADRÕES)
+# ---------------------------
+- Use Lombok by default for new code.
+- Use MapStruct for mappings:
+  - Domain <-> Persistence entities
+  - Domain <-> API DTOs
+- Do not expose JPA entities to controllers/resolvers.
+- Prefer immutability in domain:
+  - value objects as records or Lombok @Value where appropriate
+- Keep packages consistent per BC:
+  com.slifesys.sagnus.<bc>.{domain,application,infrastructure,api}
+
+# ---------------------------
+# ERROS / OBSERVABILIDADE
+# ---------------------------
+- Use standardized error model from sagnus-shared-api-error.
+- Web exception handling goes through sagnus-platform-web conventions.
+- Logging/correlationId concerns stay in api/infrastructure, never domain.
+
+# ---------------------------
+# TESTES
+# ---------------------------
+- Domain tests must be pure unit tests (no Spring).
+- Fiscal rules require unit tests with representative cases (IBS/CBS scenarios).
+- Infrastructure tests can be slice/integration tests as needed.
+
+# ---------------------------
+# GIT / DOCUMENTAÇÃO
+# ---------------------------
+- Use Conventional Commits: feat:, fix:, refactor:, test:, docs:, chore:
+- When describing changes, reference classes with full package + class name.
+- Always include merge/apply checklist in PR notes.
+
+# ---------------------------
+# ASSISTANT BEHAVIOR (Cursor AI)
+# ---------------------------
+When implementing/refactoring:
+1) Respect boundaries (domain/application/infrastructure/api).
+2) Prefer creating ports and adapters rather than calling infra directly from use cases.
+3) Search existing code patterns in the repo before inventing new conventions.
+4) Avoid breaking public contracts; if needed, provide migration steps.
+5) Consultar `DECISIONS.md` e `CONVENSOES.md` antes de sugerir mudanças de arquitetura, contratos entre BCs ou padrões transversais (segurança, erros, NFe, etc.).
+
+Document reference guide:
+- **Package structure:** CONVENSOES.md § 1
+- **Persistence rules:** CONVENSOES.md § 2
+- **Port location:** DECISIONS.md ADR-0010
+- **Gateway rules:** DECISIONS.md ADR-0011
+- **Fiscal services:** DECISIONS.md ADR-0012
+- **Naming conventions:** CONVENSOES.md § 3

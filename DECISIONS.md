@@ -1,6 +1,6 @@
 # Sagnus ERP — Architectural Decisions (DECISIONS.md)
 
-Data: 2025-12-16
+Data: 2026-01-19 (última atualização)
 
 Este documento registra decisões arquiteturais (estilo **ADR — Architecture Decision Records**).
 O objetivo é manter o “porquê” das decisões, reduzindo retrabalho e discussões recorrentes.
@@ -139,6 +139,60 @@ com possibilidade de trocar para HTTP/mensageria no futuro.
 **Consequências:**
 - entrega inicial sem SEFAZ, mas com base sólida
 - permite testes unitários desde o início
+
+---
+
+## ADR-0010 — Localização de Ports por Tipo
+
+**Decisão:** Ports devem ser organizados por tipo e responsabilidade:
+- **Repositórios:** `domain/repository/` (contratos de persistência do domínio)
+- **Integrações externas:** `application/port/out/` (SEFAZ, email, APIs externas)
+- **Casos de uso (opcional):** `application/port/in/` (se necessário explicitar contratos de entrada)
+
+**Motivo:**
+- Repositórios são conceitos do domínio (agregados precisam ser persistidos)
+- Integrações externas são detalhes de aplicação (não fazem parte do core domain)
+- Separação clara facilita testes e manutenção
+
+**Consequências:**
+- Ports de repositório sempre ficam no domínio
+- Ports de integração (HTTP, messaging, etc.) ficam em application
+- Reduz ambiguidade sobre onde criar novos ports
+
+---
+
+## ADR-0011 — API Gateway: Agregação Read-Only
+
+**Decisão:** O `sagnus-api-gateway` pode fazer agregação de dados via contratos de BCs (queries read-only), mas **nunca** deve ter persistência própria ou lógica de domínio.
+
+**Motivo:**
+- Gateway é um BFF/Edge layer, não um BC
+- Agregação é necessária para UX (evitar múltiplas chamadas do front)
+- Persistência no Gateway duplicaria domínio e quebraria bounded contexts
+
+**Consequências:**
+- Gateway pode depender de contratos `*-api` dos BCs
+- Gateway **não** pode ter tabelas próprias ou JPA repositories
+- Toda lógica de negócio deve estar nos BCs
+
+---
+
+## ADR-0012 — Classificação de Serviços Fiscais (NFe)
+
+**Decisão:** Regras fiscais (IVA Dual IBS/CBS) devem estar centralizadas em **Domain Services** dentro do BC NFe:
+- `CalculadoraIvaService` → `domain/service/`
+- Orquestração de emissão → `application/usecase/EmitirNfeUseCase`
+- Integração SEFAZ → `infrastructure/http/SefazClient`
+
+**Motivo:**
+- Cálculos fiscais são **regras de domínio puras** (não dependem de infra)
+- Centralização evita duplicação e inconsistências
+- Facilita testes unitários (sem Spring)
+
+**Consequências:**
+- `CalculadoraIvaService` não pode depender de Spring/JPA
+- Use cases chamam domain services para cálculos
+- Adapters (XML, SEFAZ) ficam em infrastructure
 
 ---
 
