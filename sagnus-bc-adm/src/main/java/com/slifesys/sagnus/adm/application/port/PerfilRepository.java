@@ -9,7 +9,15 @@ import java.util.List;
 public interface PerfilRepository {
     Perfil save(Perfil perfil);
 
+    /**
+     * Convenience method used by the current REST endpoints.
+     * For advanced search and pagination, prefer {@link #findAll(String, PageRequest)}.
+     */
+    List<Perfil> findAll();
+
     Optional<Perfil> findById(Long id);
+
+    void deleteById(Long id);
 
     List<Perfil> findAllByIds(List<Long> ids);
 

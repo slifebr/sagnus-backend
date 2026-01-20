@@ -2,8 +2,8 @@ package com.slifesys.sagnus.adm.application.service.usuario;
 
 import com.slifesys.sagnus.adm.application.dto.usuario.UsuarioDTO;
 import com.slifesys.sagnus.adm.application.mapper.usuario.UsuarioMapper;
+import com.slifesys.sagnus.adm.application.port.UsuarioRepository;
 import com.slifesys.sagnus.adm.domain.model.usuario.Usuario;
-import com.slifesys.sagnus.adm.infrastructure.repository.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

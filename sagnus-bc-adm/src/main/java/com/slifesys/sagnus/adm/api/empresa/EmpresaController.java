@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.adm.interfaces.web.empresa;
+package com.slifesys.sagnus.adm.api.empresa;
 
 import com.slifesys.sagnus.adm.application.dto.empresa.EmpresaDTO;
 import com.slifesys.sagnus.adm.application.service.empresa.EmpresaService;

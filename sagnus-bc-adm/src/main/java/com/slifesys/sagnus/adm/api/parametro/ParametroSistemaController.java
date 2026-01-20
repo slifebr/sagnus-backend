@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.adm.interfaces.web.parametro;
+package com.slifesys.sagnus.adm.api.parametro;
 
 import com.slifesys.sagnus.adm.application.dto.parametro.ParametroSistemaDTO;
 import com.slifesys.sagnus.adm.application.service.parametro.ParametroSistemaService;

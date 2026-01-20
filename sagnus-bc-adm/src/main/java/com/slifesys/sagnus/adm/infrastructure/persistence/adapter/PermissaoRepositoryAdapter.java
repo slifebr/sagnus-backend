@@ -32,8 +32,23 @@ public class PermissaoRepositoryAdapter implements PermissaoRepository {
     }
 
     @Override
+    public List<Permissao> findAll() {
+        return jpaRepository.findAll().stream().map(AdmPersistenceMapper::toDomain).toList();
+    }
+
+    @Override
     public Optional<Permissao> findById(Long id) {
         return jpaRepository.findById(id).map(AdmPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
     }
 
     @Override

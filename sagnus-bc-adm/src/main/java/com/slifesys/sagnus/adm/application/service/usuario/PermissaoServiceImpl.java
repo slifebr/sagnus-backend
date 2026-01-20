@@ -2,8 +2,8 @@ package com.slifesys.sagnus.adm.application.service.usuario;
 
 import com.slifesys.sagnus.adm.application.dto.usuario.PermissaoDTO;
 import com.slifesys.sagnus.adm.application.mapper.usuario.PermissaoMapper;
+import com.slifesys.sagnus.adm.application.port.PermissaoRepository;
 import com.slifesys.sagnus.adm.domain.model.usuario.Permissao;
-import com.slifesys.sagnus.adm.infrastructure.repository.PermissaoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

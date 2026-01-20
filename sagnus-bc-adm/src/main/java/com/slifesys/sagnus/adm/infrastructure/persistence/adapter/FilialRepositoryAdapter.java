@@ -14,8 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -33,8 +33,18 @@ public class FilialRepositoryAdapter implements FilialRepository {
     }
 
     @Override
+    public List<Filial> findAll() {
+        return jpaRepository.findAll().stream().map(AdmPersistenceMapper::toDomain).toList();
+    }
+
+    @Override
     public Optional<Filial> findById(Long id) {
         return jpaRepository.findById(id).map(AdmPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.adm.interfaces.web.usuario;
+package com.slifesys.sagnus.adm.api.usuario;
 
 import com.slifesys.sagnus.adm.application.dto.usuario.PerfilDTO;
 import com.slifesys.sagnus.adm.application.service.usuario.PerfilService;

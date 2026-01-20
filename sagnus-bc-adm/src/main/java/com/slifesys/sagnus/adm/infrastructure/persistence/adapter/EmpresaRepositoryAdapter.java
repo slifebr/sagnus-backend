@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -29,8 +30,18 @@ public class EmpresaRepositoryAdapter implements EmpresaRepository {
     }
 
     @Override
+    public List<Empresa> findAll() {
+        return jpaRepository.findAll().stream().map(AdmPersistenceMapper::toDomain).toList();
+    }
+
+    @Override
     public Optional<Empresa> findById(Long id) {
         return jpaRepository.findById(id).map(AdmPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
     }
 
     @Override

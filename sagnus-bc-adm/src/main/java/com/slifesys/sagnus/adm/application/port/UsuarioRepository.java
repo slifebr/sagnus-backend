@@ -8,7 +8,15 @@ import java.util.Optional;
 public interface UsuarioRepository {
     Usuario save(Usuario usuario);
 
+    /**
+     * Convenience method used by the current REST endpoints.
+     * For advanced search and pagination, prefer {@link #findAll(String, String, PageRequest)}.
+     */
+    java.util.List<Usuario> findAll();
+
     Optional<Usuario> findById(Long id);
+
+    void deleteById(Long id);
 
     Optional<Usuario> findByUsername(String username);
 

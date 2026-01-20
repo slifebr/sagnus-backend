@@ -2,8 +2,8 @@ package com.slifesys.sagnus.adm.application.service.empresa;
 
 import com.slifesys.sagnus.adm.application.dto.empresa.FilialDTO;
 import com.slifesys.sagnus.adm.application.mapper.empresa.FilialMapper;
+import com.slifesys.sagnus.adm.application.port.FilialRepository;
 import com.slifesys.sagnus.adm.domain.model.empresa.Filial;
-import com.slifesys.sagnus.adm.infrastructure.repository.FilialRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

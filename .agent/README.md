@@ -39,7 +39,7 @@ Os três documentos principais devem estar sempre sincronizados:
 
 1. **`.cursorrules`** — Regras técnicas detalhadas
 2. **`DECISIONS.md`** — ADRs (por que fazemos assim)
-3. **`CONVENSOES.md`** — Estrutura e organização (como fazemos)
+3. **`CONVENCOES.md`** — Estrutura e organização (como fazemos)
 
 O arquivo `.agent/rules.md` **referencia** esses três documentos, não os duplica.
 
@@ -55,7 +55,7 @@ O arquivo `.agent/rules.md` **referencia** esses três documentos, não os dupli
 ❌ **NÃO atualizar quando:**
 - Mudar regras técnicas (atualizar `.cursorrules`)
 - Adicionar ADRs (atualizar `DECISIONS.md`)
-- Mudar estrutura de pacotes (atualizar `CONVENSOES.md`)
+- Mudar estrutura de pacotes (atualizar `CONVENCOES.md`)
 
 ### Checklist de Sincronização
 
@@ -63,7 +63,7 @@ Após atualizar qualquer documento:
 
 - [ ] `.cursorrules` atualizado?
 - [ ] `DECISIONS.md` atualizado (se ADR nova)?
-- [ ] `CONVENSOES.md` atualizado (se estrutura mudou)?
+- [ ] `CONVENCOES.md` atualizado (se estrutura mudou)?
 - [ ] Cross-references validadas?
 - [ ] `.agent/rules.md` aponta para documentos corretos?
 
@@ -71,6 +71,9 @@ Após atualizar qualquer documento:
 
 O diretório `.agent/workflows/` pode conter workflows específicos do projeto (se necessário).
 
+## ADRs
+
+O diretório `docs/adr/` contem os ADRs (Architecture Decision Records) específicos do projeto (se necessário).
 ---
 
 **Criado em:** 2026-01-19  

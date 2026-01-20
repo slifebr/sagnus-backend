@@ -2,8 +2,8 @@ package com.slifesys.sagnus.adm.application.service.empresa;
 
 import com.slifesys.sagnus.adm.application.dto.empresa.EmpresaDTO;
 import com.slifesys.sagnus.adm.application.mapper.empresa.EmpresaMapper;
+import com.slifesys.sagnus.adm.application.port.EmpresaRepository;
 import com.slifesys.sagnus.adm.domain.model.empresa.Empresa;
-import com.slifesys.sagnus.adm.infrastructure.repository.EmpresaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

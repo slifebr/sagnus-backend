@@ -9,7 +9,15 @@ import java.util.List;
 public interface FilialRepository {
     Filial save(Filial filial);
 
+    /**
+     * Convenience method used by the current REST endpoints.
+     * For advanced search and pagination, prefer {@link #findAll(Long, String, PageRequest)}.
+     */
+    List<Filial> findAll();
+
     Optional<Filial> findById(Long id);
+
+    void deleteById(Long id);
 
     List<Filial> findByEmpresaId(Long empresaId);
 

@@ -29,8 +29,23 @@ public class PerfilRepositoryAdapter implements PerfilRepository {
     }
 
     @Override
+    public List<Perfil> findAll() {
+        return jpaRepository.findAll().stream().map(AdmPersistenceMapper::toDomain).toList();
+    }
+
+    @Override
     public Optional<Perfil> findById(Long id) {
         return jpaRepository.findById(id).map(AdmPersistenceMapper::toDomain);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        jpaRepository.deleteById(id);
     }
 
     @Override
