@@ -99,6 +99,7 @@
         <module>sagnus-bc-corp</module>   
         <module>sagnus-bc-nfe</module>
         <module>sagnus-bc-adm</module>
+        <module>sagnus-archunit-rules</module>
         <!--        <module>sagnus-bc-estoque</module> -->
         <!--        <module>sagnus-bc-faturamento-nfe</module>-->
 

@@ -30,6 +30,6 @@ public class EmpresaEntity {
     private String nif;
 
     @Column(nullable = false)
-    private Boolean ativo = true;
+    private Boolean ativo;
 
 }

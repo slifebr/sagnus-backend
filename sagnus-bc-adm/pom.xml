@@ -68,6 +68,12 @@
 
         <!-- Regras de arquitetura (DDD): evita regressões de camadas (Ports & Adapters) -->
         <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-archunit-rules</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>        
+        <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
             <version>${archunit.version}</version>
@@ -96,6 +102,7 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
+         
     </dependencies>
 
 
