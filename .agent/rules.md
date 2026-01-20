@@ -10,8 +10,13 @@ Este é o projeto **Sagnus ERP**, um sistema ERP fiscal brasileiro construído c
 ## Documentos Obrigatórios de Consulta
 
 Antes de propor qualquer mudança arquitetural, criação de módulos, ou alteração de padrões, você **DEVE** consultar os seguintes documentos na raiz do projeto:
+### 1. `.ai-context`
+**Quando consultar:**
+- Sempre que iniciar trabalho em qualquer módulo
+- Antes de criar novos Bounded Contexts
+- Ao implementar persistência, APIs ou casos de uso
 
-### 1. `.cursorrules`
+### 2. `.cursorrules`
 **Quando consultar:**
 - Sempre que iniciar trabalho em qualquer módulo
 - Antes de criar novos Bounded Contexts
@@ -24,7 +29,7 @@ Antes de propor qualquer mudança arquitetural, criação de módulos, ou altera
 - Padrões fiscais (IVA Dual)
 - Convenções de código Java
 
-### 2. `DECISIONS.md`
+### 3. `DECISIONS.md`
 **Quando consultar:**
 - Antes de propor mudanças arquiteturais
 - Ao decidir onde colocar ports (ADR-0010)
@@ -37,7 +42,7 @@ Antes de propor qualquer mudança arquitetural, criação de módulos, ou altera
 - Justificativas de decisões arquiteturais
 - Consequências de cada decisão
 
-### 3. `CONVENSOES.md`
+### 4 `CONVENSOES.md`
 **Quando consultar:**
 - Ao criar novos BCs ou módulos
 - Ao implementar persistência (JPA/repositories)
@@ -54,7 +59,7 @@ Antes de propor qualquer mudança arquitetural, criação de módulos, ou altera
 
 ### Para Mudanças Arquiteturais
 
-1. **Ler** `.cursorrules` + `DECISIONS.md` + `CONVENSOES.md`
+1. **Ler** `.ai-context` + `.cursorrules` + `DECISIONS.md` + `CONVENSOES.md`
 2. **Verificar** se há ADR existente que se aplica
 3. **Propor** solução alinhada com as ADRs
 4. **Se precisar desviar:** Sugerir nova ADR em `DECISIONS.md`
@@ -94,7 +99,7 @@ Antes de propor qualquer mudança arquitetural, criação de módulos, ou altera
 | Onde colocar ports | `DECISIONS.md` ADR-0010 |
 | Regras do Gateway | `DECISIONS.md` ADR-0011 |
 | Serviços fiscais | `DECISIONS.md` ADR-0012 |
-| Regras gerais de camadas | `.cursorrules` |
+| Regras gerais de camadas |`.ai-context` + `.cursorrules` |
 | Por que fazemos assim | `DECISIONS.md` |
 
 ## Comportamento Esperado

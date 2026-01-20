@@ -96,10 +96,10 @@
         <module>sagnus-bc-corp-contracts</module>
         <module>sagnus-bc-auth</module>
 
-        <module>sagnus-bc-corp</module>
+        <module>sagnus-bc-corp</module>   
         <module>sagnus-bc-nfe</module>
         <module>sagnus-bc-adm</module>
-        <module>sagnus-bc-estoque</module>
+        <!--        <module>sagnus-bc-estoque</module> -->
         <!--        <module>sagnus-bc-faturamento-nfe</module>-->
 
         <!--        <module>sagnus-bc-financeiro-ctpagar</module>-->
@@ -159,5 +159,24 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>architecture-validation</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <includes>
+                                <include>**/*ArchitectureTest.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

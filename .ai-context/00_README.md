@@ -14,3 +14,11 @@ Order of precedence:
 Governance references:
 - Merge / PR checklist: docs/CHECKLIST_MERGE.md
 - Commit message standard: docs/CONVENTIONAL_COMMITS.md
+
+## Vocabulário oficial
+
+O projeto Sagnus ERP utiliza um vocabulário arquitetural padronizado,
+definido em `docs/glossario.md`.
+
+Todos os ADRs, decisões técnicas, revisões arquiteturais e agentes de IA
+devem utilizar este glossário como referência semântica oficial.
