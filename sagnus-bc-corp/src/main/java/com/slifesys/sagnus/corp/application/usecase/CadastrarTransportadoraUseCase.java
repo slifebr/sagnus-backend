@@ -21,12 +21,12 @@ public class CadastrarTransportadoraUseCase {
                 command.getPlacaVeiculo(),
                 command.getRntc(),
                 command.getUsuCriacao());
-        Transportadora transportadoraSalva = transportadoraRepository.save(nova);
+        Transportadora salvo = transportadoraRepository.save(nova);
         return TransportadoraDTO.builder()
-                .id(transportadoraSalva.getId())
-                .idPessoa(transportadoraSalva.getIdPessoa())
-                .placaVeiculo(transportadoraSalva.getPlacaVeiculo())
-                .rntc(transportadoraSalva.getRntc())
+                .id(salvo.getId())
+                .idPessoa(salvo.getIdPessoa())
+                .placaVeiculo(salvo.getPlacaVeiculo())
+                .rntc(salvo.getRntc())
                 .build();
     }
 }
