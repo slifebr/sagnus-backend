@@ -1,9 +1,9 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.command.CadastrarMarcaCommand;
-import com.slifesys.sagnus.corp.application.dto.MarcaResult;
+import com.slifesys.sagnus.corp.contract.marca.MarcaDTO;
 import com.slifesys.sagnus.corp.application.port.MarcaRepository;
 import com.slifesys.sagnus.corp.domain.model.marca.Marca;
+import com.slifesys.sagnus.corp.contract.marca.MarcaCreateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +15,20 @@ public class CadastrarMarcaUseCase {
     private final MarcaRepository marcaRepository;
 
     @Transactional
-    public MarcaResult execute(CadastrarMarcaCommand command) {
+    public MarcaDTO execute(MarcaCreateRequest request) {
         Marca novaMarca = new Marca(
-                command.getNome(),
-                command.getDescricao(),
-                command.getUsuCriacao());
+                request.getNome(),
+                request.getDescricao(),
+                request.getUsuCriacao());
         Marca salvo = marcaRepository.save(novaMarca);
-        return MarcaResult.from(salvo);
+        return MarcaDTO.builder()
+                .id(salvo.getId())
+                .nome(salvo.getNome())
+                .descricao(salvo.getDescricao())
+                .criadoEm(salvo.getCriadoEm())
+                .usuCriacao(salvo.getUsuCriacao())
+                .atualizadoEm(salvo.getAtualizadoEm())
+                .usuAlteracao(salvo.getUsuAlteracao())
+                .build();
     }
 }

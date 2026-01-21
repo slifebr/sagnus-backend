@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
 import com.slifesys.sagnus.corp.application.command.AlterarSindicatoCommand;
-import com.slifesys.sagnus.corp.application.dto.SindicatoResult;
+import com.slifesys.sagnus.corp.contract.sindicato.SindicatoDTO;
 import com.slifesys.sagnus.corp.application.port.SindicatoRepository;
 import com.slifesys.sagnus.corp.domain.model.sindicato.Sindicato;
 import com.slifesys.sagnus.shared.error.NotFoundException;
@@ -16,7 +16,7 @@ public class AlterarSindicatoUseCase {
     private final SindicatoRepository sindicatoRepository;
 
     @Transactional
-    public SindicatoResult execute(AlterarSindicatoCommand command) {
+    public SindicatoDTO execute(AlterarSindicatoCommand command) {
         Sindicato sindicato = sindicatoRepository.findById(command.getId())
                 .orElseThrow(
                         () -> new NotFoundException("CORP-404", "Sindicato nao encontrado com id: " + command.getId()));
@@ -48,6 +48,34 @@ public class AlterarSindicatoUseCase {
                 command.getUsuAlteracao());
 
         Sindicato salvo = sindicatoRepository.save(atualizado);
-        return SindicatoResult.from(salvo);
+        return toDTO(salvo);
+    }
+
+    private SindicatoDTO toDTO(Sindicato s) {
+        return SindicatoDTO.builder()
+                .id(s.getId())
+                .nome(s.getNome())
+                .codigoBanco(s.getCodigoBanco())
+                .codigoAgencia(s.getCodigoAgencia())
+                .contaBanco(s.getContaBanco())
+                .codigoCedente(s.getCodigoCedente())
+                .logradouro(s.getLogradouro())
+                .numero(s.getNumero())
+                .bairro(s.getBairro())
+                .municipioIbge(s.getMunicipioIbge())
+                .uf(s.getUf())
+                .fone1(s.getFone1())
+                .fone2(s.getFone2())
+                .email(s.getEmail())
+                .tipoSindicato(s.getTipoSindicato())
+                .dataBase(s.getDataBase())
+                .pisoSalarial(s.getPisoSalarial())
+                .cnpj(s.getCnpj())
+                .classificacaoContabilConta(s.getClassificacaoContabilConta())
+                .criadoEm(s.getCriadoEm())
+                .usuCriacao(s.getUsuCriacao())
+                .atualizadoEm(s.getAtualizadoEm())
+                .usuAlteracao(s.getUsuAlteracao())
+                .build();
     }
 }

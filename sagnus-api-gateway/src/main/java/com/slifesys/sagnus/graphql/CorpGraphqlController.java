@@ -1,13 +1,13 @@
 package com.slifesys.sagnus.graphql;
 
-import com.slifesys.sagnus.corp.application.dto.MarcaResult;
-import com.slifesys.sagnus.corp.application.dto.PessoaResult;
-import com.slifesys.sagnus.corp.application.dto.SindicatoResult;
-import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
-import com.slifesys.sagnus.corp.application.dto.VendedorResult;
+import com.slifesys.sagnus.corp.contract.marca.MarcaDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaDTO;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaCreateRequest;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaUpdateRequest;
+import com.slifesys.sagnus.corp.contract.sindicato.SindicatoDTO;
+import com.slifesys.sagnus.corp.contract.transportadora.TransportadoraDTO;
+import com.slifesys.sagnus.corp.contract.vendedor.VendedorDTO;
 
-import com.slifesys.sagnus.corp.application.command.AlterarPessoaCommand;
-import com.slifesys.sagnus.corp.application.command.CadastrarPessoaCommand;
 import com.slifesys.sagnus.corp.application.usecase.AlterarPessoaUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarPessoaUseCase;
 
@@ -67,13 +67,13 @@ public class CorpGraphqlController {
 
     @QueryMapping
     public CorpPessoa corpPessoa(@Argument Long id) {
-        PessoaResult r = obterPessoaUseCase.execute(id);
+        PessoaDTO r = obterPessoaUseCase.execute(id);
         return CorpPessoa.from(r);
     }
 
     @QueryMapping
     public TelaCadastroPessoa telaCadastroPessoa(@Argument Long id) {
-        PessoaResult r = obterPessoaUseCase.execute(id);
+        PessoaDTO r = obterPessoaUseCase.execute(id);
         return new TelaCadastroPessoa(CorpPessoa.from(r));
     }
 
@@ -82,52 +82,52 @@ public class CorpGraphqlController {
         PageRequest req = GraphqlUtils.toPageRequest(page, "id");
         String nome = filter != null ? filter.nome() : null;
         String documento = filter != null ? filter.documento() : null;
-        PageResult<PessoaResult> result = listarPessoasUseCase.execute(nome, documento, req);
+        PageResult<PessoaDTO> result = listarPessoasUseCase.execute(nome, documento, req);
         return CorpPessoaPage.from(result);
     }
 
     @QueryMapping
     public CorpMarca corpMarca(@Argument Long id) {
-        MarcaResult r = obterMarcaUseCase.execute(id);
+        MarcaDTO r = obterMarcaUseCase.execute(id);
         return CorpMarca.from(r);
     }
 
     @QueryMapping
     public CorpTransportadora corpTransportadora(@Argument Long id) {
-        TransportadoraResult r = obterTransportadoraUseCase.execute(id);
+        TransportadoraDTO r = obterTransportadoraUseCase.execute(id);
         return CorpTransportadora.from(r);
     }
 
     @QueryMapping
     public CorpTransportadoraPage corpTransportadoras(@Argument PageInput page) {
         PageRequest req = GraphqlUtils.toPageRequest(page, "id");
-        PageResult<TransportadoraResult> r = listarTransportadorasUseCase.execute(req);
+        PageResult<TransportadoraDTO> r = listarTransportadorasUseCase.execute(req);
         return CorpTransportadoraPage.from(r);
     }
 
     @QueryMapping
     public CorpVendedor corpVendedor(@Argument Long id) {
-        VendedorResult r = obterVendedorUseCase.execute(id);
+        VendedorDTO r = obterVendedorUseCase.execute(id);
         return CorpVendedor.from(r);
     }
 
     @QueryMapping
     public CorpVendedorPage corpVendedores(@Argument PageInput page) {
         PageRequest req = GraphqlUtils.toPageRequest(page, "id");
-        PageResult<VendedorResult> r = listarVendedoresUseCase.execute(req);
+        PageResult<VendedorDTO> r = listarVendedoresUseCase.execute(req);
         return CorpVendedorPage.from(r);
     }
 
     @QueryMapping
     public CorpSindicato corpSindicato(@Argument Long id) {
-        SindicatoResult r = obterSindicatoUseCase.execute(id);
+        SindicatoDTO r = obterSindicatoUseCase.execute(id);
         return CorpSindicato.from(r);
     }
 
     @QueryMapping
     public CorpSindicatoPage corpSindicatos(@Argument PageInput page) {
         PageRequest req = GraphqlUtils.toPageRequest(page, "id");
-        PageResult<SindicatoResult> r = listarSindicatosUseCase.execute(req);
+        PageResult<SindicatoDTO> r = listarSindicatosUseCase.execute(req);
         return CorpSindicatoPage.from(r);
     }
 
@@ -137,7 +137,7 @@ public class CorpGraphqlController {
 
     @MutationMapping
     public CorpPessoa corpCriarPessoa(@Argument CorpPessoaCreateInput input) {
-        CadastrarPessoaCommand cmd = CadastrarPessoaCommand.builder()
+        PessoaCreateRequest cmd = PessoaCreateRequest.builder()
                 .nome(input.nome())
                 .tipo(input.parseTipo())
                 .documento(input.documento())
@@ -146,20 +146,19 @@ public class CorpGraphqlController {
                 .usuCriacao("SYSTEM")
                 .build();
 
-        PessoaResult saved = cadastrarPessoaUseCase.execute(cmd);
+        PessoaDTO saved = cadastrarPessoaUseCase.execute(cmd);
         return CorpPessoa.from(saved);
     }
 
     @MutationMapping
     public CorpPessoa corpAlterarPessoa(@Argument Long id, @Argument CorpPessoaUpdateInput input) {
-        AlterarPessoaCommand cmd = AlterarPessoaCommand.builder()
-                .id(id)
+        PessoaUpdateRequest cmd = PessoaUpdateRequest.builder()
                 .nome(input.nome())
                 .site(input.site())
                 .email(input.email())
                 .build();
 
-        PessoaResult saved = alterarPessoaUseCase.execute(cmd);
+        PessoaDTO saved = alterarPessoaUseCase.execute(id, cmd);
         return CorpPessoa.from(saved);
     }
 }

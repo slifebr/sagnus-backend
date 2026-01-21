@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.VendedorResult;
+import com.slifesys.sagnus.corp.contract.vendedor.VendedorDTO;
 import com.slifesys.sagnus.corp.application.port.VendedorRepository;
 import com.slifesys.sagnus.shared.error.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,14 @@ public class ObterVendedorUseCase {
     private final VendedorRepository vendedorRepository;
 
     @Transactional(readOnly = true)
-    public VendedorResult execute(Long id) {
+    public VendedorDTO execute(Long id) {
         return vendedorRepository.findById(id)
-                .map(VendedorResult::from)
+                .map(v -> VendedorDTO.builder()
+                        .id(v.getId())
+                        .idPessoa(v.getIdPessoa())
+                        .comissao(v.getComissao())
+                        .meta(v.getMeta())
+                        .build())
                 .orElseThrow(() -> new NotFoundException("CORP-404", "Vendedor nao encontrado com id: " + id));
     }
 }

@@ -283,8 +283,8 @@ infrastructure/repository/InMemoryExampleRepository.java  # opcional
 
 - **Decisões arquiteturais:** Consulte `DECISIONS.md` para ADRs completas
 - **Regras do Cursor AI:** Consulte `.cursorrules` para diretrizes de desenvolvimento
-- **Estrutura de pacotes:** Esta seção (CONVENSOES.md § 1)
-- **Persistência:** Esta seção (CONVENSOES.md § 2)
+- **Estrutura de pacotes:** Esta seção (CONVENCOES.md § 1)
+- **Persistência:** Esta seção (CONVENCOES.md § 2)
 
 ---
 

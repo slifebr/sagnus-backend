@@ -1,8 +1,8 @@
 package com.slifesys.sagnus.nfe.application.service;
 
 import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
-import com.slifesys.sagnus.nfe.application.command.EmitirNfeCommand;
-import com.slifesys.sagnus.nfe.application.command.EmitirNfeItemCommand;
+import com.slifesys.sagnus.nfe.contract.emitir.EmitirNfeRequest;
+import com.slifesys.sagnus.nfe.contract.emitir.EmitirNfeItemRequest;
 import com.slifesys.sagnus.nfe.domain.exception.NfeDomainException;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.Dinheiro;
 import com.slifesys.sagnus.nfe.domain.model.fiscal.ProdutoFiscal;
@@ -33,7 +33,7 @@ public class NfeAssembler {
         this.rtcNormalizer = rtcNormalizer;
     }
 
-    public Nfe assemble(EmitirNfeCommand cmd, PessoaResumoDTO emitenteDto, PessoaResumoDTO destinatarioDto) {
+    public Nfe assemble(EmitirNfeRequest cmd, PessoaResumoDTO emitenteDto, PessoaResumoDTO destinatarioDto) {
         Emitente emitente = new Emitente(
                 cmd.getEmitentePessoaId(),
                 emitenteDto.getNome(),
@@ -51,7 +51,7 @@ public class NfeAssembler {
 
         // 2) adiciona itens
         if (cmd.getItens() != null) {
-            for (EmitirNfeItemCommand it : cmd.getItens()) {
+            for (EmitirNfeItemRequest it : cmd.getItens()) {
                 NfeItem item = montarItemDominio(it);
                 nfe.adicionarItem(item);
             }
@@ -60,7 +60,7 @@ public class NfeAssembler {
         return nfe;
     }
 
-    private NfeItem montarItemDominio(EmitirNfeItemCommand it) {
+    private NfeItem montarItemDominio(EmitirNfeItemRequest it) {
         Objects.requireNonNull(it, "Item command é obrigatório");
 
         ProdutoFiscal produto = new ProdutoFiscal(
@@ -100,7 +100,7 @@ public class NfeAssembler {
      * MVP de tributos: só persiste/gera IBS/CBS + CST/cClassTrib.
      * ICMS/PIS/COFINS/IPI seguem placeholders por enquanto.
      */
-    private TributosItem montarTributos(EmitirNfeItemCommand it) {
+    private TributosItem montarTributos(EmitirNfeItemRequest it) {
         String itemLabel = "Item " + it.getNItem() + " (produtoId=" + it.getProdutoId() + ")";
 
         Optional<Ibs> ibs = parseIbs(it, itemLabel);
@@ -124,7 +124,7 @@ public class NfeAssembler {
     }
 
 
-    private Optional<Ibs> parseIbs(EmitirNfeItemCommand it, String itemLabel) {
+    private Optional<Ibs> parseIbs(EmitirNfeItemRequest it, String itemLabel) {
         boolean any = it.getIbsBase() != null || it.getIbsAliquota() != null || it.getIbsValor() != null;
         if (!any) return Optional.empty();
 
@@ -142,7 +142,7 @@ public class NfeAssembler {
     }
 
 
-    private Optional<Cbs> parseCbs(EmitirNfeItemCommand it, String itemLabel) {
+    private Optional<Cbs> parseCbs(EmitirNfeItemRequest it, String itemLabel) {
         boolean any = it.getCbsBase() != null || it.getCbsAliquota() != null || it.getCbsValor() != null;
         if (!any) return Optional.empty();
 

@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.command.AlterarMarcaCommand;
-import com.slifesys.sagnus.corp.application.dto.MarcaResult;
+import com.slifesys.sagnus.corp.contract.marca.MarcaUpdateRequest;
+import com.slifesys.sagnus.corp.contract.marca.MarcaDTO;
 import com.slifesys.sagnus.corp.application.port.MarcaRepository;
 import com.slifesys.sagnus.corp.domain.model.marca.Marca;
 import com.slifesys.sagnus.shared.error.NotFoundException;
@@ -16,10 +16,10 @@ public class AlterarMarcaUseCase {
     private final MarcaRepository marcaRepository;
 
     @Transactional
-    public MarcaResult execute(AlterarMarcaCommand command) {
-        Marca marca = marcaRepository.findById(command.getId())
+    public MarcaDTO execute(Long id, MarcaUpdateRequest command) {
+        Marca marca = marcaRepository.findById(id)
                 .orElseThrow(
-                        () -> new NotFoundException("CORP-404", "Marca nao encontrada com id: " + command.getId()));
+                        () -> new NotFoundException("CORP-404", "Marca nao encontrada com id: " + id));
 
         Marca atualizada = new Marca(
                 marca.getId(),
@@ -31,6 +31,14 @@ public class AlterarMarcaUseCase {
                 command.getUsuAlteracao());
 
         Marca salva = marcaRepository.save(atualizada);
-        return MarcaResult.from(salva);
+        return MarcaDTO.builder()
+                 .id(salva.getId())
+                 .nome(salva.getNome())
+                 .descricao(salva.getDescricao())
+                 .criadoEm(salva.getCriadoEm())
+                 .usuCriacao(salva.getUsuCriacao())
+                 .atualizadoEm(salva.getAtualizadoEm())
+                 .usuAlteracao(salva.getUsuAlteracao())
+                 .build();
     }
 }

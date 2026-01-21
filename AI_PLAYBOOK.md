@@ -43,3 +43,9 @@ Este playbook define como a IA deve trabalhar no monorepo Sagnus para:
 - Sempre crie primeiro a interface do **Port** no `application`
 - Depois implemente o adapter no `infrastructure`
 - Só depois exponha
+
+## 3) Documentação Obrigatória
+Sempre que criar/aprovar um:
+- **Task List** (`task.md`): Salve cópia em `docs/tasks/TaskName.md`
+- **Implementation Plan** (`implementation_plan.md`): Salve cópia em `docs/plans/YYYY-MM-DD-FeatureName.md`
+- **Walkthrough** (`walkthrough.md`): Salve cópia em `docs/walkthroughs/YYYY-MM-DD-FeatureName.md`

@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
+import com.slifesys.sagnus.corp.contract.transportadora.TransportadoraDTO;
 import com.slifesys.sagnus.corp.application.port.TransportadoraRepository;
 import com.slifesys.sagnus.corp.domain.model.transportadora.Transportadora;
 import com.slifesys.sagnus.shared.paging.PageRequest;
@@ -18,10 +18,15 @@ public class ListarTransportadorasUseCase {
 
     private final TransportadoraRepository transportadoraRepository;
 
-    public PageResult<TransportadoraResult> execute(PageRequest pageRequest) {
+    public PageResult<TransportadoraDTO> execute(PageRequest pageRequest) {
         PageResult<Transportadora> page = transportadoraRepository.list(pageRequest);
-        return PageResult.<TransportadoraResult>builder()
-                .items(page.getItems().stream().map(TransportadoraResult::from).toList())
+        return PageResult.<TransportadoraDTO>builder()
+                .items(page.getItems().stream().map(t -> TransportadoraDTO.builder()
+                        .id(t.getId())
+                        .idPessoa(t.getIdPessoa())
+                        .placaVeiculo(t.getPlacaVeiculo())
+                        .rntc(t.getRntc())
+                        .build()).toList())
                 .totalElements(page.getTotalElements())
                 .totalPages(page.getTotalPages())
                 .page(page.getPage())

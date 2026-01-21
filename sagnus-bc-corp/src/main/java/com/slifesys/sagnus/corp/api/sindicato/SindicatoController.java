@@ -2,7 +2,7 @@ package com.slifesys.sagnus.corp.api.sindicato;
 
 import com.slifesys.sagnus.corp.application.command.AlterarSindicatoCommand;
 import com.slifesys.sagnus.corp.application.command.CadastrarSindicatoCommand;
-import com.slifesys.sagnus.corp.application.dto.SindicatoResult;
+import com.slifesys.sagnus.corp.contract.sindicato.SindicatoDTO;
 import com.slifesys.sagnus.corp.application.usecase.AlterarSindicatoUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarSindicatoUseCase;
 import com.slifesys.sagnus.corp.application.usecase.ObterSindicatoUseCase;
@@ -22,8 +22,8 @@ public class SindicatoController {
     private final ObterSindicatoUseCase obterSindicatoUseCase;
 
     @PostMapping
-    public ResponseEntity<SindicatoResponse> cadastrar(@RequestBody @Valid SindicatoCreateRequest request) {
-        SindicatoResult result = cadastrarSindicatoUseCase.execute(new CadastrarSindicatoCommand(
+    public ResponseEntity<SindicatoDTO> cadastrar(@RequestBody @Valid SindicatoCreateRequest request) {
+        SindicatoDTO result = cadastrarSindicatoUseCase.execute(new CadastrarSindicatoCommand(
                 request.getNome(),
                 request.getCodigoBanco(),
                 request.getCodigoAgencia(),
@@ -43,13 +43,13 @@ public class SindicatoController {
                 request.getCnpj(),
                 request.getClassificacaoContabilConta(),
                 null));
-        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SindicatoResponse> alterar(@PathVariable Long id,
+    public ResponseEntity<SindicatoDTO> alterar(@PathVariable Long id,
             @RequestBody @Valid SindicatoUpdateRequest request) {
-        SindicatoResult result = alterarSindicatoUseCase.execute(new AlterarSindicatoCommand(
+        SindicatoDTO result = alterarSindicatoUseCase.execute(new AlterarSindicatoCommand(
                 id,
                 request.getNome(),
                 request.getCodigoBanco(),
@@ -70,36 +70,12 @@ public class SindicatoController {
                 request.getCnpj(),
                 request.getClassificacaoContabilConta(),
                 null));
-        return ResponseEntity.ok(toResponse(result));
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SindicatoResponse> obterPorId(@PathVariable Long id) {
-        SindicatoResult result = obterSindicatoUseCase.execute(id);
-        return ResponseEntity.ok(toResponse(result));
-    }
-
-    private SindicatoResponse toResponse(SindicatoResult result) {
-        return SindicatoResponse.builder()
-                .id(result.getId())
-                .nome(result.getNome())
-                .codigoBanco(result.getCodigoBanco())
-                .codigoAgencia(result.getCodigoAgencia())
-                .contaBanco(result.getContaBanco())
-                .codigoCedente(result.getCodigoCedente())
-                .logradouro(result.getLogradouro())
-                .numero(result.getNumero())
-                .bairro(result.getBairro())
-                .municipioIbge(result.getMunicipioIbge())
-                .uf(result.getUf())
-                .fone1(result.getFone1())
-                .fone2(result.getFone2())
-                .email(result.getEmail())
-                .tipoSindicato(result.getTipoSindicato())
-                .dataBase(result.getDataBase())
-                .pisoSalarial(result.getPisoSalarial())
-                .cnpj(result.getCnpj())
-                .classificacaoContabilConta(result.getClassificacaoContabilConta())
-                .build();
+    public ResponseEntity<SindicatoDTO> obterPorId(@PathVariable Long id) {
+        SindicatoDTO result = obterSindicatoUseCase.execute(id);
+        return ResponseEntity.ok(result);
     }
 }

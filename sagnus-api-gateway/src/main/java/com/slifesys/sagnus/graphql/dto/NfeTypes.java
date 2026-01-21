@@ -1,7 +1,6 @@
 package com.slifesys.sagnus.graphql.dto;
 
-import com.slifesys.sagnus.graphql.util.GraphqlUtils;
-import com.slifesys.sagnus.nfe.application.command.EmitirNfeItemCommand;
+
 
 import java.util.List;
 
@@ -31,33 +30,7 @@ public class NfeTypes {
             String cbsAliquota,
             String cbsValor,
             String regimeIbsCbs
-    ) {
-        public EmitirNfeItemCommand toItemCmd() {
-            return EmitirNfeItemCommand.builder()
-                    .nItem(nItem)
-                    .produtoId(produtoId)
-                    .descricao(descricao)
-                    .ncm(ncm)
-                    .cfop(cfop)
-                    .uCom(uCom)
-                    .quantidade(GraphqlUtils.parseDecimal(quantidade))
-                    .valorUnitario(GraphqlUtils.parseDecimal(valorUnitario))
-                    .desconto(GraphqlUtils.parseDecimal(desconto))
-                    .frete(GraphqlUtils.parseDecimal(frete))
-                    .seguro(GraphqlUtils.parseDecimal(seguro))
-                    .outras(GraphqlUtils.parseDecimal(outras))
-                    .cstIbsCbs(cstIbsCbs)
-                    .cClassTrib(cClassTrib)
-                    .ibsBase(GraphqlUtils.parseDecimal(ibsBase))
-                    .ibsAliquota(GraphqlUtils.parseDecimal(ibsAliquota))
-                    .ibsValor(GraphqlUtils.parseDecimal(ibsValor))
-                    .cbsBase(GraphqlUtils.parseDecimal(cbsBase))
-                    .cbsAliquota(GraphqlUtils.parseDecimal(cbsAliquota))
-                    .cbsValor(GraphqlUtils.parseDecimal(cbsValor))
-                    .regimeIbsCbs(regimeIbsCbs)
-                    .build();
-        }
-    }
+    ) {}
 
     public record NfeEmitirPayload(String nfeId, String status, String mensagem) {}
 }

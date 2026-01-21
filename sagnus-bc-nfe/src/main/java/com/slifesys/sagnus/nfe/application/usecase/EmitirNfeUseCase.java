@@ -1,11 +1,7 @@
 package com.slifesys.sagnus.nfe.application.usecase;
 
 import com.slifesys.sagnus.corp.contract.pessoa.PessoaResumoDTO;
-import com.slifesys.sagnus.nfe.application.command.EmitirNfeCommand;
-import com.slifesys.sagnus.nfe.application.port.CorpPessoaGatewayPort;
-import com.slifesys.sagnus.nfe.application.port.DomainEventPublisher;
-import com.slifesys.sagnus.nfe.application.port.NfeRepository;
-import com.slifesys.sagnus.nfe.application.result.EmitirNfeResult;
+
 import com.slifesys.sagnus.nfe.application.service.NfeAssembler;
 import com.slifesys.sagnus.shared.observability.CorrelationIdContext;
 import com.slifesys.sagnus.nfe.domain.event.NfeEmitidaEvent;
@@ -14,6 +10,11 @@ import com.slifesys.sagnus.nfe.domain.model.nfe.Nfe;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
+import com.slifesys.sagnus.nfe.contract.emitir.EmitirNfeRequest;
+import com.slifesys.sagnus.nfe.contract.emitir.EmitirNfeResponse;
+import com.slifesys.sagnus.nfe.application.port.DomainEventPublisher;
+import com.slifesys.sagnus.nfe.application.port.NfeRepository;
+import com.slifesys.sagnus.nfe.application.port.CorpPessoaGatewayPort;
 
 @Service
 public class EmitirNfeUseCase {
@@ -34,7 +35,7 @@ public class EmitirNfeUseCase {
     }
 
     @Transactional
-    public EmitirNfeResult execute(EmitirNfeCommand cmd) {
+    public EmitirNfeResponse execute(EmitirNfeRequest cmd) {
         validarEntrada(cmd);
 
         PessoaResumoDTO emitenteDto = corpPessoaGateway.obterResumoPorId(cmd.getEmitentePessoaId())
@@ -63,14 +64,14 @@ public class EmitirNfeUseCase {
                 .status(saved.getStatus().name())
                 .build());
 
-        return EmitirNfeResult.builder()
+        return EmitirNfeResponse.builder()
                 .nfeId(saved.getId().getValue())
                 .status(saved.getStatus().name())
                 .mensagem("NFe emitida (etapa interna). Próximo passo: autorização SEFAZ.")
                 .build();
     }
 
-    private void validarEntrada(EmitirNfeCommand cmd) {
+    private void validarEntrada(EmitirNfeRequest cmd) {
         if (cmd == null) throw new IllegalArgumentException("Command é obrigatório");
         if (cmd.getEmitentePessoaId() == null) throw new IllegalArgumentException("emitentePessoaId é obrigatório");
         if (cmd.getDestinatarioPessoaId() == null) throw new IllegalArgumentException("destinatarioPessoaId é obrigatório");

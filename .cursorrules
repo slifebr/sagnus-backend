@@ -5,17 +5,17 @@
 # ---------------------------
 # DECISÕES ARQUITETURAIS (DECISIONS.md)
 # ---------------------------
-- Toda decisão estrutural/arquitetural (novos módulos, mudança de camadas, comunicação entre BCs, padrão de segurança, etc.) deve respeitar as ADRs documentadas em `DECISIONS.md` e `CONVENSOES.md` .
+- Toda decisão estrutural/arquitetural (novos módulos, mudança de camadas, comunicação entre BCs, padrão de segurança, etc.) deve respeitar as ADRs documentadas em `DECISIONS.md` e `CONVENCOES.md` .
 - Antes de:
   - criar novos Bounded Contexts ou contratos `*-api`,
   - alterar regras de domínio compartilhadas,
   - modificar padrões de segurança, erros ou integração,
-  o desenvolvedor/assistente deve consultar `DECISIONS.md`  e `CONVENSOES.md` e alinhar a mudança às ADRs existentes.
+  o desenvolvedor/assistente deve consultar `DECISIONS.md`  e `CONVENCOES.md` e alinhar a mudança às ADRs existentes.
 - Se for necessário desviar de uma ADR existente:
   - criar uma nova ADR em `DECISIONS.md` (ex.: `ADR-00XX — ...`) registrando a mudança,
   - manter compatibilidade retroativa sempre que possível.
 - O assistente (Cursor AI) deve:
-  1) Ler/considerar `DECISIONS.md` e `CONVENSOES.md` sempre que houver dúvida arquitetural.
+  1) Ler/considerar `DECISIONS.md` e `CONVENCOES.md` sempre que houver dúvida arquitetural.
   2) Evitar propor soluções que entrem em conflito com as ADRs sem antes sugerir uma nova ADR.
 
 # ---------------------------
@@ -128,6 +128,7 @@ sagnus-api-gateway is an EDGE/BFF module:
 - Use Conventional Commits: feat:, fix:, refactor:, test:, docs:, chore:
 - When describing changes, reference classes with full package + class name.
 - Always include merge/apply checklist in PR notes.
+- **Walkthroughs**: Save in `docs/walkthroughs/` with format `YYYY-MM-DD_description.md` (e.g., `2026-01-21_refactoring-dtos-to-contracts.md`).
 
 # ---------------------------
 # ASSISTANT BEHAVIOR (Cursor AI)
@@ -137,12 +138,12 @@ When implementing/refactoring:
 2) Prefer creating ports and adapters rather than calling infra directly from use cases.
 3) Search existing code patterns in the repo before inventing new conventions.
 4) Avoid breaking public contracts; if needed, provide migration steps.
-5) Consultar `DECISIONS.md` e `CONVENSOES.md` antes de sugerir mudanças de arquitetura, contratos entre BCs ou padrões transversais (segurança, erros, NFe, etc.).
+5) Consultar `DECISIONS.md` e `CONVENCOES.md` antes de sugerir mudanças de arquitetura, contratos entre BCs ou padrões transversais (segurança, erros, NFe, etc.).
 
 Document reference guide:
-- **Package structure:** CONVENSOES.md § 1
-- **Persistence rules:** CONVENSOES.md § 2
+- **Package structure:** CONVENCOES.md § 1
+- **Persistence rules:** CONVENCOES.md § 2
 - **Port location:** DECISIONS.md ADR-0010
 - **Gateway rules:** DECISIONS.md ADR-0011
 - **Fiscal services:** DECISIONS.md ADR-0012
-- **Naming conventions:** CONVENSOES.md § 3
+- **Naming conventions:** CONVENCOES.md § 3
