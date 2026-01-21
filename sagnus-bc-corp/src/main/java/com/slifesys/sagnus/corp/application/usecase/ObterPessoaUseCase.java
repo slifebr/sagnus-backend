@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.PessoaResult;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaDTO;
 import com.slifesys.sagnus.corp.domain.model.pessoa.Pessoa;
 import com.slifesys.sagnus.corp.domain.model.pessoa.PessoaId;
 import com.slifesys.sagnus.corp.application.port.PessoaRepository;
@@ -16,10 +16,18 @@ public class ObterPessoaUseCase {
     private final PessoaRepository repo;
 
     @Transactional(readOnly = true)
-    public PessoaResult execute(Long id) {
+    public PessoaDTO execute(Long id) {
         Pessoa pessoa = repo.findById(PessoaId.of(id))
                 .orElseThrow(() -> new NotFoundException("CORP-404", "Pessoa não encontrada."));
 
-        return PessoaResult.from(pessoa);
+        return PessoaDTO.builder()
+                .id(pessoa.getId() != null ? pessoa.getId().getValue() : null)
+                .tipo(com.slifesys.sagnus.corp.contract.pessoa.TipoPessoa.valueOf(pessoa.getTipo().name()))
+                .documento(pessoa.getDocumento().getValue())
+                .nome(pessoa.getNome().getValue())
+                .email(pessoa.getEmail() != null ? pessoa.getEmail().getValue() : null)
+                .site(pessoa.getSite())
+                .ativa(pessoa.isAtiva())
+                .build();
     }
 }

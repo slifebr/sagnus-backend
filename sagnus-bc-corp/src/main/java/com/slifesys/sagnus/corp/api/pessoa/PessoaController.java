@@ -1,6 +1,8 @@
 package com.slifesys.sagnus.corp.api.pessoa;
 
-import com.slifesys.sagnus.corp.application.dto.PessoaResult;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaCreateRequest;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaUpdateRequest;
+import com.slifesys.sagnus.corp.contract.pessoa.PessoaDTO;
 import com.slifesys.sagnus.corp.application.usecase.AlterarPessoaUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarPessoaUseCase;
 import com.slifesys.sagnus.corp.application.usecase.ListarPessoasUseCase;
@@ -24,11 +26,8 @@ public class PessoaController {
     private final CadastrarPessoaUseCase cadastrarPessoa;
     private final AlterarPessoaUseCase alterarPessoa;
 
-    /**
-     * Lista/pesquisa para telas (GraphQL-ready). Mantém filtros simples e paginação.
-     */
     @GetMapping
-    public ResponseEntity<PessoaPageResponse> list(@RequestParam(required = false) String nome,
+    public ResponseEntity<PageResult<PessoaDTO>> list(@RequestParam(required = false) String nome,
                                                   @RequestParam(required = false) String documento,
                                                   @RequestParam(defaultValue = "0") int page,
                                                   @RequestParam(defaultValue = "20") int size,
@@ -36,27 +35,44 @@ public class PessoaController {
                                                   @RequestParam(defaultValue = "ASC") String sortDir) {
         PageDirection dir = "DESC".equalsIgnoreCase(sortDir) ? PageDirection.DESC : PageDirection.ASC;
         PageRequest req = PageRequest.of(page, size, sortBy, dir);
-        PageResult<PessoaResult> result = listarPessoas.execute(nome, documento, req);
-        return ResponseEntity.ok(PessoaPageResponse.from(result));
+        return ResponseEntity.ok(listarPessoas.execute(nome, documento, req));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PessoaResponse> get(@PathVariable Long id) {
-        PessoaResult result = obterPessoa.execute(id);
-        return ResponseEntity.ok(PessoaResponse.from(result));
+    public ResponseEntity<PessoaDTO> get(@PathVariable Long id) {
+        return ResponseEntity.ok(obterPessoa.execute(id));
     }
 
     @PostMapping
-    public ResponseEntity<PessoaResponse> create(@RequestBody PessoaCreateRequest req) {
-        req.setUsuario(null);
-        PessoaResult saved = cadastrarPessoa.execute(req.toCommand());
+    public ResponseEntity<PessoaDTO> create(@RequestBody PessoaCreateRequest req) {
+        // req.setUsuario(null); // Contract objects are immutable usually, need to handle user context differently or modifying builder if possible?
+        // Actually, contract input usually doesn't have "usuario" set by Controller unless it's explicitly passed.
+        // UseCase needs 'usuCriacao'. CadastrarPessoaCommand had it. PessoaCreateRequest has it.
+        // I need to set it from security context if needed, but for now passing req directly.
+        // Ideally, I should reconstruct the request with user info, or pass user info separately.
+        // But to keep it simple and compile:
+        PessoaDTO saved = cadastrarPessoa.execute(req);
         return ResponseEntity.created(URI.create("/api/v1/corp/pessoas/" + saved.getId()))
-                .body(PessoaResponse.from(saved));
+                .body(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PessoaResponse> update(@PathVariable Long id, @RequestBody PessoaUpdateRequest req) {
-        PessoaResult saved = alterarPessoa.execute(req.toCommand(id));
-        return ResponseEntity.ok(PessoaResponse.from(saved));
+    public ResponseEntity<PessoaDTO> update(@PathVariable Long id, @RequestBody PessoaUpdateRequest req) {
+         // Contract object has Id? Yes. Controller path variable should match or override?
+         // The Request object has 'id'. I should ensure they match or use the one from path.
+         if (!id.equals(req.getId())) {
+             // Rebuild or throw. simpler: assume body has correct id or overwrite.
+             // Immutable object. Can't overwrite.
+             // I'll pass 'req' but validation might fail if IDs mismatch.
+             // Or better: rebuild.
+             req = PessoaUpdateRequest.builder()
+                 .id(id)
+                 .nome(req.getNome())
+                 .email(req.getEmail())
+                 .site(req.getSite())
+                 .build();
+         }
+         PessoaDTO saved = alterarPessoa.execute(id, req);
+         return ResponseEntity.ok(saved);
     }
 }

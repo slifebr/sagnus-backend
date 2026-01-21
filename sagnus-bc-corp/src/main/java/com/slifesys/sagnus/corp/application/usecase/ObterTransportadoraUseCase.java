@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
+import com.slifesys.sagnus.corp.contract.transportadora.TransportadoraDTO;
 import com.slifesys.sagnus.corp.application.port.TransportadoraRepository;
 import com.slifesys.sagnus.shared.error.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,14 @@ public class ObterTransportadoraUseCase {
     private final TransportadoraRepository transportadoraRepository;
 
     @Transactional(readOnly = true)
-    public TransportadoraResult execute(Long id) {
+    public TransportadoraDTO execute(Long id) {
         return transportadoraRepository.findById(id)
-                .map(TransportadoraResult::from)
+                .map(t -> TransportadoraDTO.builder()
+                        .id(t.getId())
+                        .idPessoa(t.getIdPessoa())
+                        .placaVeiculo(t.getPlacaVeiculo())
+                        .rntc(t.getRntc())
+                        .build())
                 .orElseThrow(() -> new NotFoundException("CORP-404", "Transportadora nao encontrada com id: " + id));
     }
 }

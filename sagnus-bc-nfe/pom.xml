@@ -88,6 +88,11 @@
             <artifactId>sagnus-bc-corp-contracts</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-nfe-contracts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

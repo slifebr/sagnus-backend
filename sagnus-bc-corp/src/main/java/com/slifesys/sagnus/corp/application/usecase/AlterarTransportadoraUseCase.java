@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
 import com.slifesys.sagnus.corp.application.command.AlterarTransportadoraCommand;
-import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
+import com.slifesys.sagnus.corp.contract.transportadora.TransportadoraDTO;
 import com.slifesys.sagnus.corp.application.port.TransportadoraRepository;
 import com.slifesys.sagnus.corp.domain.model.transportadora.Transportadora;
 import com.slifesys.sagnus.shared.error.NotFoundException;
@@ -16,7 +16,7 @@ public class AlterarTransportadoraUseCase {
     private final TransportadoraRepository transportadoraRepository;
 
     @Transactional
-    public TransportadoraResult execute(AlterarTransportadoraCommand command) {
+    public TransportadoraDTO execute(AlterarTransportadoraCommand command) {
         Transportadora transportadora = transportadoraRepository.findById(command.getId())
                 .orElseThrow(() -> new NotFoundException("CORP-404",
                         "Transportadora nao encontrada com id: " + command.getId()));
@@ -32,6 +32,15 @@ public class AlterarTransportadoraUseCase {
                 command.getUsuAlteracao());
 
         Transportadora salva = transportadoraRepository.save(atualizada);
-        return TransportadoraResult.from(salva);
+        return TransportadoraDTO.builder()
+                .id(salva.getId())
+                .idPessoa(salva.getIdPessoa())
+                .placaVeiculo(salva.getPlacaVeiculo())
+                .rntc(salva.getRntc())
+                .criadoEm(salva.getCriadoEm())
+                .usuCriacao(salva.getUsuCriacao())
+                .atualizadoEm(salva.getAtualizadoEm())
+                .usuAlteracao(salva.getUsuAlteracao())
+                .build();
     }
 }

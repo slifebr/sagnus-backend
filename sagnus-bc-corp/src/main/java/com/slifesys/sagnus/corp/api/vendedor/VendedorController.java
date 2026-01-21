@@ -2,7 +2,7 @@ package com.slifesys.sagnus.corp.api.vendedor;
 
 import com.slifesys.sagnus.corp.application.command.AlterarVendedorCommand;
 import com.slifesys.sagnus.corp.application.command.CadastrarVendedorCommand;
-import com.slifesys.sagnus.corp.application.dto.VendedorResult;
+import com.slifesys.sagnus.corp.contract.vendedor.VendedorDTO;
 import com.slifesys.sagnus.corp.application.usecase.AlterarVendedorUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarVendedorUseCase;
 import com.slifesys.sagnus.corp.application.usecase.ObterVendedorUseCase;
@@ -22,39 +22,30 @@ public class VendedorController {
     private final ObterVendedorUseCase obterVendedorUseCase;
 
     @PostMapping
-    public ResponseEntity<VendedorResponse> cadastrar(@RequestBody @Valid VendedorCreateRequest request) {
-        VendedorResult result = cadastrarVendedorUseCase.execute(new CadastrarVendedorCommand(
+    public ResponseEntity<VendedorDTO> cadastrar(@RequestBody @Valid VendedorCreateRequest request) {
+        VendedorDTO result = cadastrarVendedorUseCase.execute(new CadastrarVendedorCommand(
                 request.getIdPessoa(),
                 request.getComissao(),
                 request.getMeta(),
                 null));
-        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VendedorResponse> alterar(@PathVariable Long id,
+    public ResponseEntity<VendedorDTO> alterar(@PathVariable Long id,
             @RequestBody @Valid VendedorUpdateRequest request) {
-        VendedorResult result = alterarVendedorUseCase.execute(new AlterarVendedorCommand(
+        VendedorDTO result = alterarVendedorUseCase.execute(new AlterarVendedorCommand(
                 id,
                 request.getIdPessoa(),
                 request.getComissao(),
                 request.getMeta(),
                 null));
-        return ResponseEntity.ok(toResponse(result));
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VendedorResponse> obterPorId(@PathVariable Long id) {
-        VendedorResult result = obterVendedorUseCase.execute(id);
-        return ResponseEntity.ok(toResponse(result));
-    }
-
-    private VendedorResponse toResponse(VendedorResult result) {
-        return VendedorResponse.builder()
-                .id(result.getId())
-                .idPessoa(result.getIdPessoa())
-                .comissao(result.getComissao())
-                .meta(result.getMeta())
-                .build();
+    public ResponseEntity<VendedorDTO> obterPorId(@PathVariable Long id) {
+        VendedorDTO result = obterVendedorUseCase.execute(id);
+        return ResponseEntity.ok(result);
     }
 }

@@ -2,7 +2,7 @@ package com.slifesys.sagnus.corp.api.transportadora;
 
 import com.slifesys.sagnus.corp.application.command.AlterarTransportadoraCommand;
 import com.slifesys.sagnus.corp.application.command.CadastrarTransportadoraCommand;
-import com.slifesys.sagnus.corp.application.dto.TransportadoraResult;
+import com.slifesys.sagnus.corp.contract.transportadora.TransportadoraDTO;
 import com.slifesys.sagnus.corp.application.usecase.AlterarTransportadoraUseCase;
 import com.slifesys.sagnus.corp.application.usecase.CadastrarTransportadoraUseCase;
 import com.slifesys.sagnus.corp.application.usecase.ObterTransportadoraUseCase;
@@ -22,39 +22,30 @@ public class TransportadoraController {
     private final ObterTransportadoraUseCase obterTransportadoraUseCase;
 
     @PostMapping
-    public ResponseEntity<TransportadoraResponse> cadastrar(@RequestBody @Valid TransportadoraCreateRequest request) {
-        TransportadoraResult result = cadastrarTransportadoraUseCase.execute(new CadastrarTransportadoraCommand(
+    public ResponseEntity<TransportadoraDTO> cadastrar(@RequestBody @Valid TransportadoraCreateRequest request) {
+        TransportadoraDTO result = cadastrarTransportadoraUseCase.execute(new CadastrarTransportadoraCommand(
                 request.getIdPessoa(),
                 request.getPlacaVeiculo(),
                 request.getRntc(),
                 null));
-        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(result));
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TransportadoraResponse> alterar(@PathVariable Long id,
+    public ResponseEntity<TransportadoraDTO> alterar(@PathVariable Long id,
             @RequestBody @Valid TransportadoraUpdateRequest request) {
-        TransportadoraResult result = alterarTransportadoraUseCase.execute(new AlterarTransportadoraCommand(
+        TransportadoraDTO result = alterarTransportadoraUseCase.execute(new AlterarTransportadoraCommand(
                 id,
                 request.getIdPessoa(),
                 request.getPlacaVeiculo(),
                 request.getRntc(),
                 null));
-        return ResponseEntity.ok(toResponse(result));
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransportadoraResponse> obterPorId(@PathVariable Long id) {
-        TransportadoraResult result = obterTransportadoraUseCase.execute(id);
-        return ResponseEntity.ok(toResponse(result));
-    }
-
-    private TransportadoraResponse toResponse(TransportadoraResult result) {
-        return TransportadoraResponse.builder()
-                .id(result.getId())
-                .idPessoa(result.getIdPessoa())
-                .placaVeiculo(result.getPlacaVeiculo())
-                .rntc(result.getRntc())
-                .build();
+    public ResponseEntity<TransportadoraDTO> obterPorId(@PathVariable Long id) {
+        TransportadoraDTO result = obterTransportadoraUseCase.execute(id);
+        return ResponseEntity.ok(result);
     }
 }

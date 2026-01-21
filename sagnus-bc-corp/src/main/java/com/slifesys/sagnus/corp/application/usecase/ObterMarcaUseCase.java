@@ -1,6 +1,6 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
-import com.slifesys.sagnus.corp.application.dto.MarcaResult;
+import com.slifesys.sagnus.corp.contract.marca.MarcaDTO;
 import com.slifesys.sagnus.corp.application.port.MarcaRepository;
 import com.slifesys.sagnus.shared.error.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,17 @@ public class ObterMarcaUseCase {
     private final MarcaRepository marcaRepository;
 
     @Transactional(readOnly = true)
-    public MarcaResult execute(Long id) {
+    public MarcaDTO execute(Long id) {
         return marcaRepository.findById(id)
-                .map(MarcaResult::from)
+                .map(m -> MarcaDTO.builder()
+                        .id(m.getId())
+                        .nome(m.getNome())
+                        .descricao(m.getDescricao())
+                        .criadoEm(m.getCriadoEm())
+                        .usuCriacao(m.getUsuCriacao())
+                        .atualizadoEm(m.getAtualizadoEm())
+                        .usuAlteracao(m.getUsuAlteracao())
+                        .build())
                 .orElseThrow(() -> new NotFoundException("CORP-404", "Marca nao encontrada com id: " + id));
     }
 }

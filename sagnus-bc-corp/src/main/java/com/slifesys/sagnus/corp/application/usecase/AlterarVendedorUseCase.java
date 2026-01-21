@@ -1,7 +1,7 @@
 package com.slifesys.sagnus.corp.application.usecase;
 
 import com.slifesys.sagnus.corp.application.command.AlterarVendedorCommand;
-import com.slifesys.sagnus.corp.application.dto.VendedorResult;
+import com.slifesys.sagnus.corp.contract.vendedor.VendedorDTO;
 import com.slifesys.sagnus.corp.application.port.VendedorRepository;
 import com.slifesys.sagnus.corp.domain.model.vendedor.Vendedor;
 import com.slifesys.sagnus.shared.error.NotFoundException;
@@ -16,7 +16,7 @@ public class AlterarVendedorUseCase {
     private final VendedorRepository vendedorRepository;
 
     @Transactional
-    public VendedorResult execute(AlterarVendedorCommand command) {
+    public VendedorDTO execute(AlterarVendedorCommand command) {
         Vendedor vendedor = vendedorRepository.findById(command.getId())
                 .orElseThrow(
                         () -> new NotFoundException("CORP-404", "Vendedor nao encontrado com id: " + command.getId()));
@@ -32,6 +32,11 @@ public class AlterarVendedorUseCase {
                 command.getUsuAlteracao());
 
         Vendedor salvo = vendedorRepository.save(atualizado);
-        return VendedorResult.from(salvo);
+        return VendedorDTO.builder()
+                .id(salvo.getId())
+                .idPessoa(salvo.getIdPessoa())
+                .comissao(salvo.getComissao())
+                .meta(salvo.getMeta())
+                .build();
     }
 }

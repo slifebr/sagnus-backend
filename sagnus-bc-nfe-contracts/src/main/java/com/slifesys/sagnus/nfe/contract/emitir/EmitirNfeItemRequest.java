@@ -1,4 +1,4 @@
-package com.slifesys.sagnus.nfe.application.command;
+package com.slifesys.sagnus.nfe.contract.emitir;
 
 import lombok.Builder;
 import lombok.Value;
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Value
 @Builder
-public class EmitirNfeItemCommand {
+public class EmitirNfeItemRequest {
     int nItem;
 
     Long produtoId;
@@ -25,9 +25,8 @@ public class EmitirNfeItemCommand {
     BigDecimal outras;
 
     // ===== RTC (IBS/CBS) - MVP =====
-    // Se preencher IBS/CBS, preencha pelo menos base/aliquota/valor. Regime pode ser omitido (default REGULAR).
-    String cstIbsCbs;      // 3 dígitos (ex.: 000)
-    String cClassTrib;     // 6 dígitos (ex.: 410031)
+    String cstIbsCbs;      // 3 dígitos
+    String cClassTrib;     // 6 dígitos
 
     BigDecimal ibsBase;
     BigDecimal ibsAliquota;
@@ -37,5 +36,5 @@ public class EmitirNfeItemCommand {
     BigDecimal cbsAliquota;
     BigDecimal cbsValor;
 
-    String regimeIbsCbs;   // enum name: REGULAR, ISENCAO, ...
+    String regimeIbsCbs;   // enum name
 }

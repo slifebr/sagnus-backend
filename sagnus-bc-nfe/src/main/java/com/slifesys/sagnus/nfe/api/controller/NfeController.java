@@ -1,11 +1,8 @@
 package com.slifesys.sagnus.nfe.api.controller;
 
-import com.slifesys.sagnus.nfe.application.command.EmitirNfeCommand;
-import com.slifesys.sagnus.nfe.application.result.EmitirNfeResult;
 import com.slifesys.sagnus.nfe.application.usecase.EmitirNfeUseCase;
-import com.slifesys.sagnus.nfe.application.mapper.NfeCommandMapper;
-import com.slifesys.sagnus.nfe.api.dto.EmitirNfeRequest;
-import com.slifesys.sagnus.nfe.api.dto.EmitirNfeResponse;
+import com.slifesys.sagnus.nfe.contract.emitir.EmitirNfeRequest;
+import com.slifesys.sagnus.nfe.contract.emitir.EmitirNfeResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +16,6 @@ import java.net.URI;
 public class NfeController {
 
     private final EmitirNfeUseCase emitirNfeUseCase;
-    private final NfeCommandMapper nfeCommandMapper;
 
     /**
      * Endpoint mínimo para rodar end-to-end.
@@ -29,15 +25,8 @@ public class NfeController {
      */
     @PostMapping("/notas-fiscais:emitir")
     public ResponseEntity<EmitirNfeResponse> emitir(@Valid @RequestBody EmitirNfeRequest req) {
-        EmitirNfeCommand cmd = nfeCommandMapper.toCommand(req);
-
-        EmitirNfeResult result = emitirNfeUseCase.execute(cmd);
-
-        EmitirNfeResponse resp = EmitirNfeResponse.builder()
-                .nfeId(result.getNfeId())
-                .status(result.getStatus())
-                .mensagem(result.getMensagem())
-                .build();
+        
+        EmitirNfeResponse resp = emitirNfeUseCase.execute(req);
 
         return ResponseEntity.created(URI.create("/api/v1/nfe/notas-fiscais/" + resp.getNfeId())).body(resp);
     }
