@@ -20,6 +20,11 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
@@ -84,6 +89,20 @@
         <dependency>
             <groupId>com.slifesys.sagnus</groupId>
             <artifactId>sagnus-bc-nfe-contracts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- BC-AUTH para endpoints REST -->
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-auth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- BC-ADM para endpoints REST -->
+        <dependency>
+            <groupId>com.slifesys.sagnus</groupId>
+            <artifactId>sagnus-bc-adm</artifactId>
             <version>${project.version}</version>
         </dependency>
 
