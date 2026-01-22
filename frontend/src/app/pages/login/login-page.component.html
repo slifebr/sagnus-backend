@@ -1,0 +1,31 @@
+<div class="login">
+  <div class="login__card">
+    <header class="login__header">
+      <h1>Sagnus ERP</h1>
+      <p>Acesso ao painel administrativo</p>
+    </header>
+
+    <form class="login__form" [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        E-mail
+        <input type="email" formControlName="username" placeholder="usuario@sagnus.com.br" />
+      </label>
+
+      <label>
+        Senha
+        <input type="password" formControlName="password" placeholder="••••••••" />
+      </label>
+
+      <p class="login__error" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <button type="submit" class="login__button" [disabled]="isLoading">
+        {{ isLoading ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <div class="login__footer">
+      <span>Precisa de suporte?</span>
+      <a href="mailto:suporte@sagnus.com.br">Fale com o time</a>
+    </div>
+  </div>
+</div>
